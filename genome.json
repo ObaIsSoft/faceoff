@@ -1,0 +1,17 @@
+{
+  "genome": {
+    "dnaHash": "83df2645a476700131322d3a469001321f159a1ad4bdf35ea47b8fd4afa5336e",
+    "chromosomes": {
+      "ch3_type_display": {
+        "family": "Jolly Lodger, cursive, sans-serif",
+        "displayName": "Jolly Lodger",
+        "importUrl": "https://fonts.googleapis.com/css2?family=Jolly+Lodger:wght@400;700&display=swap"
+      },
+      "ch16_typography": {
+        "display": {
+          "size": "120px"
+        }
+      }
+    }
+  }
+}
