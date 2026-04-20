@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>About | Faceoff</title>
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body class="scrollable-page">
+    <header class="nav-top">
+        <nav>
+            <ul class="nav-links">
+                <li><a href="index.html">home</a></li>
+                <li><a href="catalog.html">catalog</a></li>
+                <li><a href="showroom.html">showroom</a></li>
+                <li><a href="compare.html">compare</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="about-container">
+        
+        <!-- Intro Section -->
+        <section class="about-section">
+            <h1 class="editorial-header">Experimental <br> Mobility</h1>
+            <div class="body-text">
+                <p>Faceoff is an experimental automotive company dedicated to the precision import of premium vehicles into Nigeria. We bridge the gap between global engineering excellence and local accessibility, curating a selection that defines modern craftsmanship.</p>
+                <p>We provide top-notch quality and comprehensive post-purchase services, backed by extensive warranties for all vehicles purchased at affordable, transparent price points.</p>
+            </div>
+            
+            <div class="category-grid">
+                <div class="category-item">Family Cars</div>
+                <div class="category-item">Starter Vehicles</div>
+                <div class="category-item">Electric (EV)</div>
+                <div class="category-item">Sedans</div>
+                <div class="category-item">Escalades</div>
+                <div class="category-item">Supercars</div>
+                <div class="category-item">Vintage & Classics</div>
+            </div>
+        </section>
+
+        <!-- CEO Quote Section -->
+        <section class="about-section">
+            <div class="ceo-section">
+                <div>
+                    <img src="assets/ceo.png" alt="CEO of Faceoff" class="ceo-image">
+                </div>
+                <div class="ceo-quote">
+                    <span class="quote-mark">"</span>
+                    <p class="ceo-text">Mobility is not just about transportation; it is about the seamless integration of global standards into the Nigerian lifestyle.</p>
+                    <p class="body-text" style="font-size: 0.8rem; letter-spacing: 0.1em; text-transform: uppercase; font-weight: 700;">— Our CEO on Vision</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Operations Section -->
+        <section class="about-section">
+            <div class="standards-grid">
+                <div>
+                    <h2 style="font-family: var(--font-display); font-size: 2.5rem; text-transform: uppercase;">Global Standards</h2>
+                    <p class="body-text">We adhere to global industry standards and maintain absolute transparency in every transaction. Faceoff is a fully licensed import entity, ensuring that your investment is protected by legal integrity and professional ethics.</p>
+                </div>
+                <div>
+                    <h2 style="font-family: var(--font-display); font-size: 2.5rem; text-transform: uppercase;">Regional Coverage</h2>
+                    <p class="body-text">Headquartered in Lagos, our operations extend across Nigeria, Ghana, Togo, and Benin Republic. We deliver directly to your doorstep via trusted delivery partners or our exclusive in-house distribution networks.</p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    <script>
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.about-section').forEach(section => {
+            observer.observe(section);
+        });
+    </script>
+</body>
+</html>

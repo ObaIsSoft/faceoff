@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compare | Faceoff</title>
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body>
+    <header class="nav-top">
+        <nav>
+            <ul class="nav-links">
+                <li><a href="index.html">home</a></li>
+                <li><a href="about.html">about</a></li>
+                <li><a href="catalog.html">catalog</a></li>
+                <li><a href="showroom.html">showroom</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="compare-wrapper">
+        <section class="faceoff-zone">
+
+            <div class="faceoff-col">
+                <div class="stack-filter">
+                    <div class="sf-group">
+                        <span class="sf-label">VEHICLE TYPE</span>
+                        <div class="sf-control">
+                            <select class="sf-select"><option>ALL</option><option>SUV</option><option>SEDAN</option><option>TRUCK</option></select>
+                            <span class="sf-chevron">∨</span>
+                        </div>
+                    </div>
+                    <div class="sf-group">
+                        <span class="sf-label">CATEGORY</span>
+                        <div class="sf-control">
+                            <select class="sf-select"><option>ALL</option><option>LUXURY</option><option>SPORT</option><option>OFF-ROAD</option></select>
+                            <span class="sf-chevron">∨</span>
+                        </div>
+                    </div>
+                    <div class="sf-group">
+                        <span class="sf-label">BRAND</span>
+                        <div class="sf-control">
+                            <input type="text" class="sf-input" placeholder="SEARCH BRAND...">
+                        </div>
+                    </div>
+                    <div class="sf-group">
+                        <span class="sf-label">MAX MILEAGE</span>
+                        <div class="sf-control">
+                            <select class="sf-select"><option>ANY</option><option>10,000</option><option>50,000</option><option>100,000</option></select>
+                            <span class="sf-chevron">∨</span>
+                        </div>
+                    </div>
+                    <div class="sf-group">
+                        <span class="sf-label">PRICE RANGE</span>
+                        <div class="sf-control">
+                            <input type="range" class="sf-range" min="100000" max="6000000000" value="200000000" step="100000" oninput="syncPriceFromSlider(this)">
+                        </div>
+                        <div class="sf-range-bounds">
+                            <span>₦100K</span>
+                            <input type="text" class="sf-range-val sf-price-input" value="₦200M" oninput="syncPriceFromInput(this)" onblur="formatPriceInput(this)">
+                            <span>₦6B</span>
+                        </div>
+                    </div>
+                    <div class="sf-group">
+                        <span class="sf-label">ENERGY</span>
+                        <div class="sf-control">
+                            <select class="sf-select"><option>ALL</option><option>PETROL</option><option>HYBRID</option><option>ELECTRIC</option></select>
+                            <span class="sf-chevron">∨</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="left-stack" class="car-stack"></div>
+            </div>
+
+            <div class="vs-divider">VS</div>
+
+            <div class="faceoff-col">
+                <div class="stack-filter">
+                    <div class="sf-group">
+                        <span class="sf-label">VEHICLE TYPE</span>
+                        <div class="sf-control">
+                            <select class="sf-select"><option>ALL</option><option>SUV</option><option>SEDAN</option><option>TRUCK</option></select>
+                            <span class="sf-chevron">∨</span>
+                        </div>
+                    </div>
+                    <div class="sf-group">
+                        <span class="sf-label">CATEGORY</span>
+                        <div class="sf-control">
+                            <select class="sf-select"><option>ALL</option><option>LUXURY</option><option>SPORT</option><option>OFF-ROAD</option></select>
+                            <span class="sf-chevron">∨</span>
+                        </div>
+                    </div>
+                    <div class="sf-group">
+                        <span class="sf-label">BRAND</span>
+                        <div class="sf-control">
+                            <input type="text" class="sf-input" placeholder="SEARCH BRAND...">
+                        </div>
+                    </div>
+                    <div class="sf-group">
+                        <span class="sf-label">MAX MILEAGE</span>
+                        <div class="sf-control">
+                            <select class="sf-select"><option>ANY</option><option>10,000</option><option>50,000</option><option>100,000</option></select>
+                            <span class="sf-chevron">∨</span>
+                        </div>
+                    </div>
+                    <div class="sf-group">
+                        <span class="sf-label">PRICE RANGE</span>
+                        <div class="sf-control">
+                            <input type="range" class="sf-range" min="100000" max="6000000000" value="200000000" step="100000" oninput="syncPriceFromSlider(this)">
+                        </div>
+                        <div class="sf-range-bounds">
+                            <span>₦100K</span>
+                            <input type="text" class="sf-range-val sf-price-input" value="₦200M" oninput="syncPriceFromInput(this)" onblur="formatPriceInput(this)">
+                            <span>₦6B</span>
+                        </div>
+                    </div>
+                    <div class="sf-group">
+                        <span class="sf-label">ENERGY</span>
+                        <div class="sf-control">
+                            <select class="sf-select"><option>ALL</option><option>PETROL</option><option>HYBRID</option><option>ELECTRIC</option></select>
+                            <span class="sf-chevron">∨</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="right-stack" class="car-stack"></div>
+            </div>
+
+        </section>
+    </main>
+
+    <script src="js/cars-data.js"></script>
+    <script>
+        function formatNaira(val) {
+            val = +val;
+            if (val >= 1e9) return '₦' + (val % 1e9 === 0 ? val / 1e9 : (val / 1e9).toFixed(1)) + 'B';
+            if (val >= 1e6) return '₦' + Math.round(val / 1e6) + 'M';
+            if (val >= 1e3) return '₦' + Math.round(val / 1e3) + 'K';
+            return '₦' + val;
+        }
+
+        function parseNaira(str) {
+            str = str.replace(/[₦,\s]/g, '').toUpperCase();
+            if (str.endsWith('B')) return parseFloat(str) * 1e9;
+            if (str.endsWith('M')) return parseFloat(str) * 1e6;
+            if (str.endsWith('K')) return parseFloat(str) * 1e3;
+            return parseFloat(str);
+        }
+
+        function syncPriceFromSlider(slider) {
+            const input = slider.closest('.sf-group').querySelector('.sf-price-input');
+            input.value = formatNaira(slider.value);
+        }
+
+        function syncPriceFromInput(input) {
+            const raw = parseNaira(input.value);
+            if (!isNaN(raw)) {
+                const slider = input.closest('.sf-group').querySelector('.sf-range');
+                slider.value = Math.min(6e9, Math.max(1e5, raw));
+            }
+        }
+
+        function formatPriceInput(input) {
+            const raw = parseNaira(input.value);
+            if (!isNaN(raw)) input.value = formatNaira(Math.min(6e9, Math.max(1e5, raw)));
+        }
+    </script>
+    <script>
+        function buildCar(id, overrides = {}) {
+            const car = CARS[id];
+            return {
+                id,
+                name: car.name,
+                img: car.img,
+                price: car.price,
+                specs: { power: car.power, speed: car.speed, engine: car.engine },
+                ...overrides
+            };
+        }
+
+        const leftCars = [
+            buildCar("mercedes-g-wagon"),
+            buildCar("range-rover"),
+            buildCar("elite-suv", { flipped: true })
+        ];
+
+        const rightCars = [
+            buildCar("lexus-lx-600"),
+            buildCar("escalade-v"),
+            buildCar("luxury-lx")
+        ];
+
+        class CarStack {
+            constructor(containerId, carData) {
+                this.container = document.getElementById(containerId);
+                this.cars = carData;
+                this.index = 0;
+                this.isTransitioning = false;
+                
+                this.init();
+                this.setupEvents();
+            }
+
+            init() {
+                this.render();
+            }
+
+            render() {
+                this.container.innerHTML = '';
+                
+                // Foreground car
+                const front = this.createItem(this.index, 'foreground');
+                this.container.appendChild(front);
+
+                // Background layer 1
+                const b1Index = (this.index + 1) % this.cars.length;
+                const b1 = this.createItem(b1Index, 'background');
+                this.container.appendChild(b1);
+
+                // Background layer 2
+                const b2Index = (this.index + 2) % this.cars.length;
+                const b2 = this.createItem(b2Index, 'background-2');
+                this.container.appendChild(b2);
+            }
+
+            createItem(idx, stateClass) {
+                const car = this.cars[idx];
+                const isForeground = stateClass.includes('foreground');
+                const div = document.createElement('div');
+                div.className = `depth-item ${stateClass}`;
+                
+                let specsHTML = '';
+                if (isForeground) {
+                    specsHTML = `
+                        <div class="car-specs-overlay">
+                            <div class="spec-pill"><span class="spec-val">${car.specs.power}</span><span class="spec-label">POWER</span></div>
+                            <div class="spec-pill"><span class="spec-val">${car.specs.speed}</span><span class="spec-label">0-100</span></div>
+                            <div class="spec-pill"><span class="spec-val">${car.specs.engine}</span><span class="spec-label">ENGINE</span></div>
+                        </div>
+                    `;
+                }
+
+                div.innerHTML = `
+                    ${specsHTML}
+                    <div class="car-visual ${car.flipped ? 'flipped' : ''}" onclick="window.location.href='showroom.html?car=${car.id}${car.flipped ? '&flipped=true' : ''}'">
+                        <img src="${car.img}" alt="${car.name}" class="car-image">
+                    </div>
+                    <span class="depth-label">${car.name}</span>
+                    <span class="depth-price">${car.price}</span>
+                `;
+                return div;
+            }
+
+            swap() {
+                if (this.isTransitioning) return;
+                this.isTransitioning = true;
+
+                const foreground = this.container.querySelector('.foreground');
+                const b1 = this.container.querySelector('.background');
+                const b2 = this.container.querySelector('.background-2');
+
+                // 1. Exit foreground
+                foreground.classList.replace('foreground', 'exiting');
+
+                // 2. Promote B1 to Foreground
+                b1.classList.replace('background', 'foreground');
+                
+                // Add specs to newly promoted foreground
+                const b1CarIdx = (this.index + 1) % this.cars.length;
+                const car = this.cars[b1CarIdx];
+                const specsDiv = document.createElement('div');
+                specsDiv.className = 'car-specs-overlay';
+                specsDiv.innerHTML = `
+                    <div class="spec-pill"><span class="spec-val">${car.specs.power}</span><span class="spec-label">POWER</span></div>
+                    <div class="spec-pill"><span class="spec-val">${car.specs.speed}</span><span class="spec-label">0-100</span></div>
+                    <div class="spec-pill"><span class="spec-val">${car.specs.engine}</span><span class="spec-label">ENGINE</span></div>
+                `;
+                b1.prepend(specsDiv);
+
+                // 3. Promote B2 to B1
+                b2.classList.replace('background-2', 'background');
+
+                // 4. Instantiate new B2
+                this.index = (this.index + 1) % this.cars.length;
+                const nextB2Idx = (this.index + 2) % this.cars.length;
+                const nextItem = this.createItem(nextB2Idx, 'background-2 hidden');
+                this.container.appendChild(nextItem);
+
+                requestAnimationFrame(() => {
+                    nextItem.classList.remove('hidden');
+                });
+
+                // Cleanup
+                setTimeout(() => {
+                    foreground.remove();
+                    this.isTransitioning = false;
+                }, 1000);
+            }
+
+            setupEvents() {
+                const handleScroll = (e) => {
+                    e.preventDefault();
+                    if (Math.abs(e.deltaY) > 50) {
+                        this.swap();
+                    }
+                };
+
+                this.container.addEventListener('wheel', handleScroll, { passive: false });
+
+                // Touch support
+                let touchStart = 0;
+                this.container.addEventListener('touchstart', (e) => {
+                    touchStart = e.touches[0].clientY;
+                });
+                this.container.addEventListener('touchmove', (e) => {
+                    const deltaY = touchStart - e.touches[0].clientY;
+                    if (Math.abs(deltaY) > 50) {
+                        this.swap();
+                        touchStart = e.touches[0].clientY;
+                    }
+                }, { passive: false });
+            }
+        }
+
+        // Initialize stacks
+        new CarStack('left-stack', leftCars);
+        new CarStack('right-stack', rightCars);
+    </script>
+</body>
+</html>
