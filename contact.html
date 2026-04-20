@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact | Faceoff</title>
+    <link rel="stylesheet" href="css/index.css">
+</head>
+<body class="scrollable-page">
+    <header class="nav-top">
+        <nav>
+            <ul class="nav-links">
+                <li><a href="index.html">home</a></li>
+                <li><a href="about.html">about</a></li>
+                <li><a href="catalog.html">catalog</a></li>
+                <li><a href="showroom.html">showroom</a></li>
+                <li><a href="compare.html">compare</a></li>
+                <li><a href="contact.html" style="opacity:1;">contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="contact-wrapper">
+        <div class="contact-grid">
+
+            <div class="contact-context" id="contact-context">
+                <!-- filled by JS -->
+            </div>
+
+            <div class="contact-form-panel">
+                <form id="contact-form" class="contact-form" onsubmit="handleSubmit(event)">
+                    <div id="form-fields"></div>
+                    <button type="submit" class="contact-submit">Send Message <span class="submit-arrow">→</span></button>
+                </form>
+            </div>
+
+        </div>
+    </main>
+
+    <script src="js/cars-data.js"></script>
+    <script>
+        const params  = new URLSearchParams(window.location.search);
+        const type    = params.get('type');   // 'inspection' | 'enquiry'
+        const carId   = params.get('car');
+        const from    = params.get('from');   // 'about' | 'catalog'
+        const car     = carId ? CARS[carId] : null;
+
+        // ── Dynamic page title ────────────────────────────────
+        if (type === 'inspection')      document.title = 'Book Inspection | Faceoff';
+        else if (type === 'enquiry' && car) document.title = `Enquiry – ${car.name} | Faceoff`;
+        else if (type === 'enquiry')    document.title = 'Make an Enquiry | Faceoff';
+
+        // ── Context panel ─────────────────────────────────────
+        function buildContext() {
+            const ctx = document.getElementById('contact-context');
+
+            if (type === 'inspection' && car) {
+                ctx.innerHTML = `
+                    <span class="contact-eyebrow">Schedule a Viewing</span>
+                    <h1 class="contact-heading">Book an<br>Inspection</h1>
+                    <div class="contact-car-preview">
+                        <img src="${car.img}" alt="${car.name}" class="contact-car-img">
+                        <div class="contact-car-badge">
+                            <span class="contact-car-name">${car.name}</span>
+                            <span class="contact-car-price">${car.price}</span>
+                        </div>
+                    </div>
+                    <p class="contact-context-note">Choose your preferred date and city. Our team will confirm availability within 24 hours and send full directions.</p>
+                    <div class="contact-meta">
+                        <div class="contact-meta-item"><span class="contact-meta-label">Response</span><span class="contact-meta-val">Within 24 hours</span></div>
+                        <div class="contact-meta-item"><span class="contact-meta-label">Locations</span><span class="contact-meta-val">Lagos · Abuja · PH · Enugu</span></div>
+                    </div>`;
+
+            } else if (type === 'enquiry' && car) {
+                ctx.innerHTML = `
+                    <span class="contact-eyebrow">Vehicle Enquiry</span>
+                    <h1 class="contact-heading">Tell Us<br>What You<br>Need</h1>
+                    <div class="contact-car-preview">
+                        <img src="${car.img}" alt="${car.name}" class="contact-car-img">
+                        <div class="contact-car-badge">
+                            <span class="contact-car-name">${car.name}</span>
+                            <span class="contact-car-price">${car.price}</span>
+                        </div>
+                    </div>
+                    <p class="contact-context-note">We'll respond with full documentation, availability status, and a transparent cost breakdown — no surprises.</p>
+                    <div class="contact-meta">
+                        <div class="contact-meta-item"><span class="contact-meta-label">Response</span><span class="contact-meta-val">Within 24 hours</span></div>
+                        <div class="contact-meta-item"><span class="contact-meta-label">Includes</span><span class="contact-meta-val">VIN report · Service history · Pricing</span></div>
+                    </div>`;
+
+            } else if (type === 'enquiry' && from === 'about') {
+                ctx.innerHTML = `
+                    <span class="contact-eyebrow">General Enquiry</span>
+                    <h1 class="contact-heading">We'd Love<br>to Hear<br>From You</h1>
+                    <p class="contact-context-note">Whether it's a question about our process, a specific vehicle you have in mind, or a partnership opportunity — drop us a message.</p>
+                    <div class="contact-meta">
+                        <div class="contact-meta-item"><span class="contact-meta-label">Headquarters</span><span class="contact-meta-val">Lagos, Nigeria</span></div>
+                        <div class="contact-meta-item"><span class="contact-meta-label">Hours</span><span class="contact-meta-val">Mon – Sat, 9am – 6pm WAT</span></div>
+                        <div class="contact-meta-item"><span class="contact-meta-label">Response</span><span class="contact-meta-val">Within 24 hours</span></div>
+                        <div class="contact-meta-item"><span class="contact-meta-label">Coverage</span><span class="contact-meta-val">Nigeria · Ghana · Togo · Benin</span></div>
+                    </div>`;
+
+            } else {
+                ctx.innerHTML = `
+                    <span class="contact-eyebrow">Faceoff Automotive</span>
+                    <h1 class="contact-heading">Let's Talk<br>Automotive</h1>
+                    <p class="contact-context-note">Looking for a specific vehicle? Want to understand our import process? Or just want to talk cars? We're here for all of it.</p>
+                    <div class="contact-meta">
+                        <div class="contact-meta-item"><span class="contact-meta-label">Email</span><span class="contact-meta-val">adebayokiisi@gmail.com</span></div>
+                        <div class="contact-meta-item"><span class="contact-meta-label">Base</span><span class="contact-meta-val">Lagos, Nigeria</span></div>
+                        <div class="contact-meta-item"><span class="contact-meta-label">Hours</span><span class="contact-meta-val">Mon – Sat, 9am – 6pm WAT</span></div>
+                        <div class="contact-meta-item"><span class="contact-meta-label">Coverage</span><span class="contact-meta-val">Nigeria · Ghana · Togo · Benin</span></div>
+                    </div>`;
+            }
+        }
+
+        // ── Form fields ───────────────────────────────────────
+        function buildForm() {
+            const fields = document.getElementById('form-fields');
+            const msg    = defaultMessage();
+            const today  = new Date().toISOString().split('T')[0];
+
+            let html = `
+                <div class="cf-group">
+                    <label class="cf-label">Full Name</label>
+                    <input type="text" name="name" class="cf-input" required placeholder="Your full name">
+                </div>
+                <div class="cf-row--half">
+                    <div class="cf-group">
+                        <label class="cf-label">Email Address</label>
+                        <input type="email" name="email" class="cf-input" required placeholder="your@email.com">
+                    </div>
+                    <div class="cf-group">
+                        <label class="cf-label">Phone Number</label>
+                        <input type="tel" name="phone" class="cf-input" placeholder="+234 xxx xxx xxxx">
+                    </div>
+                </div>`;
+
+            if (type === 'inspection') {
+                html += `
+                <div class="cf-row--half">
+                    <div class="cf-group">
+                        <label class="cf-label">Preferred Inspection Date</label>
+                        <input type="date" name="date" class="cf-input" required min="${today}">
+                    </div>
+                    <div class="cf-group">
+                        <label class="cf-label">Inspection Location</label>
+                        <select name="location" class="cf-input cf-select" required>
+                            <option value="" disabled selected>Select a city</option>
+                            <option>Lagos Island</option>
+                            <option>Lagos Mainland</option>
+                            <option>Abuja</option>
+                            <option>Port Harcourt</option>
+                            <option>Enugu</option>
+                            <option>I'll travel to your facility (Lagos)</option>
+                        </select>
+                    </div>
+                </div>`;
+            }
+
+            if (!type) {
+                html += `
+                <div class="cf-group">
+                    <label class="cf-label">Subject</label>
+                    <input type="text" name="subject" class="cf-input" placeholder="What is this about?">
+                </div>`;
+            }
+
+            html += `
+                <div class="cf-group">
+                    <label class="cf-label">Message</label>
+                    <textarea name="message" class="cf-input cf-textarea" rows="6">${msg}</textarea>
+                </div>`;
+
+            fields.innerHTML = html;
+        }
+
+        function defaultMessage() {
+            if (type === 'inspection' && car)
+                return `Hi Faceoff,\n\nI'd like to book an inspection for the ${car.name} (${car.price}).\n\nPlease confirm availability at my chosen date and location.\n\nThank you.`;
+            if (type === 'enquiry' && car)
+                return `Hi Faceoff,\n\nI'd like to make enquiries about the ${car.name} (${car.price}).\n\nCould you provide details on availability, full specifications, and next steps?\n\nThank you.`;
+            if (from === 'about' || type === 'enquiry')
+                return `Hi Faceoff,\n\nI came across your website and I'd like to know more about what you do and how your import process works.\n\nThank you.`;
+            return '';
+        }
+
+        // ── Submit → mailto ───────────────────────────────────
+        function handleSubmit(e) {
+            e.preventDefault();
+            const data     = new FormData(e.target);
+            const name     = data.get('name');
+            const email    = data.get('email');
+            const phone    = data.get('phone') || 'Not provided';
+            const message  = data.get('message');
+            const date     = data.get('date')     || '';
+            const location = data.get('location') || '';
+            const subjectInput = data.get('subject') || '';
+
+            let subject;
+            if (type === 'inspection' && car) subject = `Inspection Request — ${car.name}`;
+            else if (type === 'enquiry' && car) subject = `Vehicle Enquiry — ${car.name}`;
+            else if (subjectInput) subject = subjectInput;
+            else subject = 'Faceoff — New Enquiry';
+
+            let body = `Name: ${name}\nEmail: ${email}\nPhone: ${phone}\n`;
+            if (date)     body += `Preferred Date: ${date}\n`;
+            if (location) body += `Location: ${location}\n`;
+            body += `\n${message}`;
+
+            window.location.href = `mailto:adebayokiisi@gmail.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+        }
+
+        buildContext();
+        buildForm();
+    </script>
+</body>
+</html>
