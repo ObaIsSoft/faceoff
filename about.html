@@ -101,6 +101,17 @@
                 </div>
             </div>
         </section>
+        
+        <!-- Brand Explosion Section -->
+        <section class="explosion-section" id="brand-spiral-section">
+            <div class="explosion-sticky">
+                <div id="explosion-root" class="explosion-container">
+                    <div id="explosion-center" class="explosion-core">
+                        <img src="assets/nigeria-map.png" alt="Nigeria" class="explosion-core-img">
+                    </div>
+                </div>
+            </div>
+        </section>
 
         <!-- Full-bleed atmospheric image -->
         <section class="about-fullbleed">
@@ -268,13 +279,87 @@
     </main>
 
     <script>
+        // ── Section fade-in observer ──────────────────────────
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) entry.target.classList.add('visible');
             });
         }, { threshold: 0.08 });
-
         document.querySelectorAll('.about-section').forEach(s => observer.observe(s));
+
+        // ── Spiral bloom ──────────────────────────────────────
+        const BRANDS = [
+            "Rolls-Royce", "Bentley", "Mercedes-Benz", "BMW", "Audi", "Lexus",
+            "Land Rover", "Porsche", "Genesis", "Cadillac", "Ferrari", "Lamborghini",
+            "McLaren", "Aston Martin", "Bugatti", "Pagani", "Koenigsegg", "Maserati",
+            "Lotus", "Rimac", "Toyota", "Honda", "Ford", "Chevrolet", "Tesla",
+            "Volkswagen", "Volvo", "Jaguar", "Hyundai", "Kia", "Jeep", "Dodge",
+            "RAM", "GMC", "Alfa Romeo", "Mini", "Subaru", "Nissan", "Infiniti", "Rivian"
+        ];
+
+        const GOLDEN = 2.39996; // golden angle in radians
+        const root   = document.getElementById('explosion-root');
+        const section = document.getElementById('brand-spiral-section');
+
+        // Inject all 40 fragments
+        BRANDS.forEach(name => {
+            const el = document.createElement('span');
+            el.className = 'brand-fragment';
+            el.textContent = name;
+            root.appendChild(el);
+        });
+
+        function scrollProgress() {
+            const rect  = section.getBoundingClientRect();
+            const total = section.offsetHeight - window.innerHeight;
+            return Math.max(0, Math.min(1, -rect.top / total));
+        }
+
+        function bloom() {
+            const p    = scrollProgress();
+            const frags = root.querySelectorAll('.brand-fragment');
+            const cW   = root.offsetWidth;
+            const cH   = root.offsetHeight;
+            
+            // Recalculate maxR for mobile specifically
+            const isMobile = window.innerWidth < 768;
+            const maxR = isMobile 
+                ? Math.min(cW, cH) * 0.40  // Tighter radius for mobile
+                : Math.min(cW, cH) * 0.44;
+
+            // Core subtly grows as bloom opens
+            document.getElementById('explosion-center')
+                .style.transform = `translate(-50%,-50%) scale(${1 + p * 0.2})`;
+
+            frags.forEach((el, i) => {
+                // Each brand has a staggered birth threshold (0 → 0.65 of total scroll)
+                const birth   = (i / BRANDS.length) * 0.65;
+                const local   = Math.max(0, (p - birth) / (1 - birth + 0.001));
+                // Ease out — fast launch, gentle settle
+                const eased   = 1 - Math.pow(1 - Math.min(local, 1), 2.8);
+
+                const angle = i * GOLDEN;
+                
+                // Adjust base radius for mobile brand density
+                const baseRadiusMultiplier = isMobile ? (maxR - 50) : (maxR - 76);
+                const startRadius = isMobile ? 50 : 76;
+
+                const baseR = startRadius + i * (baseRadiusMultiplier / BRANDS.length);
+                const r     = 68 + (baseR - 68) * eased;
+                const x     = Math.cos(angle) * r;
+                const y     = Math.sin(angle) * r;
+
+                el.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
+                el.style.opacity   = Math.min(1, eased * 2.5);
+                
+                // Shrink font size slightly for mobile fragments
+                if (isMobile) el.style.fontSize = '0.6rem';
+            });
+        }
+
+        window.addEventListener('scroll', bloom, { passive: true });
+        window.addEventListener('resize', bloom, { passive: true });
+        bloom();
     </script>
 </body>
 </html>

@@ -226,14 +226,39 @@ header.nav-top .nav-links a:hover {
     }
 }
 
-/* Mobile Responsiveness */
+/* Mobile Responsiveness & Micro-UI */
 @media (max-width: 768px) {
     :root {
-        --nav-gap: 1.5rem;
+        --nav-gap: 1.2rem;
+        --nav-size: 0.65rem;
     }
-    .nav-links {
-        flex-direction: column;
+    
+    body {
+        overflow-y: auto; /* Allow scrolling on mobile by default */
+        position: relative;
+    }
+
+    header.nav-top {
+        padding: 0.8rem 0; /* Compact Nav bar */
+    }
+
+    header.nav-top .nav-links {
         gap: 1rem;
+        justify-content: center;
+        width: 100%;
+        padding: 0 1rem;
+    }
+
+    header.nav-top .nav-links a {
+        font-size: 0.65rem;
+        letter-spacing: 0.15em;
+        white-space: nowrap;
+    }
+
+    .nav-links {
+        flex-direction: row; /* Force side-by-side micro-nav */
+        flex-wrap: wrap;
+        justify-content: center;
     }
 }
 
@@ -369,15 +394,87 @@ header.nav-top .nav-links a:hover {
 @keyframes slideInLeft { to { transform: translateX(0); opacity: 1; } }
 @keyframes slideInRight { to { transform: translateX(0); opacity: 1; } }
 
-/* Mobile Compare */
+/* Mobile Compare (Side-by-Side Mandate) */
 @media (max-width: 900px) {
-    .faceoff-zone {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto auto auto;
-        gap: 2rem;
+    .compare-wrapper {
+        padding-top: 15vh; /* Less top padding on small screens */
     }
-    .vs-divider { font-size: 4rem; margin: 1rem 0; }
-    .car-visual { max-width: 100%; }
+
+    .faceoff-zone {
+        grid-template-columns: 1fr 40px 1fr; /* Narrower VS column */
+        padding: 0 1rem; /* Less horizontal padding */
+        gap: 0.5rem;
+    }
+
+    .vs-divider { 
+        font-size: 2.5rem; 
+        margin: 0;
+        letter-spacing: -0.05em;
+    }
+
+    .car-visual { 
+        max-width: 100%; 
+        aspect-ratio: 1; /* Squarer on mobile for stacking depth */
+    }
+
+    .depth-item .depth-label {
+        font-size: 0.5rem;
+        letter-spacing: 0.1em;
+    }
+
+    .depth-item .depth-price {
+        font-size: 0.45rem;
+    }
+
+    /* Compact Spec Overlays for mobile */
+    .car-specs-overlay {
+        bottom: 0px;
+        left: 0;
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        gap: 2px;
+        z-index: 10;
+        pointer-events: none;
+    }
+
+    .spec-pill {
+        padding: 4px 6px;
+        background: black;
+        color: white;
+        transform: scale(0.7); /* Shrink significantly */
+        transform-origin: bottom center;
+        margin: -2px;
+    }
+
+    .spec-val { font-size: 0.45rem; }
+    .spec-label { font-size: 0.35rem; }
+
+    /* Shrink the filter sidebar if it's visible or repositioned */
+    .stack-filter {
+        position: static;
+        width: 100%;
+        margin-bottom: 2rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+
+    .sf-group {
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        padding: 1rem 0;
+    }
+
+    .sf-label { font-size: 0.45rem; }
+    .sf-select, .sf-input { font-size: 0.7rem; }
+}
+
+@media (max-width: 480px) {
+    .faceoff-zone {
+        grid-template-columns: 1fr 30px 1fr;
+    }
+    .vs-divider { font-size: 1.8rem; }
+    .car-visual { aspect-ratio: 16/10; }
 }
 
 /* Comparison Filter Bar */
@@ -489,8 +586,20 @@ header.nav-top .nav-links a:hover {
 
 #left-stack .depth-item.background-2 {
     transform: translateX(45%) translateZ(-1000px) scale(0.4);
-    opacity: 0.1;
+    opacity: 0.15;
     filter: blur(10px);
+}
+
+#left-stack .depth-item.background-3 {
+    transform: translateX(65%) translateZ(-1500px) scale(0.3);
+    opacity: 0.08;
+    filter: blur(15px);
+}
+
+#left-stack .depth-item.background-4 {
+    transform: translateX(80%) translateZ(-2000px) scale(0.2);
+    opacity: 0.04;
+    filter: blur(20px);
 }
 
 /* Right Stack Vanishing Point: Recedes toward Left-Center */
@@ -509,8 +618,20 @@ header.nav-top .nav-links a:hover {
 
 #right-stack .depth-item.background-2 {
     transform: translateX(-45%) translateZ(-1000px) scale(0.4);
-    opacity: 0.1;
+    opacity: 0.15;
     filter: blur(10px);
+}
+
+#right-stack .depth-item.background-3 {
+    transform: translateX(-65%) translateZ(-1500px) scale(0.3);
+    opacity: 0.08;
+    filter: blur(15px);
+}
+
+#right-stack .depth-item.background-4 {
+    transform: translateX(-80%) translateZ(-2000px) scale(0.2);
+    opacity: 0.04;
+    filter: blur(20px);
 }
 
 .depth-item.exiting {
@@ -852,25 +973,51 @@ body.scrollable-page {
     align-items: flex-start;
 }
 
-.catalog-item-name {
-    font-family: var(--font-display);
-    font-size: 2rem;
-    text-transform: uppercase;
-}
+@media (max-width: 900px) {
+    .catalog-container { padding: 4rem 1.5rem; }
+    
+    .catalog-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 1rem;
+        margin-bottom: 2rem;
+    }
 
-.catalog-item-price {
-    font-family: var(--font-nav);
-    font-weight: 900;
-    font-size: 1.2rem;
-    color: #000;
-}
+    .catalog-title { font-size: 2.5rem; }
 
-.catalog-item-meta {
-    font-size: 0.7rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    opacity: 0.5;
-    margin-top: 0.5rem;
+    .catalog-filters {
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .caf-controls {
+        flex-direction: column;
+        gap: 1rem;
+    }
+
+    .caf-pills {
+        overflow-x: auto;
+        padding-bottom: 0.5rem;
+        scrollbar-width: none;
+    }
+    .caf-pills::-webkit-scrollbar { display: none; }
+
+    .catalog-grid {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+
+    .catalog-card { padding-bottom: 2rem; border-bottom: 1px solid rgba(0,0,0,0.05); }
+    .catalog-card:last-child { border-bottom: none; }
+
+    .catalog-item-info {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .catalog-item-name { font-size: 1.5rem; }
+    .catalog-item-price { font-size: 1rem; }
 }
 
 /* ─── About Page ─────────────────────────────────────────── */
@@ -1318,14 +1465,47 @@ body.scrollable-page {
 }
 
 @media (max-width: 900px) {
+    .about-container { padding: 0 1rem; }
+    
+    .editorial-header { font-size: 3.5rem; margin-bottom: 2rem; }
+    
     .about-hero-grid,
-    .about-cta-inner { grid-template-columns: 1fr; gap: 3rem; }
+    .ceo-section,
+    .standards-grid,
+    .about-cta-inner { 
+        grid-template-columns: 1fr; 
+        gap: 3rem; 
+        text-align: center;
+    }
+
+    .ceo-quote {
+        border-left: none;
+        border-top: 1px solid black;
+        padding-left: 0;
+        padding-top: 2rem;
+    }
+
+    .about-stat-bar {
+        padding: 2rem 0;
+        gap: 1.5rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .stat-item { flex: 0 0 40%; }
+    .stat-val { font-size: 1.5rem; }
+
+    .about-section-title { font-size: 2rem; }
+
     .services-grid { grid-template-columns: 1fr; }
     .process-steps { flex-direction: column; gap: 2rem; }
     .process-step { border-left: none; border-top: 1px solid rgba(0,0,0,0.08); padding: 1.5rem 0 0; }
     .process-step:first-child { border-top: none; padding-top: 0; }
     .manifesto-rule { display: none; }
     .stat-divider { display: none; }
+
+    .cat-item-rich { gap: 1rem; }
+    .cat-name-rich { font-size: 1.2rem; }
 }
 
 /* ─── Contact Page ───────────────────────────────────────── */
@@ -1631,115 +1811,64 @@ body.showroom-light header.nav-top .nav-links a {
     overflow: hidden;
 }
 
-/* Three-column editorial layout */
-.showroom-layout {
-    position: absolute;
-    inset: 0;
-    z-index: 10;
-    display: grid;
-    grid-template-columns: 260px 1fr 260px;
-    align-items: center;
-    padding: 5rem 2rem 2rem;
-}
+/* Showroom Mobile Refactor */
+@media (max-width: 900px) {
+    .showroom-layout {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+        padding: 5rem 1.5rem 2rem;
+        gap: 1.5rem;
+    }
 
-.showroom-center {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-}
+    .spec-panel {
+        flex-direction: row;
+        flex-wrap: wrap;
+        padding: 0;
+        border: none;
+        height: auto;
+        justify-content: center;
+        gap: 1rem;
+    }
 
-/* Spec panels flanking the car */
-.spec-panel {
-    color: #fff;
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    height: 100%;
-    justify-content: center;
-    padding-bottom: 3rem;
-}
+    .spec-panel--left, .spec-panel--right {
+        padding: 0;
+        border: none;
+    }
 
-.spec-panel--left {
-    padding-right: 2rem;
-    border-right: 1px solid rgba(255,255,255,0.05);
-}
+    .sp-row {
+        flex: 0 0 calc(50% - 1rem); /* Side-by-side specs on mobile */
+        border-bottom-color: rgba(255,255,255,0.08);
+    }
 
-.spec-panel--right {
-    padding-left: 2rem;
-    border-left: 1px solid rgba(255,255,255,0.05);
-}
+    .sp-section-label { 
+        width: 100%; 
+        text-align: center; 
+        font-size: 0.38rem;
+    }
 
-.sp-section-label {
-    font-family: var(--font-nav);
-    font-size: 0.42rem;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    font-weight: 900;
-    opacity: 0.25;
-    margin-top: 0.9rem;
-    margin-bottom: 0.1rem;
-}
+    .sp-label { font-size: 0.42rem; }
+    .sp-val { font-size: 0.5rem; }
 
-.sp-section-label:first-child { margin-top: 0; }
+    .showroom-center {
+        order: 2; /* Keep car in middle */
+    }
 
-.sp-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    gap: 0.8rem;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-    padding-bottom: 0.3rem;
-}
+    .showroom-title { font-size: 1.8rem; }
+    .showroom-price { font-size: 0.75rem; }
 
-.sp-row--block {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.2rem;
-}
+    .flashlight-beam {
+        background: radial-gradient(400px 300px at 50% 20%, rgba(255, 255, 255, 0.25) 0%, transparent 80%);
+    }
+    
+    .flashlight-beam.right {
+        background: radial-gradient(400px 300px at 50% 50%, rgba(255, 255, 255, 0.2) 0%, transparent 80%);
+    }
 
-.sp-label {
-    font-family: var(--font-nav);
-    font-size: 0.48rem;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-    opacity: 0.35;
-    white-space: nowrap;
-    flex-shrink: 0;
-}
-
-.sp-val {
-    font-family: var(--font-nav);
-    font-size: 0.58rem;
-    font-weight: 700;
-    text-align: right;
-    color: rgba(255,255,255,0.85);
-    letter-spacing: 0.02em;
-}
-
-.sp-row--block .sp-val {
-    text-align: left;
-    font-size: 0.52rem;
-    font-weight: 400;
-    opacity: 0.65;
-    line-height: 1.5;
-}
-
-.sp-divider {
-    height: 1px;
-    background: rgba(255,255,255,0.06);
-    margin: 0.4rem 0;
-    flex-shrink: 0;
-}
-
-.sp-funfact {
-    font-family: var(--font-nav);
-    font-size: 0.52rem;
-    font-style: italic;
-    opacity: 0.4;
-    line-height: 1.7;
-    margin: 0;
+    .flashlight-source {
+        width: 150px;
+        height: 150px;
+        top: -50px;
+    }
 }
 
 .showroom-stage::before, .showroom-stage::after, .hex-grid-container {
@@ -2146,4 +2275,574 @@ body.showroom-light header.nav-top .nav-links a {
 
 .sf-price-input:focus {
     border-bottom-color: #000;
+}
+
+/* Explosion Section — scroll-driven spiral bloom */
+.explosion-section {
+    position: relative;
+    height: 320vh;
+    display: block;
+    background: #fff;
+}
+
+.explosion-sticky {
+    position: sticky;
+    top: 0;
+    height: 100vh;
+    width: 100%;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.explosion-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+.explosion-core {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 128px;
+    height: 128px;
+    background: transparent;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.explosion-core-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+.brand-fragment {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-family: var(--font-nav);
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #000;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    will-change: transform, opacity;
+}
+
+/* Brand Fragment Logo Expansion */
+.brand-fragment {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.brand-logo-img {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    filter: grayscale(1) invert(0); /* Black logos on white bg */
+    transition: all 0.3s ease;
+    opacity: 0.4;
+}
+
+.brand-fragment:hover .brand-logo-img {
+    filter: grayscale(0) invert(0);
+    opacity: 1;
+    transform: scale(1.1);
+}
+
+.brand-fragment .brand-name {
+    font-size: 0.6rem;
+    font-family: var(--font-nav);
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    font-weight: 700;
+}
+
+/* --- Contact Page Mobile Refinement --- */
+@media (max-width: 768px) {
+    .contact-wrapper {
+        padding: 4rem 1.5rem 2rem;
+        min-height: auto;
+    }
+
+    .contact-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 3rem;
+    }
+
+    .contact-context {
+        padding-right: 0;
+        border-right: none;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 3rem;
+    }
+
+    .contact-heading {
+        font-size: 3rem;
+        line-height: 1.1;
+    }
+
+    .contact-car-preview {
+        max-width: 100%;
+        margin: 2rem 0;
+    }
+
+    .contact-meta {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+
+    .contact-form-panel {
+        padding-left: 0;
+    }
+
+    .cf-row--half {
+        grid-template-columns: 1fr;
+    }
+
+    .contact-submit {
+        width: 100%;
+        justify-content: center;
+        padding: 1.5rem;
+    }
+
+    /* Fixed top nav for mobile readability */
+    .nav-top {
+        padding: 1.5rem;
+    }
+    
+    .nav-links {
+        gap: 1rem;
+        flex-wrap: wrap;
+        justify-content: center;
+    }
+
+    .nav-links a {
+        font-size: 0.6rem;
+    }
+}
+
+/* Showcase Page (Showroom) Typography Polish */
+.showroom-title {
+    font-family: var(--font-display) !important;
+    font-size: clamp(3rem, 10vw, 6rem) !important;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    line-height: 0.9;
+    margin-bottom: 0.2rem;
+}
+
+.showroom-price {
+    font-family: var(--font-nav) !important;
+    font-size: 1.2rem !important;
+    letter-spacing: 0.1em;
+    opacity: 0.6;
+    margin-bottom: 2rem;
+}
+
+.sp-section-label {
+    font-family: var(--font-display) !important;
+    font-size: 1.5rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-bottom: 1.5rem;
+    color: #fff;
+    opacity: 0.9;
+}
+
+.sp-label {
+    font-family: var(--font-nav) !important;
+    font-size: 0.65rem !important;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    font-weight: 700;
+}
+
+.sp-val {
+    font-family: var(--font-nav) !important;
+    font-size: 0.85rem !important;
+    letter-spacing: 0.02em;
+}
+
+.sp-funfact {
+    font-family: var(--font-nav) !important;
+    font-size: 0.85rem !important;
+    line-height: 1.6;
+    font-style: italic;
+    opacity: 0.7;
+}
+
+.cta-btn {
+    font-family: var(--font-nav) !important;
+    font-size: 0.7rem !important;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    font-weight: 900;
+}
+
+/* Showroom Detailed Layout */
+.showroom-layout {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: grid;
+    grid-template-columns: 260px 1fr 260px;
+    align-items: center;
+    padding: 5rem 2rem 2rem;
+}
+
+.showroom-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+/* Spec panels flanking the car */
+.spec-panel {
+    color: #fff;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+    height: 100%;
+    justify-content: center;
+    padding-bottom: 3rem;
+}
+
+.spec-panel--left {
+    padding-right: 2rem;
+    border-right: 1px solid rgba(255,255,255,0.05);
+}
+
+.spec-panel--right {
+    padding-left: 2rem;
+    border-left: 1px solid rgba(255,255,255,0.05);
+}
+
+.sp-section-label {
+    font-family: var(--font-nav);
+    font-size: 0.42rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    font-weight: 900;
+    opacity: 0.25;
+    margin-top: 0.9rem;
+    margin-bottom: 0.1rem;
+}
+
+.sp-section-label:first-child { margin-top: 0; }
+
+.sp-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 0.8rem;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+    padding-bottom: 0.3rem;
+}
+
+.sp-row--block {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+}
+
+.sp-label {
+    font-family: var(--font-nav);
+    font-size: 0.48rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    opacity: 0.35;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+.sp-val {
+    font-family: var(--font-nav);
+    font-size: 0.58rem;
+    font-weight: 700;
+    text-align: right;
+    color: rgba(255,255,255,0.85);
+    letter-spacing: 0.02em;
+}
+
+.sp-row--block .sp-val {
+    text-align: left;
+    font-size: 0.52rem;
+    font-weight: 400;
+    opacity: 0.65;
+    line-height: 1.5;
+}
+
+.sp-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.06);
+    margin: 0.4rem 0;
+    flex-shrink: 0;
+}
+
+.sp-funfact {
+    font-family: var(--font-nav);
+    font-size: 0.52rem;
+    font-style: italic;
+    opacity: 0.4;
+    line-height: 1.7;
+    margin: 0;
+} 
+
+/* Showroom CTA Adjustments */
+.showroom-price {
+    font-family: var(--font-display);
+    font-size: 1.5rem;
+    color: #fff;
+    margin: 0;
+}
+
+.showroom-cta {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+}
+
+.cta-btn {
+    font-family: var(--font-nav);
+    font-size: 0.6rem;
+    letter-spacing: 0.15em;
+    text-transform: uppercase;
+    padding: 0.8rem 1.5rem;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.cta-btn--primary {
+    background: #fff;
+    color: #000;
+}
+
+.cta-btn--primary:hover {
+    background: #ccc;
+}
+
+.cta-btn--ghost {
+    border: 1px solid rgba(255,255,255,0.2);
+    color: #fff;
+}
+
+.cta-btn--ghost:hover {
+    background: rgba(255,255,255,0.05);
+    border-color: #fff;
+}
+
+/* --- Categorical Mobile Adaptations --- */
+
+@media (max-width: 768px) {
+    /* 1. Universal Layout & Navigation */
+    header.nav-top {
+        padding: 1rem;
+    }
+    .nav-links {
+        gap: 1rem;
+        font-size: 0.6rem;
+    }
+
+    /* 2. Showroom Mobile Adaptation */
+    .showroom-layout {
+        grid-template-columns: 1fr; /* Stack panels */
+        padding: 5rem 1rem 2rem;
+        overflow-y: auto; /* Allow scrolling for long lists */
+        height: auto;
+        min-height: 100vh;
+        display: block; /* Fallback for older browsers */
+    }
+
+    .showroom-center {
+        padding: 2rem 0;
+        text-align: center;
+    }
+
+    .showroom-title {
+        font-size: 2.5rem;
+    }
+
+    .spec-panel {
+        padding: 1.5rem 0;
+        height: auto;
+        border: none;
+    }
+
+    .spec-panel--left {
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        padding-right: 0;
+    }
+    
+    .spec-panel--right {
+        padding-left: 0;
+    }
+
+    /* 3. About Page Mobile Adaptation */
+    .about-hero-grid {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+    }
+
+    .editorial-header {
+        font-size: 3rem;
+    }
+
+    .about-stat-bar {
+        flex-wrap: wrap;
+        gap: 2rem;
+        justify-content: center;
+    }
+
+    .stat-divider {
+        display: none; /* Hide dividers on wrap */
+    }
+
+    .ceo-section {
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .ceo-image-wrap {
+        width: 100%;
+        max-width: 400px;
+    }
+
+    .services-grid {
+        grid-template-columns: 1fr;
+    }
+
+    /* 4. Brand Explosion Mobile Adaptation */
+    .explosion-section {
+        height: 120vh;
+    }
+    
+    .brand-fragment {
+        font-size: 0.8rem; /* Smaller labels for phone screens */
+    }
+    
+    .explosion-container {
+        transform: scale(0.7); /* Scale the whole effect down to fit viewport width */
+    }
+
+    /* 5. Compare Page Mobile Adaptation */
+    .car-lineup-container {
+        flex-direction: column;
+        height: auto;
+        padding-top: 5rem;
+    }
+
+    .car-stack-half {
+        width: 100%;
+        height: 50vh;
+        border: none;
+    }
+
+    .left-half { border-bottom: 1px solid #111; }
+
+    .vs-divider {
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-size: 1.5rem;
+    }
+
+    /* 6. Catalog Grid Mobile Adaptation */
+    .catalog-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+/* --- Mobile "Swing" Spec Panels --- */
+@media (max-width: 768px) {
+    body.showroom-mode {
+        overflow: hidden; /* Lock scroll, use panels instead */
+    }
+
+    .showroom-layout {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        overflow: visible;
+        padding-top: 0;
+    }
+
+    .spec-panel {
+        position: fixed;
+        left: 0;
+        width: 100%;
+        height: 60vh;
+        background: #050505; /* Slightly lighter than void for depth */
+        z-index: 100;
+        padding: 2rem;
+        transition: transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+        border: none !important;
+        box-shadow: 0 0 50px rgba(0,0,0,0.8);
+    }
+
+    /* Pull Tabs for Panels */
+    .spec-panel::after {
+        content: '';
+        position: absolute;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 40px;
+        height: 4px;
+        background: rgba(255,255,255,0.2);
+        border-radius: 2px;
+    }
+
+    /* Top Panel (Identity/Performance) */
+    .spec-panel--left {
+        top: 0;
+        transform: translateY(-90%); /* Hidden peek */
+        border-bottom: 1px solid rgba(255,255,255,0.1) !important;
+    }
+    .spec-panel--left::after { bottom: 10px; }
+    .spec-panel--left.active { transform: translateY(0); }
+
+    /* Bottom Panel (Interior/Tech) */
+    .spec-panel--right {
+        bottom: 0;
+        transform: translateY(90%); /* Hidden peek */
+        border-top: 1px solid rgba(255,255,255,0.1) !important;
+    }
+    .spec-panel--right::after { top: 10px; }
+    .spec-panel--right.active { transform: translateY(0); }
+
+    /* Trigger Overlay for Tapping */
+    .panel-trigger {
+        position: fixed;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 120px;
+        height: 40px;
+        z-index: 110;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: var(--font-nav);
+        font-size: 0.5rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.4);
+        cursor: pointer;
+    }
+    .trigger--top { top: 10px; }
+    .trigger--bottom { bottom: 10px; }
 }

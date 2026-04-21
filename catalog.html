@@ -62,7 +62,11 @@
 
     <script src="js/cars-data.js"></script>
     <script>
-        const CATALOG_ORDER = ["mercedes-g-wagon", "lexus-lx-600", "range-rover", "escalade-v"];
+        const CATALOG_ORDER = [
+            "mercedes-g-wagon", "lexus-lx-600", "range-rover", "escalade-v",
+            "_2026cadillac", "byd-ato3", "camry2025hybrid", "corolla2025",
+            "cybertruck", "kia2023sportage", "mercedes2025sclass"
+        ];
 
         let activeEngine = '';
         let activeSort   = '';
@@ -80,8 +84,8 @@
                 const q = activeSearch.toLowerCase();
                 results = results.filter(c =>
                     c.name.toLowerCase().includes(q) ||
-                    c.meta.toLowerCase().includes(q) ||
-                    c.engine.toLowerCase().includes(q)
+                    (c.details && c.details.manufacturer.toLowerCase().includes(q)) ||
+                    c.power.toLowerCase().includes(q)
                 );
             }
 
@@ -111,7 +115,7 @@
                         <div class="catalog-item-info">
                             <div>
                                 <h2 class="catalog-item-name">${car.name}</h2>
-                                <p class="catalog-item-meta">${car.meta}</p>
+                                <p class="catalog-item-meta">${car.details ? car.details.year : ''} — ${car.power}</p>
                             </div>
                             <span class="catalog-item-price">${car.price}</span>
                         </div>
