@@ -19,6 +19,33 @@
                 <li><a href="contact.html" id="nav-contact">contact</a></li>
             </ul>
         </nav>
+
+        <div class="landing-footer">
+            <div class="region-label">Operational across: Nigeria, Ghana, Togo, Benin</div>
+            <div class="currency-selector" id="currency-switcher">
+                <span class="curr-opt active" data-curr="NGN">NGN</span>
+                <span class="curr-opt" data-curr="GHS">GHS</span>
+                <span class="curr-opt" data-curr="XOF">XOF</span>
+                <span class="curr-opt" data-curr="USD">USD</span>
+            </div>
+        </div>
+    </main>
+    <script>
+        document.querySelectorAll('.curr-opt').forEach(opt => {
+            opt.addEventListener('click', () => {
+                document.querySelectorAll('.curr-opt').forEach(o => o.classList.remove('active'));
+                opt.classList.add('active');
+                localStorage.setItem('preferred-currency', opt.getAttribute('data-curr'));
+            });
+        });
+
+        // Init from storage
+        const saved = localStorage.getItem('preferred-currency');
+        if (saved) {
+            const btn = document.querySelector(`.curr-opt[data-curr="${saved}"]`);
+            if (btn) btn.click();
+        }
+    </script>
     </main>
 </body>
 </html>
