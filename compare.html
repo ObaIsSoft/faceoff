@@ -173,21 +173,29 @@
                 name: car.name,
                 img: car.img,
                 price: car.price,
-                specs: { power: car.power, speed: car.speed, engine: car.engine },
+                specs: { 
+                    power: car.power, 
+                    speed: car.details ? car.details.zeroToSixty : 'N/A', 
+                    engine: car.details ? car.details.engineFull : 'N/A' 
+                },
                 ...overrides
             };
         }
 
         const leftCars = [
-            buildCar("mercedes-g-wagon"),
-            buildCar("range-rover"),
-            buildCar("elite-suv", { flipped: true })
+            buildCar("range-rover", { flipped: false }), // Source faces Right
+            buildCar("mercedes-g-wagon", { flipped: true }), // Source faces Left
+            buildCar("cybertruck", { flipped: false }), // Source faces Right
+            buildCar("mercedes2025sclass", { flipped: true }), // Source faces Left
+            buildCar("corolla2025", { flipped: false }) // Source faces Right
         ];
 
         const rightCars = [
-            buildCar("lexus-lx-600"),
-            buildCar("escalade-v"),
-            buildCar("luxury-lx")
+            buildCar("escalade-v", { flipped: false }), // Source faces Left
+            buildCar("lexus-lx-600", { flipped: false }), // Source faces Left
+            buildCar("_2026cadillac", { flipped: true }), // Source faces Right
+            buildCar("camry2025hybrid", { flipped: true }), // Source faces Right
+            buildCar("kia2023sportage", { flipped: true }) // Source faces Right
         ];
 
         class CarStack {
@@ -208,19 +216,14 @@
             render() {
                 this.container.innerHTML = '';
                 
-                // Foreground car
-                const front = this.createItem(this.index, 'foreground');
-                this.container.appendChild(front);
-
-                // Background layer 1
-                const b1Index = (this.index + 1) % this.cars.length;
-                const b1 = this.createItem(b1Index, 'background');
-                this.container.appendChild(b1);
-
-                // Background layer 2
-                const b2Index = (this.index + 2) % this.cars.length;
-                const b2 = this.createItem(b2Index, 'background-2');
-                this.container.appendChild(b2);
+                // 5 Layers: Foreground + 4 Background
+                const layers = ['foreground', 'background', 'background-2', 'background-3', 'background-4'];
+                
+                layers.forEach((stateClass, i) => {
+                    const idx = (this.index + i) % this.cars.length;
+                    const item = this.createItem(idx, stateClass);
+                    this.container.appendChild(item);
+                });
             }
 
             createItem(idx, stateClass) {
