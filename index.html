@@ -8,15 +8,28 @@
     <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
-    <main class="landing-container" id="main-content">
+    <!-- Persistent Navigation (Initially Hidden on Landing) -->
+    <header class="nav-top" id="persistent-nav" style="display: none;">
+        <nav>
+            <ul class="nav-links">
+                <li><a href="index.html">home</a></li>
+                <li><a href="about.html">about</a></li>
+                <li><a href="catalog.html">catalog</a></li>
+                <li><a href="compare.html">compare</a></li>
+                <li><a href="contact.html">contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main id="main-content" class="landing-container">
         <h1 class="company-name" id="brand-logo">Faceoff</h1>
         <nav>
             <ul class="nav-links">
-                <li><a href="about.html" id="nav-about">about</a></li>
-                <li><a href="catalog.html" id="nav-catalog">catalog</a></li>
-                <li><a href="showroom.html" id="nav-showroom">showroom</a></li>
-                <li><a href="compare.html" id="nav-compare">compare</a></li>
-                <li><a href="contact.html" id="nav-contact">contact</a></li>
+                <li><a href="about.html">about</a></li>
+                <li><a href="catalog.html">catalog</a></li>
+                <li><a href="showroom.html">showroom</a></li>
+                <li><a href="compare.html">compare</a></li>
+                <li><a href="contact.html">contact</a></li>
             </ul>
         </nav>
 
@@ -31,25 +44,55 @@
         </div>
     </main>
 
-    <script>
-        document.querySelectorAll('.currency-btn').forEach(btn => {
-            btn.addEventListener('click', () => {
-                document.querySelectorAll('.currency-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
-                // Store preference
-                localStorage.setItem('faceoff_currency', btn.dataset.cur);
-            });
-        });
+    <!-- Persistent Global Scripts -->
+    <script src="js/cars-data.js"></script>
+    <script src="js/drawer.js"></script>
+    <script src="js/player.js"></script>
+    
+    <!-- Page Logic Modules -->
+    <script src="js/pages/catalog.js"></script>
+    <script src="js/pages/compare.js"></script>
+    <script src="js/pages/showroom.js"></script>
+    
+    <!-- Router (Must be last) -->
+    <script src="js/router.js"></script>
 
-        // Init from storage
-        const saved = localStorage.getItem('faceoff_currency');
-        if (saved) {
-            const btn = document.querySelector(`[data-cur="${saved}"]`);
-            if (btn) {
-                document.querySelectorAll('.currency-btn').forEach(b => b.classList.remove('active'));
-                btn.classList.add('active');
+    <script>
+        // Landing page specific logic (Persistent)
+        function initLanding() {
+            const nav = document.getElementById('persistent-nav');
+            if (nav) nav.style.display = 'none';
+
+            document.querySelectorAll('.currency-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    document.querySelectorAll('.currency-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    localStorage.setItem('faceoff_currency', btn.dataset.cur);
+                    if (window.CatalogPage) window.CatalogPage.renderGrid();
+                });
+            });
+
+            const saved = localStorage.getItem('faceoff_currency');
+            if (saved) {
+                const btn = document.querySelector(`[data-cur="${saved}"]`);
+                if (btn) {
+                    document.querySelectorAll('.currency-btn').forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                }
             }
         }
+
+        // Show/Hide Nav based on route
+        window.addEventListener('popstate', () => {
+            const path = window.location.pathname.split('/').pop() || 'index.html';
+            const nav = document.getElementById('persistent-nav');
+            if (nav) nav.style.display = (path === 'index.html' || path === '') ? 'none' : 'flex';
+        });
+
+        // Intercept landing page clicks
+        document.addEventListener('DOMContentLoaded', () => {
+            initLanding();
+        });
     </script>
 </body>
 </html>

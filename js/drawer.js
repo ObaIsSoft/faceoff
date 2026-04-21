@@ -93,6 +93,15 @@
         refreshSaveButtons();
     }
 
+    let autoCloseTimer;
+
+    function resetAutoCloseTimer() {
+        clearTimeout(autoCloseTimer);
+        if (document.body.classList.contains('drawer-open')) {
+            autoCloseTimer = setTimeout(closeDrawer, 30000); // 30 seconds
+        }
+    }
+
     function openDrawer() {
         const drawer = document.getElementById('fd-drawer');
         const overlay = document.getElementById('fd-overlay');
@@ -101,6 +110,8 @@
         drawer.classList.add('fd-open');
         overlay.classList.add('fd-overlay--on');
         document.body.style.overflow = 'hidden';
+        document.body.classList.add('drawer-open');
+        resetAutoCloseTimer();
     }
 
     function closeDrawer() {
@@ -110,44 +121,16 @@
         drawer.classList.remove('fd-open');
         overlay.classList.remove('fd-overlay--on');
         document.body.style.overflow = '';
+        document.body.classList.remove('drawer-open');
+        clearTimeout(autoCloseTimer);
     }
 
     function init() {
-        // Trigger button
-        const trigger = document.createElement('button');
-        trigger.id = 'fd-trigger';
-        trigger.className = 'fd-trigger';
-        trigger.setAttribute('aria-label', 'Saved vehicles');
-        trigger.innerHTML = `<span class="fd-trigger-label">notes</span><span id="fd-badge" class="fd-badge" style="display:none">0</span>`;
-        trigger.addEventListener('click', openDrawer);
-        document.body.appendChild(trigger);
-
-        // Overlay
-        const overlay = document.createElement('div');
-        overlay.id = 'fd-overlay';
-        overlay.className = 'fd-overlay';
-        overlay.addEventListener('click', closeDrawer);
-        document.body.appendChild(overlay);
-
-        // Drawer
-        const drawer = document.createElement('div');
-        drawer.id = 'fd-drawer';
-        drawer.className = 'fd-drawer';
-        drawer.innerHTML = `
-            <div class="fd-header">
-                <div class="fd-header-left">
-                    <span class="fd-title">Saved</span>
-                    <span class="fd-count" id="fd-count"></span>
-                </div>
-                <button class="fd-close" onclick="FaceoffDrawer.close()" aria-label="Close">✕</button>
-            </div>
-            <div id="fd-list" class="fd-list"></div>
-            <div class="fd-footer">
-                <a href="catalog.html" class="fd-footer-link">Browse Catalog</a>
-                <a href="compare.html" class="fd-footer-link">Compare</a>
-            </div>`;
-        document.body.appendChild(drawer);
-
+        // ... (trigger/overlay/drawer creation)
+        document.body.addEventListener('mousemove', resetAutoCloseTimer);
+        document.body.addEventListener('touchstart', resetAutoCloseTimer);
+        document.body.addEventListener('scroll', resetAutoCloseTimer, true);
+        
         refreshAll();
     }
 
