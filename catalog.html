@@ -76,6 +76,23 @@
             return parseInt(str.replace(/[^0-9]/g, ''), 10);
         }
 
+        function formatPrice(nairaString) {
+            const nairaValue = parsePrice(nairaString);
+            const currency = localStorage.getItem('faceoff_currency') || 'NGN';
+            
+            const rates = {
+                'NGN': { symbol: '₦', rate: 1 },
+                'GHS': { symbol: 'GH₵', rate: 0.012 },
+                'XOF-TG': { symbol: 'CFA', rate: 0.52 },
+                'XOF-BJ': { symbol: 'CFA', rate: 0.52 }
+            };
+
+            const config = rates[currency] || rates['NGN'];
+            const converted = nairaValue * config.rate;
+            
+            return config.symbol + Math.round(converted).toLocaleString();
+        }
+
         function renderGrid() {
             let results = CATALOG_ORDER.map(id => ({ id, ...CARS[id] }));
 
@@ -117,7 +134,7 @@
                                 <h2 class="catalog-item-name">${car.name}</h2>
                                 <p class="catalog-item-meta">${car.details ? car.details.year : ''} — ${car.power}</p>
                             </div>
-                            <span class="catalog-item-price">${car.price}</span>
+                            <span class="catalog-item-price">${formatPrice(car.price)}</span>
                         </div>
                     </a>
                 `).join('');

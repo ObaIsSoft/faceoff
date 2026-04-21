@@ -42,8 +42,24 @@
         const params  = new URLSearchParams(window.location.search);
         const type    = params.get('type');   // 'inspection' | 'enquiry'
         const carId   = params.get('car');
-        const from    = params.get('from');   // 'about' | 'catalog'
         const car     = carId ? CARS[carId] : null;
+
+        function formatPrice(nairaString) {
+            const nairaValue = parseInt(nairaString.replace(/[^0-9]/g, ''), 10);
+            const currency = localStorage.getItem('faceoff_currency') || 'NGN';
+            
+            const rates = {
+                'NGN': { symbol: '₦', rate: 1 },
+                'GHS': { symbol: 'GH₵', rate: 0.012 },
+                'XOF-TG': { symbol: 'CFA', rate: 0.52 },
+                'XOF-BJ': { symbol: 'CFA', rate: 0.52 }
+            };
+
+            const config = rates[currency] || rates['NGN'];
+            const converted = nairaValue * config.rate;
+            
+            return config.symbol + Math.round(converted).toLocaleString();
+        }
 
         // ── Dynamic page title ────────────────────────────────
         if (type === 'inspection')      document.title = 'Book Inspection | Faceoff';
@@ -62,7 +78,7 @@
                         <img src="${car.img}" alt="${car.name}" class="contact-car-img">
                         <div class="contact-car-badge">
                             <span class="contact-car-name">${car.name}</span>
-                            <span class="contact-car-price">${car.price}</span>
+                            <span class="contact-car-price">${formatPrice(car.price)}</span>
                         </div>
                     </div>
                     <p class="contact-context-note">Choose your preferred date and city. Our team will confirm availability within 24 hours and send full directions.</p>
@@ -79,7 +95,7 @@
                         <img src="${car.img}" alt="${car.name}" class="contact-car-img">
                         <div class="contact-car-badge">
                             <span class="contact-car-name">${car.name}</span>
-                            <span class="contact-car-price">${car.price}</span>
+                            <span class="contact-car-price">${formatPrice(car.price)}</span>
                         </div>
                     </div>
                     <p class="contact-context-note">We'll respond with full documentation, availability status, and a transparent cost breakdown — no surprises.</p>
@@ -177,9 +193,9 @@
 
         function defaultMessage() {
             if (type === 'inspection' && car)
-                return `Hi Faceoff,\n\nI'd like to book an inspection for the ${car.name} (${car.price}).\n\nPlease confirm availability at my chosen date and location.\n\nThank you.`;
+                return `Hi Faceoff,\n\nI'd like to book an inspection for the ${car.name} (${formatPrice(car.price)}).\n\nPlease confirm availability at my chosen date and location.\n\nThank you.`;
             if (type === 'enquiry' && car)
-                return `Hi Faceoff,\n\nI'd like to make enquiries about the ${car.name} (${car.price}).\n\nCould you provide details on availability, full specifications, and next steps?\n\nThank you.`;
+                return `Hi Faceoff,\n\nI'd like to make enquiries about the ${car.name} (${formatPrice(car.price)}).\n\nCould you provide details on availability, full specifications, and next steps?\n\nThank you.`;
             if (from === 'about' || type === 'enquiry')
                 return `Hi Faceoff,\n\nI came across your website and I'd like to know more about what you do and how your import process works.\n\nThank you.`;
             return '';

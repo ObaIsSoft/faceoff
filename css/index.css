@@ -226,6 +226,56 @@ header.nav-top .nav-links a:hover {
     }
 }
 
+/* Currency Dock */
+.currency-dock {
+    position: absolute;
+    bottom: 3rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.8rem;
+    animation: fadeIn 1s ease-out 1s both;
+}
+
+.dock-label {
+    font-size: 0.5rem;
+    letter-spacing: 0.4em;
+    text-transform: uppercase;
+    font-weight: 900;
+    opacity: 0.2;
+}
+
+.currency-switcher {
+    display: flex;
+    gap: 0.5rem;
+    background: rgba(255,255,255,0.05);
+    padding: 0.3rem;
+    border: 1px solid rgba(0,0,0,0.05);
+    backdrop-filter: blur(10px);
+}
+
+.currency-btn {
+    background: none;
+    border: none;
+    font-family: var(--font-nav);
+    font-size: 0.65rem;
+    letter-spacing: 0.1em;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    opacity: 0.3;
+}
+
+.currency-btn:hover {
+    opacity: 0.7;
+}
+
+.currency-btn.active {
+    opacity: 1;
+    background: #000;
+    color: #fff;
+}
+
 /* Mobile Responsiveness & Micro-UI */
 @media (max-width: 768px) {
     :root {
