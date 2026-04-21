@@ -13,8 +13,15 @@ var CatalogPage = {
     },
 
     init() {
-        this.renderGrid();
-        this.setupListeners();
+        const tryRender = (retries = 0) => {
+            if (document.getElementById('catalog-grid')) {
+                this.renderGrid();
+                this.setupListeners();
+            } else if (retries < 10) {
+                setTimeout(() => tryRender(retries + 1), 100);
+            }
+        };
+        tryRender();
     },
 
     parsePrice(str) {

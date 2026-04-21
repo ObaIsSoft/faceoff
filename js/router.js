@@ -38,6 +38,7 @@ var Router = {
     async handleRoute(url, isInitial = false) {
         let path = url.split('?')[0].split('/').pop() || 'index.html';
         if (path === '' || path === '/') path = 'index.html';
+        if (!path.includes('.')) path += '.html';
         
         // Normalize: remove .html for matching
         const baseName = path.replace('.html', '');
@@ -64,7 +65,12 @@ var Router = {
         // 3. Fetch and swap content (if not initial load)
         if (!isInitial) {
             try {
-                const response = await fetch(url);
+                // Ensure we fetch the actual component file, not the SPA entry point
+                const fetchUrl = url.includes('.html') ? url : (url.endsWith('/') ? `${url}index.html` : `${url}.html`);
+                const response = await fetch(fetchUrl);
+                
+                if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+                
                 const html = await response.text();
                 const parser = new DOMParser();
                 const doc = parser.parseFromString(html, 'text/html');
@@ -79,13 +85,12 @@ var Router = {
                 }
 
                 document.title = doc.title;
-                // Preserve global classes like 'is-zone-page'
+                // Preserve global classes
                 const preservedClasses = Array.from(document.body.classList).filter(c => c.startsWith('is-zone-page') || c.startsWith('page-'));
                 document.body.className = doc.body.className;
                 preservedClasses.forEach(c => document.body.classList.add(c));
             } catch (err) {
                 console.error('Navigation failed:', err);
-                // Fallback: full reload if fetch fails
                 window.location.href = url;
                 return;
             }
@@ -99,39 +104,31 @@ var Router = {
             a.style.opacity = isActive ? '1' : '0.6';
         });
 
-        // 5. Zone Logic: Music & Drawer
+        // 5. Zone Logic
         const triggerGlobalUI = () => {
             if (isZonePage) {
                 document.body.classList.add('is-zone-page');
                 document.body.classList.add(`page-${baseName}`);
-                // Ensure visibility
-                if (window.MusicPlayer && typeof window.MusicPlayer.show === 'function') {
-                    window.MusicPlayer.show();
-                }
-                if (window.FaceoffDrawer && typeof window.FaceoffDrawer.show === 'function') {
-                    window.FaceoffDrawer.show();
-                }
+                if (window.MusicPlayer && typeof window.MusicPlayer.show === 'function') window.MusicPlayer.show();
+                if (window.FaceoffDrawer && typeof window.FaceoffDrawer.show === 'function') window.FaceoffDrawer.show();
             } else {
                 document.body.classList.remove('is-zone-page', 'page-catalog', 'page-compare', 'page-showroom');
-                if (window.MusicPlayer && typeof window.MusicPlayer.hide === 'function') {
-                    window.MusicPlayer.hide();
-                }
-                if (window.FaceoffDrawer && typeof window.FaceoffDrawer.hide === 'function') {
-                    window.FaceoffDrawer.hide();
-                }
+                if (window.MusicPlayer && typeof window.MusicPlayer.hide === 'function') window.MusicPlayer.hide();
+                if (window.FaceoffDrawer && typeof window.FaceoffDrawer.hide === 'function') window.FaceoffDrawer.hide();
             }
         };
 
         triggerGlobalUI();
 
-        // 6. Initialize new page logic
-        this.loadPageScript(path);
+        // 6. Initialize new page logic - With small delay for DOM settlement
+        setTimeout(() => this.loadPageScript(path), 50);
         
         // 7. Scroll to top
         window.scrollTo(0, 0);
     },
 
     loadPageScript(path) {
+        const baseName = path.replace('.html', '');
         if (path === 'catalog.html') {
             window.currentPage = window.CatalogPage;
         } else if (path === 'compare.html') {
@@ -143,7 +140,6 @@ var Router = {
         } else if (path === 'about.html') {
             window.currentPage = window.AboutPage;
         } else if (path === 'index.html') {
-            // Special case for landing page logic
             window.currentPage = {
                 init: () => {
                     document.querySelectorAll('.currency-btn').forEach(btn => {
@@ -154,7 +150,6 @@ var Router = {
                             if (window.CatalogPage) window.CatalogPage.renderGrid();
                         });
                     });
-
                     const saved = localStorage.getItem('faceoff_currency');
                     if (saved) {
                         const btn = document.querySelector(`[data-cur="${saved}"]`);

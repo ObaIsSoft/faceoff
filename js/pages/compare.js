@@ -7,14 +7,21 @@ var ComparePage = {
     },
 
     init() {
-        if (!document.querySelector('.faceoff-col') || !document.getElementById('left-stack')) {
-            console.warn('ComparePage: Required DOM elements missing. Retrying...');
-            setTimeout(() => this.init(), 100);
-            return;
-        }
-        this.updateSliderBounds();
-        this.initStacks();
-        this.setupListeners();
+        const tryInit = (retries = 0) => {
+            const leftStack = document.getElementById('left-stack');
+            const rightStack = document.getElementById('right-stack');
+            
+            if (leftStack && rightStack) {
+                this.updateSliderBounds();
+                this.initStacks();
+                this.setupListeners();
+            } else if (retries < 10) {
+                setTimeout(() => tryInit(retries + 1), 100);
+            } else {
+                console.warn('ComparePage: Required DOM elements (stacks) not found after 10 retries.');
+            }
+        };
+        tryInit();
     },
 
     formatNaira(val) {
