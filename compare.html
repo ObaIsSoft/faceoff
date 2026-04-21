@@ -420,9 +420,17 @@
                 const columnSide = this.container.id === 'left-stack' ? 'left' : 'right';
                 const isFlipped = getOrientation(car.id, columnSide);
 
+                const saveBtnHTML = isForeground ? `
+                    <button class="fd-save-btn" data-save-id="${car.id}"
+                        aria-label="Save vehicle"
+                        onclick="event.stopPropagation(); FaceoffDrawer.toggle('${car.id}');">
+                        <svg width="12" height="14" viewBox="0 0 12 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 1h8v12l-4-3-4 3V1z"/></svg>
+                    </button>` : '';
+
                 div.innerHTML = `
                     ${specsHTML}
-                    <div class="car-visual ${isFlipped ? 'flipped' : ''}" onclick="window.location.href='showroom.html?car=${car.id}${isFlipped ? '&flipped=true' : ''}'">
+                    ${saveBtnHTML}
+                    <div class="car-visual ${isFlipped ? 'flipped' : ''}" onclick="window.location.href='showroom.html?car=${car.id}${isFlipped ? '&flipped=true' : ''}&from=compare'">
                         <img src="${car.img}" alt="${car.name}" class="car-image">
                     </div>
                     <span class="depth-label">${car.name}</span>
@@ -588,5 +596,6 @@
         rightStack = new CarStack("right-stack", rightPool);
         document.getElementById('right-stack').setAttribute('data-foreground-id', rightPool[0].id);
     </script>
+    <script src="js/drawer.js"></script>
 </body>
 </html>

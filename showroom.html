@@ -44,6 +44,7 @@
     </main>
 
     <script src="js/cars-data.js"></script>
+    <script src="js/drawer.js"></script>
     <script>
         function renderLeftSpecs(car) {
             const d = car.details;
@@ -198,6 +199,7 @@
             const params = new URLSearchParams(window.location.search);
             const carId = params.get('car') || "mercedes-g-wagon";
             const isFlipped = params.get('flipped') === 'true';
+            const from = params.get('from');
             const car = CARS[carId];
 
             if (!car) {
@@ -217,6 +219,38 @@
                 document.getElementById('specs-left').innerHTML = renderLeftSpecs(car);
                 document.getElementById('specs-right').innerHTML = renderRightSpecs(car);
             }
+
+            // Back button
+            if (from === 'catalog' || from === 'compare' || from === 'saved') {
+                const backHref = from === 'compare' ? 'compare.html' : 'catalog.html';
+                const backLabel = from === 'compare' ? 'Compare' : 'Catalog';
+                const backEl = document.createElement('a');
+                backEl.className = 'sr-back';
+                backEl.href = backHref;
+                backEl.innerHTML = `← ${backLabel}`;
+                document.querySelector('.showroom-center').prepend(backEl);
+            }
+
+            // Save button (injected after CTAs, state synced after drawer.js loads)
+            const saveBtn = document.createElement('button');
+            saveBtn.className = 'sr-save';
+            saveBtn.setAttribute('data-save-id', carId);
+
+            function updateSaveBtn() {
+                const saved = typeof FaceoffDrawer !== 'undefined' && FaceoffDrawer.isSaved(carId);
+                saveBtn.setAttribute('data-saved', saved ? 'true' : 'false');
+                saveBtn.innerHTML = `<svg width="12" height="14" viewBox="0 0 12 14" fill="${saved ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 1h8v12l-4-3-4 3V1z"/></svg> ${saved ? 'Saved' : 'Save Vehicle'}`;
+            }
+
+            saveBtn.addEventListener('click', () => {
+                if (typeof FaceoffDrawer !== 'undefined') {
+                    FaceoffDrawer.toggle(carId);
+                    updateSaveBtn();
+                }
+            });
+            document.querySelector('.showroom-cta').insertAdjacentElement('afterend', saveBtn);
+            // Sync initial state once drawer.js has run
+            window.addEventListener('load', updateSaveBtn);
 
             if (car.details) initMobileModals(car);
         }
