@@ -100,6 +100,100 @@
             return config.symbol + Math.round(converted).toLocaleString();
         }
 
+        function initMobileModals(car) {
+            if (window.innerWidth > 768) return;
+            const d = car.details;
+
+            const CATEGORIES = [
+                {
+                    label: 'Identity',
+                    rows: [
+                        ['Manufacturer', d.manufacturer],
+                        ['Year', d.year],
+                        ['Production', d.production],
+                        ['Edition', d.limited],
+                    ]
+                },
+                {
+                    label: 'Performance',
+                    rows: [
+                        ['0–60 mph', d.zeroToSixty],
+                        ['0–100 km/h', d.zeroToHundred],
+                        ['Top Speed', car.topSpeed],
+                        ['Power', car.power],
+                        ['Torque', car.torque],
+                        ['Engine', d.engineFull],
+                    ]
+                },
+                {
+                    label: 'Interior',
+                    rows: [
+                        ['Seating', d.seating],
+                        ['Cargo', d.cargo],
+                        ['Leather', d.leather],
+                        ['Heated Seats', d.heatedSeats],
+                        ['Audio', d.stereo],
+                    ]
+                },
+                {
+                    label: 'Technology',
+                    rows: [
+                        ['Headlights', d.headlights],
+                        ['AI Systems', d.ai],
+                    ]
+                },
+                {
+                    label: 'Fun Fact',
+                    funfact: d.funFact
+                }
+            ];
+
+            function buildHTML(cat) {
+                if (cat.funfact) {
+                    return `<div class="sr-modal-label">${cat.label}</div><p class="sr-modal-funfact">"${cat.funfact}"</p>`;
+                }
+                const rows = cat.rows.map(([k, v]) =>
+                    `<div class="sr-modal-row"><span class="sr-modal-key">${k}</span><span class="sr-modal-val">${v}</span></div>`
+                ).join('');
+                return `<div class="sr-modal-label">${cat.label}</div><div class="sr-modal-grid">${rows}</div>`;
+            }
+
+            const topModal = document.createElement('div');
+            topModal.className = 'sr-modal sr-modal--top';
+            const botModal = document.createElement('div');
+            botModal.className = 'sr-modal sr-modal--bot';
+            document.body.appendChild(topModal);
+            document.body.appendChild(botModal);
+
+            let idx = 0;
+
+            function update(animate) {
+                const topCat = CATEGORIES[idx % CATEGORIES.length];
+                const botCat = CATEGORIES[(idx + 1) % CATEGORIES.length];
+
+                if (animate) {
+                    topModal.classList.remove('sr-modal--visible');
+                    botModal.classList.remove('sr-modal--visible');
+                    setTimeout(() => {
+                        topModal.innerHTML = buildHTML(topCat);
+                        botModal.innerHTML = buildHTML(botCat);
+                        topModal.classList.add('sr-modal--visible');
+                        botModal.classList.add('sr-modal--visible');
+                    }, 350);
+                } else {
+                    topModal.innerHTML = buildHTML(topCat);
+                    botModal.innerHTML = buildHTML(botCat);
+                    topModal.classList.add('sr-modal--visible');
+                    botModal.classList.add('sr-modal--visible');
+                }
+
+                idx = (idx + 1) % CATEGORIES.length;
+            }
+
+            update(false);
+            setInterval(() => update(true), 4000);
+        }
+
         function initShowroom() {
             const params = new URLSearchParams(window.location.search);
             const carId = params.get('car') || "mercedes-g-wagon";
@@ -123,6 +217,8 @@
                 document.getElementById('specs-left').innerHTML = renderLeftSpecs(car);
                 document.getElementById('specs-right').innerHTML = renderRightSpecs(car);
             }
+
+            if (car.details) initMobileModals(car);
         }
 
         initShowroom();

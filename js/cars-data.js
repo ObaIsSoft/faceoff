@@ -7,6 +7,11 @@ const CARS = {
         topSpeed: "220km/h",
         torque: "850nm",
         logo: "assets/brands/mercedes.png",
+        brand: "Mercedes-Benz",
+        type: "SUV",
+        category: "LUXURY",
+        energy: "PETROL",
+        mileage: 1200,
         details: {
             manufacturer: "Mercedes-Benz",
             year: "2024",
@@ -33,6 +38,11 @@ const CARS = {
         topSpeed: "210km/h",
         torque: "650nm",
         logo: "assets/brands/lexus.png",
+        brand: "Lexus",
+        type: "SUV",
+        category: "LUXURY",
+        energy: "PETROL",
+        mileage: 50,
         details: {
             manufacturer: "Lexus",
             year: "2024",
@@ -59,6 +69,11 @@ const CARS = {
         topSpeed: "250km/h",
         torque: "750nm",
         logo: "assets/brands/landrover.png",
+        brand: "Land Rover",
+        type: "SUV",
+        category: "ADVENTURE",
+        energy: "PETROL",
+        mileage: 15,
         details: {
             manufacturer: "Land Rover",
             year: "2024",
@@ -85,6 +100,11 @@ const CARS = {
         topSpeed: "200km/h",
         torque: "885nm",
         logo: "assets/brands/cadillac.png",
+        brand: "Cadillac",
+        type: "SUV",
+        category: "SPORT",
+        energy: "PETROL",
+        mileage: 120,
         details: {
             manufacturer: "Cadillac",
             year: "2024",
@@ -111,6 +131,11 @@ const CARS = {
         topSpeed: "180km/h",
         torque: "1064nm",
         logo: "assets/brands/cadillac.png",
+        brand: "Cadillac",
+        type: "SUV",
+        category: "LUXURY",
+        energy: "ELECTRIC",
+        mileage: 5,
         details: {
             manufacturer: "Cadillac",
             year: "2026",
@@ -137,6 +162,11 @@ const CARS = {
         topSpeed: "160km/h",
         torque: "310nm",
         logo: "assets/brands/byd.png",
+        brand: "BYD",
+        type: "SUV",
+        category: "ECONOMY",
+        energy: "ELECTRIC",
+        mileage: 2400,
         details: {
             manufacturer: "BYD",
             year: "2024",
@@ -163,6 +193,11 @@ const CARS = {
         topSpeed: "185km/h",
         torque: "221nm",
         logo: "assets/brands/toyota.png",
+        brand: "Toyota",
+        type: "SEDAN",
+        category: "ECONOMY",
+        energy: "HYBRID",
+        mileage: 10,
         details: {
             manufacturer: "Toyota",
             year: "2025",
@@ -189,6 +224,11 @@ const CARS = {
         topSpeed: "190km/h",
         torque: "205nm",
         logo: "assets/brands/toyota.png",
+        brand: "Toyota",
+        type: "SEDAN",
+        category: "ECONOMY",
+        energy: "PETROL",
+        mileage: 1800,
         details: {
             manufacturer: "Toyota",
             year: "2025",
@@ -215,6 +255,11 @@ const CARS = {
         topSpeed: "209km/h",
         torque: "10000nm",
         logo: "assets/brands/tesla.png",
+        brand: "Tesla",
+        type: "TRUCK",
+        category: "OFF-ROAD",
+        energy: "ELECTRIC",
+        mileage: 3200,
         details: {
             manufacturer: "Tesla",
             year: "2024",
@@ -241,6 +286,11 @@ const CARS = {
         topSpeed: "200km/h",
         torque: "241nm",
         logo: "assets/brands/kia.png",
+        brand: "Kia",
+        type: "SUV",
+        category: "FAMILY",
+        energy: "PETROL",
+        mileage: 15600,
         details: {
             manufacturer: "Kia",
             year: "2023",
@@ -267,6 +317,11 @@ const CARS = {
         topSpeed: "250km/h",
         torque: "560nm",
         logo: "assets/brands/mercedes.png",
+        brand: "Mercedes-Benz",
+        type: "SEDAN",
+        category: "LUXURY",
+        energy: "HYBRID",
+        mileage: 12,
         details: {
             manufacturer: "Mercedes-Benz",
             year: "2025",
@@ -308,10 +363,8 @@ const BRANDS = [
     { name: "Ford", logo: "assets/brands/ford.png" },
     { name: "Chevrolet", logo: "assets/brands/chevrolet.png" },
     { name: "Volkswagen", logo: "assets/brands/volkswagen.png" }
-    // More brands can be added following this pattern
 ];
 
-// Export data for use in other scripts
 if (typeof module !== 'undefined') {
     module.exports = { CARS, BRANDS };
 }
