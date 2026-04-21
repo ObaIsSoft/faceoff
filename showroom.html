@@ -83,6 +83,23 @@
             `;
         }
 
+        function formatPrice(nairaString) {
+            const nairaValue = parseInt(nairaString.replace(/[^0-9]/g, ''), 10);
+            const currency = localStorage.getItem('faceoff_currency') || 'NGN';
+            
+            const rates = {
+                'NGN': { symbol: '₦', rate: 1 },
+                'GHS': { symbol: 'GH₵', rate: 0.012 },
+                'XOF-TG': { symbol: 'CFA', rate: 0.52 },
+                'XOF-BJ': { symbol: 'CFA', rate: 0.52 }
+            };
+
+            const config = rates[currency] || rates['NGN'];
+            const converted = nairaValue * config.rate;
+            
+            return config.symbol + Math.round(converted).toLocaleString();
+        }
+
         function initShowroom() {
             const params = new URLSearchParams(window.location.search);
             const carId = params.get('car') || "mercedes-g-wagon";
@@ -95,7 +112,7 @@
             }
 
             document.getElementById('car-name').innerText = car.name;
-            document.getElementById('car-price').innerText = car.price;
+            document.getElementById('car-price').innerText = formatPrice(car.price);
             document.getElementById('cta-inspection').href = `contact.html?type=inspection&car=${carId}`;
             document.getElementById('cta-enquiry').href   = `contact.html?type=enquiry&car=${carId}`;
             const display = document.getElementById('car-display');

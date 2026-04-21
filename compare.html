@@ -164,6 +164,23 @@
             const raw = parseNaira(input.value);
             if (!isNaN(raw)) input.value = formatNaira(Math.min(6e9, Math.max(1e5, raw)));
         }
+
+        function formatPrice(nairaString) {
+            const nairaValue = parseInt(nairaString.replace(/[^0-9]/g, ''), 10);
+            const currency = localStorage.getItem('faceoff_currency') || 'NGN';
+            
+            const rates = {
+                'NGN': { symbol: '₦', rate: 1 },
+                'GHS': { symbol: 'GH₵', rate: 0.012 },
+                'XOF-TG': { symbol: 'CFA', rate: 0.52 },
+                'XOF-BJ': { symbol: 'CFA', rate: 0.52 }
+            };
+
+            const config = rates[currency] || rates['NGN'];
+            const converted = nairaValue * config.rate;
+            
+            return config.symbol + Math.round(converted).toLocaleString();
+        }
     </script>
     <script>
         function buildCar(id, overrides = {}) {
@@ -249,7 +266,7 @@
                         <img src="${car.img}" alt="${car.name}" class="car-image">
                     </div>
                     <span class="depth-label">${car.name}</span>
-                    <span class="depth-price">${car.price}</span>
+                    <span class="depth-price">${formatPrice(car.price)}</span>
                 `;
                 return div;
             }

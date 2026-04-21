@@ -20,32 +20,36 @@
             </ul>
         </nav>
 
-        <div class="landing-footer">
-            <div class="region-label">Operational across: Nigeria, Ghana, Togo, Benin</div>
-            <div class="currency-selector" id="currency-switcher">
-                <span class="curr-opt active" data-curr="NGN">NGN</span>
-                <span class="curr-opt" data-curr="GHS">GHS</span>
-                <span class="curr-opt" data-curr="XOF">XOF</span>
-                <span class="curr-opt" data-curr="USD">USD</span>
+        <div class="currency-dock">
+            <span class="dock-label">REGION / CURRENCY</span>
+            <div class="currency-switcher">
+                <button class="currency-btn active" data-cur="NGN">NGN</button>
+                <button class="currency-btn" data-cur="GHS">GHS</button>
+                <button class="currency-btn" data-cur="XOF-TG">XOF-TG</button>
+                <button class="currency-btn" data-cur="XOF-BJ">XOF-BJ</button>
             </div>
         </div>
     </main>
+
     <script>
-        document.querySelectorAll('.curr-opt').forEach(opt => {
-            opt.addEventListener('click', () => {
-                document.querySelectorAll('.curr-opt').forEach(o => o.classList.remove('active'));
-                opt.classList.add('active');
-                localStorage.setItem('preferred-currency', opt.getAttribute('data-curr'));
+        document.querySelectorAll('.currency-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.currency-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                // Store preference
+                localStorage.setItem('faceoff_currency', btn.dataset.cur);
             });
         });
 
         // Init from storage
-        const saved = localStorage.getItem('preferred-currency');
+        const saved = localStorage.getItem('faceoff_currency');
         if (saved) {
-            const btn = document.querySelector(`.curr-opt[data-curr="${saved}"]`);
-            if (btn) btn.click();
+            const btn = document.querySelector(`[data-cur="${saved}"]`);
+            if (btn) {
+                document.querySelectorAll('.currency-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+            }
         }
     </script>
-    </main>
 </body>
 </html>
