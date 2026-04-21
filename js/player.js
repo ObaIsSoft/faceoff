@@ -1,5 +1,6 @@
 
-const MusicPlayer = {
+if (!window.MusicPlayer) {
+var MusicPlayer = {
     tracks: [
         { title: 'Addicted', artist: 'Rema', src: 'rema-addicted.mp3', duration: '3:24' },
         { title: 'Cudi Zone', artist: 'Kid Cudi', src: 'public/assets/music/cudi-zone.mp3', duration: '3:52' },
@@ -175,6 +176,7 @@ const MusicPlayer = {
     },
 
     show() {
+        console.log('MusicPlayer: show() called');
         if (!this.el) {
             this.init(); // Ensure initialization if called early
         }
@@ -204,4 +206,5 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => MusicPlayer.init());
 } else {
     MusicPlayer.init();
+}
 }

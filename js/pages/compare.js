@@ -1,11 +1,17 @@
 
-const ComparePage = {
+if (!window.ComparePage) {
+var ComparePage = {
     stacks: {
         left: null,
         right: null
     },
 
     init() {
+        if (!document.querySelector('.faceoff-col') || !document.getElementById('left-stack')) {
+            console.warn('ComparePage: Required DOM elements missing. Retrying...');
+            setTimeout(() => this.init(), 100);
+            return;
+        }
         this.updateSliderBounds();
         this.initStacks();
         this.setupListeners();
@@ -78,13 +84,20 @@ const ComparePage = {
     },
 
     getFilteredCars(stackSide) {
-        const col = stackSide === 'left' ? document.querySelectorAll('.faceoff-col')[0] : document.querySelectorAll('.faceoff-col')[1];
-        const otherStackEl = document.getElementById(stackSide === 'left' ? 'right-stack' : 'left-stack');
+        const columns = document.querySelectorAll('.faceoff-col');
+        const col = stackSide === 'left' ? columns[0] : columns[1];
+        
+        // Find the foreground ID of the OTHER stack to exclude it
+        const otherSide = stackSide === 'left' ? 'right' : 'left';
+        const otherStackEl = document.getElementById(`${otherSide}-stack`);
         const excludeId = otherStackEl ? otherStackEl.getAttribute('data-foreground-id') : null;
 
         const getSelectByLabel = (labelText) => {
             const groups = Array.from(col.querySelectorAll('.sf-group'));
-            const group = groups.find(g => g.querySelector('.sf-label').textContent.trim().includes(labelText));
+            const group = groups.find(g => {
+                const label = g.querySelector('.sf-label');
+                return label && label.textContent.trim().includes(labelText);
+            });
             return group ? group.querySelector('select') : null;
         };
 
@@ -92,46 +105,75 @@ const ComparePage = {
         const category = getSelectByLabel('CATEGORY')?.value || 'ALL';
         const mileage  = getSelectByLabel('MAX MILEAGE')?.value || 'ANY';
         const energy   = getSelectByLabel('ENERGY')?.value || 'ALL';
-        const brand    = col.querySelector('.sf-input').value.toLowerCase();
-        const price    = this.parseNaira(col.querySelector('.sf-price-input').value);
+        
+        const brandInput = col.querySelector('.sf-input');
+        const brand = brandInput ? brandInput.value.toLowerCase() : '';
+        
+        const priceInput = col.querySelector('.sf-price-input');
+        const price = priceInput ? this.parseNaira(priceInput.value) : 1e12;
 
         return Object.keys(CARS).filter(id => {
             const car = CARS[id];
-            return (id !== excludeId) &&
-                   (type === 'ALL' || car.type === type) &&
-                   (category === 'ALL' || car.category === category) &&
-                   (!brand || [car.name, car.brand, car.details?.manufacturer].some(s => s && s.toLowerCase().includes(brand))) &&
-                   (price >= 1e9 || this.parseNaira(car.price) <= price) &&
-                   (energy === 'ALL' || car.energy === energy) &&
-                   (mileage === 'ANY' || car.mileage <= parseInt(mileage.replace(/,/g, '')));
+            
+            // Basic matching
+            const matchesType = (type === 'ALL' || car.type === type);
+            const matchesCategory = (category === 'ALL' || car.category === category);
+            const matchesBrand = (!brand || [car.name, car.brand, car.details?.manufacturer].some(s => s && s.toLowerCase().includes(brand)));
+            const matchesPrice = (price >= 1e9 || this.parseNaira(car.price) <= price);
+            const matchesEnergy = (energy === 'ALL' || car.energy === energy);
+            const matchesMileage = (mileage === 'ANY' || car.mileage <= parseInt(mileage.replace(/,/g, '')));
+
+            return (id !== excludeId) && 
+                   matchesType && 
+                   matchesCategory && 
+                   matchesBrand && 
+                   matchesPrice && 
+                   matchesEnergy && 
+                   matchesMileage;
         }).map(id => ({
             id,
             name: CARS[id].name,
             img: CARS[id].img,
             price: CARS[id].price,
-            specs: { power: CARS[id].power, speed: CARS[id].details?.zeroToSixty || 'N/A', engine: CARS[id].details?.engineFull || 'N/A' },
+            specs: { 
+                power: CARS[id].power, 
+                speed: CARS[id].details?.zeroToSixty || 'N/A', 
+                engine: CARS[id].details?.engineFull || 'N/A' 
+            },
             flipped: this.getOrientation(id, stackSide)
         }));
     },
 
     initStacks() {
+        console.log('ComparePage: Initializing stacks...');
         const leftPool = this.getFilteredCars('left');
         const rightPool = this.getFilteredCars('right');
         
-        this.stacks.left = new CarStack("left-stack", leftPool, this);
-        this.stacks.right = new CarStack("right-stack", rightPool, this);
-        
-        document.getElementById('left-stack').setAttribute('data-foreground-id', leftPool[0].id);
-        document.getElementById('right-stack').setAttribute('data-foreground-id', rightPool[0].id);
+        const leftEl = document.getElementById('left-stack');
+        const rightEl = document.getElementById('right-stack');
+
+        if (leftEl) {
+            this.stacks.left = new CarStack("left-stack", leftPool, this);
+            if (leftPool.length > 0) leftEl.setAttribute('data-foreground-id', leftPool[0].id);
+        }
+        if (rightEl) {
+            this.stacks.right = new CarStack("right-stack", rightPool, this);
+            if (rightPool.length > 0) rightEl.setAttribute('data-foreground-id', rightPool[0].id);
+        }
     },
 
     setupListeners() {
-        document.querySelectorAll('.sf-select, .sf-input, .sf-range').forEach(el => {
-            const handleChange = () => this.handleFilterChange(el);
-            el.addEventListener('change', handleChange);
-            if (el.classList.contains('sf-input') || el.classList.contains('sf-range')) {
-                el.addEventListener('input', handleChange);
-            }
+        const cols = document.querySelectorAll('.faceoff-col');
+        if (cols.length === 0) return;
+
+        cols.forEach(col => {
+            col.querySelectorAll('.sf-select, .sf-input, .sf-range').forEach(el => {
+                const handleChange = () => this.handleFilterChange(el);
+                el.addEventListener('change', handleChange);
+                if (el.classList.contains('sf-input') || el.classList.contains('sf-range')) {
+                    el.addEventListener('input', handleChange);
+                }
+            });
         });
     },
 
@@ -141,20 +183,38 @@ const ComparePage = {
         const stackSide = stackEl.id === 'left-stack' ? 'left' : 'right';
         
         if (el.classList.contains('sf-range')) {
-            el.closest('.sf-group').querySelector('.sf-price-input').value = this.formatNaira(el.value);
+            const group = el.closest('.sf-group');
+            const priceInput = group.querySelector('.sf-price-input');
+            if (priceInput) priceInput.value = this.formatNaira(el.value);
         } else if (el.classList.contains('sf-price-input')) {
             const raw = this.parseNaira(el.value);
-            if (!isNaN(raw)) el.closest('.sf-group').querySelector('.sf-range').value = Math.min(1e9, Math.max(1e5, raw));
+            const group = el.closest('.sf-group');
+            const rangeInput = group.querySelector('.sf-range');
+            if (rangeInput && !isNaN(raw)) rangeInput.value = Math.min(1e9, Math.max(1e5, raw));
         }
 
         const newPool = this.getFilteredCars(stackSide);
-        if (newPool.length === 0) return;
-
         const stack = this.stacks[stackSide];
+        
+        if (newPool.length === 0) {
+            // Optional: Show empty state or keep old pool? 
+            // For now, let's keep it but maybe clear the stack visually
+            stack.cars = [];
+            stack.render();
+            return;
+        }
+
         stack.cars = newPool;
         stack.index = 0;
         stack.render();
         stackEl.setAttribute('data-foreground-id', newPool[0].id);
+        
+        // Important: Update the OTHER side's awareness if needed
+        // but typically the other side only needs to exclude the NEW foreground ID
+        const otherSide = stackSide === 'left' ? 'right' : 'left';
+        if (this.stacks[otherSide]) {
+            this.stacks[otherSide].refreshAvailablePool();
+        }
     }
 };
 
@@ -170,8 +230,15 @@ class CarStack {
     }
 
     render() {
+        if (!this.container) return;
         this.container.innerHTML = '';
+        if (!this.cars || this.cars.length === 0) {
+            this.container.innerHTML = '<div class="depth-item foreground"><span class="depth-label">NO MATCHES</span></div>';
+            return;
+        }
+
         ['foreground', 'background', 'background-2', 'background-3', 'background-4'].forEach((cls, i) => {
+            if (i >= this.cars.length) return;
             const idx = (this.index + i) % this.cars.length;
             this.container.appendChild(this.createItem(idx, cls));
         });
@@ -213,6 +280,11 @@ class CarStack {
         const b1 = this.container.querySelector('.background');
         const b2 = this.container.querySelector('.background-2');
 
+        if (!fg || !b1) {
+            this.isTransitioning = false;
+            return;
+        }
+
         fg.classList.replace('foreground', 'exiting');
         b1.classList.replace('background', 'foreground');
         
@@ -222,33 +294,47 @@ class CarStack {
         specs.innerHTML = `<div class="spec-pill"><span class="spec-val">${car.specs.power}</span><span class="spec-label">POWER</span></div><div class="spec-pill"><span class="spec-val">${car.specs.speed}</span><span class="spec-label">0-100</span></div><div class="spec-pill"><span class="spec-val">${car.specs.engine}</span><span class="spec-label">ENGINE</span></div>`;
         b1.prepend(specs);
 
-        b2.classList.replace('background-2', 'background');
+        if (b2) b2.classList.replace('background-2', 'background');
+        
         this.index = (this.index + 1) % this.cars.length;
-        const nextB2 = this.createItem((this.index + 2) % this.cars.length, 'background-2 hidden');
-        this.container.appendChild(nextB2);
+        this.container.setAttribute('data-foreground-id', this.cars[this.index].id);
 
-        const otherStack = this.container.id === 'left-stack' ? this.page.stacks.right : this.page.stacks.left;
+        // Add a new background-2 if possible
+        if (this.cars.length > 2) {
+            const nextB2 = this.createItem((this.index + 2) % this.cars.length, 'background-2 hidden');
+            this.container.appendChild(nextB2);
+            requestAnimationFrame(() => nextB2.classList.remove('hidden'));
+        }
+
+        // Notify other stack to refresh its pool (to exclude our NEW foreground)
+        const side = this.container.id === 'left-stack' ? 'left' : 'right';
+        const otherSide = side === 'left' ? 'right' : 'left';
+        const otherStack = this.page.stacks[otherSide];
         if (otherStack) {
-            this.container.setAttribute('data-foreground-id', this.cars[this.index].id);
             otherStack.refreshAvailablePool();
         }
 
-        requestAnimationFrame(() => nextB2.classList.remove('hidden'));
         setTimeout(() => { fg.remove(); this.isTransitioning = false; }, 1000);
     }
 
     refreshAvailablePool() {
         const side = this.container.id === 'left-stack' ? 'left' : 'right';
-        const other = side === 'left' ? this.page.stacks.right : this.page.stacks.left;
-        const forbidden = other ? other.container.getAttribute('data-foreground-id') : null;
-        const newCars = this.page.getFilteredCars(side).filter(c => c.id !== forbidden);
+        const newCars = this.page.getFilteredCars(side);
         
         if (newCars.length > 0) {
-            this.cars = newCars;
             const currentId = this.container.getAttribute('data-foreground-id');
+            this.cars = newCars;
+            
+            // Re-index to keep current car if it still exists in the pool
             const newIdx = this.cars.findIndex(c => c.id === currentId);
-            this.index = newIdx !== -1 ? newIdx : 0;
-            if (newIdx === -1) this.render();
+            if (newIdx !== -1) {
+                this.index = newIdx;
+                // No need to full re-render, just update internal state
+            } else {
+                this.index = 0;
+                this.container.setAttribute('data-foreground-id', this.cars[0].id);
+                this.render();
+            }
         }
     }
 
@@ -258,3 +344,4 @@ class CarStack {
 }
 
 window.ComparePage = ComparePage;
+}

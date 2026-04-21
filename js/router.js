@@ -1,6 +1,7 @@
 
-const Router = {
-    MUSIC_ZONE: ['catalog.html', 'compare.html', 'showroom.html'],
+if (!window.Router) {
+var Router = {
+    MUSIC_ZONE: ['catalog', 'compare', 'showroom'],
     
     init() {
         window.addEventListener('popstate', () => this.handleRoute(window.location.pathname + window.location.search));
@@ -35,12 +36,24 @@ const Router = {
     },
 
     async handleRoute(url, isInitial = false) {
-        const path = url.split('?')[0].split('/').pop() || 'index.html';
+        let path = url.split('?')[0].split('/').pop() || 'index.html';
+        if (path === '' || path === '/') path = 'index.html';
         
+        // Normalize: remove .html for matching
+        const baseName = path.replace('.html', '');
+        const isZonePage = this.MUSIC_ZONE.some(zone => baseName === zone || path === `${zone}.html`);
+        
+        document.body.classList.toggle('is-zone-page', isZonePage);
+        if (isZonePage) {
+            document.body.classList.add(`page-${baseName}`);
+        } else {
+            document.body.classList.remove('page-catalog', 'page-compare', 'page-showroom');
+        }
+
         // 1. Show/Hide Persistent Nav
         const nav = document.getElementById('persistent-nav');
         if (nav) {
-            nav.style.display = (path === 'index.html' || path === '') ? 'none' : 'flex';
+            nav.style.display = (path === 'index.html') ? 'none' : 'flex';
         }
 
         // 2. Cleanup old page
@@ -62,11 +75,14 @@ const Router = {
                 if (newMain && currentMain) {
                     currentMain.innerHTML = newMain.innerHTML;
                     currentMain.className = newMain.className;
-                    currentMain.id = newMain.id || 'main-content';
+                    currentMain.id = 'main-content';
                 }
 
                 document.title = doc.title;
+                // Preserve global classes like 'is-zone-page'
+                const preservedClasses = Array.from(document.body.classList).filter(c => c.startsWith('is-zone-page') || c.startsWith('page-'));
                 document.body.className = doc.body.className;
+                preservedClasses.forEach(c => document.body.classList.add(c));
             } catch (err) {
                 console.error('Navigation failed:', err);
                 // Fallback: full reload if fetch fails
@@ -83,12 +99,30 @@ const Router = {
             a.style.opacity = isActive ? '1' : '0.6';
         });
 
-        // 5. Music Zone Logic
-        if (this.MUSIC_ZONE.includes(path)) {
-            if (window.MusicPlayer) window.MusicPlayer.show();
-        } else {
-            if (window.MusicPlayer) window.MusicPlayer.hide();
-        }
+        // 5. Zone Logic: Music & Drawer
+        const triggerGlobalUI = () => {
+            if (isZonePage) {
+                document.body.classList.add('is-zone-page');
+                document.body.classList.add(`page-${baseName}`);
+                // Ensure visibility
+                if (window.MusicPlayer && typeof window.MusicPlayer.show === 'function') {
+                    window.MusicPlayer.show();
+                }
+                if (window.FaceoffDrawer && typeof window.FaceoffDrawer.show === 'function') {
+                    window.FaceoffDrawer.show();
+                }
+            } else {
+                document.body.classList.remove('is-zone-page', 'page-catalog', 'page-compare', 'page-showroom');
+                if (window.MusicPlayer && typeof window.MusicPlayer.hide === 'function') {
+                    window.MusicPlayer.hide();
+                }
+                if (window.FaceoffDrawer && typeof window.FaceoffDrawer.hide === 'function') {
+                    window.FaceoffDrawer.hide();
+                }
+            }
+        };
+
+        triggerGlobalUI();
 
         // 6. Initialize new page logic
         this.loadPageScript(path);
@@ -108,6 +142,29 @@ const Router = {
             window.currentPage = window.ContactPage;
         } else if (path === 'about.html') {
             window.currentPage = window.AboutPage;
+        } else if (path === 'index.html') {
+            // Special case for landing page logic
+            window.currentPage = {
+                init: () => {
+                    document.querySelectorAll('.currency-btn').forEach(btn => {
+                        btn.addEventListener('click', () => {
+                            document.querySelectorAll('.currency-btn').forEach(b => b.classList.remove('active'));
+                            btn.classList.add('active');
+                            localStorage.setItem('faceoff_currency', btn.dataset.cur);
+                            if (window.CatalogPage) window.CatalogPage.renderGrid();
+                        });
+                    });
+
+                    const saved = localStorage.getItem('faceoff_currency');
+                    if (saved) {
+                        const btn = document.querySelector(`[data-cur="${saved}"]`);
+                        if (btn) {
+                            document.querySelectorAll('.currency-btn').forEach(b => b.classList.remove('active'));
+                            btn.classList.add('active');
+                        }
+                    }
+                }
+            };
         } else {
             window.currentPage = null;
         }
@@ -116,7 +173,7 @@ const Router = {
             window.currentPage.init();
         }
 
-        if (window.FaceoffDrawer) window.FaceoffDrawer.refresh();
+        if (window.FaceoffDrawer && window.FaceoffDrawer.refresh) window.FaceoffDrawer.refresh();
     }
 };
 
@@ -125,4 +182,5 @@ if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => Router.init());
 } else {
     Router.init();
+}
 }

@@ -1,5 +1,6 @@
 
-const ShowroomPage = {
+if (!window.ShowroomPage) {
+var ShowroomPage = {
     init() {
         const params = new URLSearchParams(window.location.search);
         const carId = params.get('car') || "mercedes-g-wagon";
@@ -161,3 +162,4 @@ const ShowroomPage = {
 };
 
 window.ShowroomPage = ShowroomPage;
+}

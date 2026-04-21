@@ -1,5 +1,6 @@
 
-const ContactPage = {
+if (!window.ContactPage) {
+var ContactPage = {
     init() {
         const params = new URLSearchParams(window.location.search);
         const type = params.get('type');
@@ -122,3 +123,4 @@ const ContactPage = {
 };
 
 window.ContactPage = ContactPage;
+}
