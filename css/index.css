@@ -4,9 +4,9 @@
 
 /* Faceoff Design System */
 :root {
-    --bg-color: #ffffff;
-    --text-color: #000000;
-    --nav-color: #000000;
+    --bg-color: #0c0c0c;
+    --text-color: rgba(255,255,255,0.85);
+    --nav-color: #ffffff;
     
     /* Font: Jolly Lodger (Bold & Unique) */
     --font-display: 'Jolly Lodger', system-ui, -apple-system, sans-serif;
