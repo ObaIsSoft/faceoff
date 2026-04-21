@@ -45,8 +45,8 @@ var ShowroomPage = {
             backEl.className = 'sr-back';
             backEl.href = backHref;
             backEl.innerHTML = `← ${backLabel}`;
-            const center = document.querySelector('.showroom-center');
-            if (center) center.prepend(backEl);
+            const stage = document.querySelector('.showroom-stage');
+            if (stage) stage.prepend(backEl);
         }
 
         // Save button
@@ -68,7 +68,7 @@ var ShowroomPage = {
         });
 
         const cta = document.querySelector('.showroom-cta');
-        if (cta) cta.insertAdjacentElement('afterend', saveBtn);
+        if (cta) cta.appendChild(saveBtn);
         updateBtn();
 
         if (car.details) this.initMobileModals(car);
@@ -153,11 +153,24 @@ var ShowroomPage = {
         };
         update(false);
         this._modalInterval = setInterval(() => update(true), 4000);
+
+        // Move music player below CTAs on mobile flow
+        const player = document.querySelector('.music-player-pill');
+        const center = document.querySelector('.showroom-center');
+        if (player && center) {
+            center.appendChild(player);
+        }
     },
 
     destroy() {
         if (this._modalInterval) clearInterval(this._modalInterval);
         document.querySelectorAll('.sr-modal').forEach(m => m.remove());
+
+        // Restore music player to body root for persistence on other pages
+        const player = document.querySelector('.music-player-pill');
+        if (player && player.parentElement !== document.body) {
+            document.body.appendChild(player);
+        }
     }
 };
 
