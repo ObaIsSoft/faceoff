@@ -53,46 +53,10 @@
     <script src="js/pages/catalog.js"></script>
     <script src="js/pages/compare.js"></script>
     <script src="js/pages/showroom.js"></script>
+    <script src="js/pages/contact.js"></script>
+    <script src="js/pages/about.js"></script>
     
     <!-- Router (Must be last) -->
     <script src="js/router.js"></script>
-
-    <script>
-        // Landing page specific logic (Persistent)
-        function initLanding() {
-            const nav = document.getElementById('persistent-nav');
-            if (nav) nav.style.display = 'none';
-
-            document.querySelectorAll('.currency-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.currency-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    localStorage.setItem('faceoff_currency', btn.dataset.cur);
-                    if (window.CatalogPage) window.CatalogPage.renderGrid();
-                });
-            });
-
-            const saved = localStorage.getItem('faceoff_currency');
-            if (saved) {
-                const btn = document.querySelector(`[data-cur="${saved}"]`);
-                if (btn) {
-                    document.querySelectorAll('.currency-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                }
-            }
-        }
-
-        // Show/Hide Nav based on route
-        window.addEventListener('popstate', () => {
-            const path = window.location.pathname.split('/').pop() || 'index.html';
-            const nav = document.getElementById('persistent-nav');
-            if (nav) nav.style.display = (path === 'index.html' || path === '') ? 'none' : 'flex';
-        });
-
-        // Intercept landing page clicks
-        document.addEventListener('DOMContentLoaded', () => {
-            initLanding();
-        });
-    </script>
 </body>
 </html>

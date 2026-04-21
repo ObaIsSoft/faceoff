@@ -3116,64 +3116,12 @@ body.showroom-light header.nav-top .nav-links a {
    NOTES DRAWER — Saved Vehicles
 ═══════════════════════════════════════════════════════════════ */
 
-/* ── Trigger ── */
-.fd-trigger {
-    position: fixed;
-    bottom: 1.75rem;
-    right: 1.5rem;
-    padding: 0.45rem 1.1rem 0.4rem 1rem;
-    border-radius: 100px;
-    background: transparent;
-    border: 1px solid rgba(255,255,255,0.22);
-    color: #fff;
-    cursor: pointer;
-    z-index: 800;
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
-    transition: background 0.25s, border-color 0.25s, transform 0.2s;
-}
-.fd-trigger:hover {
-    background: rgba(255,255,255,0.07);
-    border-color: rgba(255,255,255,0.38);
-    transform: translateY(-1px);
-}
-/* On showroom, move above bottom modal so it doesn't cover content */
-body.showroom-mode .fd-trigger {
-    bottom: auto;
-    top: 3.6rem;
-}
-.fd-trigger-label {
-    font-family: 'Great Vibes', cursive;
-    font-size: 1.35rem;
-    line-height: 1;
-    color: #fff;
-    letter-spacing: 0.02em;
-    padding-bottom: 0.05rem;
-}
-.fd-badge {
-    min-width: 17px;
-    height: 17px;
-    border-radius: 100px;
-    background: rgba(255,255,255,0.9);
-    color: #000;
-    font-size: 0.44rem;
-    font-weight: 700;
-    letter-spacing: 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 4px;
-    pointer-events: none;
-}
-
 /* ── Overlay ── */
 .fd-overlay {
     position: fixed;
     inset: 0;
-    background: rgba(0,0,0,0.55);
-    backdrop-filter: blur(3px);
-    -webkit-backdrop-filter: blur(3px);
+    background: rgba(0,0,0,0.3);
+    backdrop-filter: blur(2px);
     z-index: 850;
     opacity: 0;
     pointer-events: none;
@@ -3181,16 +3129,16 @@ body.showroom-mode .fd-trigger {
 }
 .fd-overlay--on { opacity: 1; pointer-events: auto; }
 
-/* ── Drawer — mobile: slides from bottom ── */
+/* ── Drawer ── */
 .fd-drawer {
     position: fixed;
     bottom: 0;
     left: 0;
     right: 0;
     height: 74dvh;
-    background: rgba(6,6,6,0.96);
-    backdrop-filter: blur(28px);
-    -webkit-backdrop-filter: blur(28px);
+    background: rgba(8, 8, 8, 0.6) !important;
+    backdrop-filter: blur(60px) !important;
+    -webkit-backdrop-filter: blur(60px) !important;
     border-top: 1px solid rgba(255,255,255,0.08);
     border-radius: 18px 18px 0 0;
     z-index: 860;
@@ -3202,7 +3150,6 @@ body.showroom-mode .fd-trigger {
 }
 .fd-drawer.fd-open { transform: translateY(0); }
 
-/* ── Drawer — desktop: slides from right ── */
 @media (min-width: 769px) {
     .fd-drawer {
         top: 0;
@@ -3268,9 +3215,18 @@ body.showroom-mode .fd-trigger {
 
 .fd-item {
     display: flex;
-    align-items: center;
-    padding: 0.65rem 1.25rem;
+    flex-direction: column;
+    padding: 0.85rem 1.25rem;
     border-bottom: 1px solid rgba(255,255,255,0.04);
+    gap: 0.6rem;
+    background: rgba(255,255,255,0.02);
+    margin: 4px 10px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.05);
+}
+.fd-item-main {
+    display: flex;
+    align-items: center;
     gap: 0.5rem;
 }
 .fd-item-link {
@@ -3319,7 +3275,31 @@ body.showroom-mode .fd-trigger {
     flex-shrink: 0;
     transition: color 0.2s;
 }
-.fd-item-remove:hover { color: rgba(255,255,255,0.7); }
+.fd-item-remove:hover { color: #ff4d4d; }
+
+.fd-item-notes {
+    width: 100%;
+}
+.fd-notes-area {
+    width: 100%;
+    min-height: 50px;
+    background: rgba(0,0,0,0.2);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 8px;
+    color: rgba(255,255,255,0.7);
+    font-size: 0.55rem;
+    padding: 0.5rem;
+    resize: vertical;
+    font-family: inherit;
+    line-height: 1.4;
+    outline: none;
+    transition: border-color 0.3s, background 0.3s;
+}
+.fd-notes-area:focus {
+    border-color: rgba(255,255,255,0.15);
+    background: rgba(0,0,0,0.35);
+    color: #fff;
+}
 
 /* ── Footer ── */
 .fd-footer {
@@ -3339,7 +3319,7 @@ body.showroom-mode .fd-trigger {
 }
 .fd-footer-link:hover { color: #fff; }
 
-/* ── Save button (on cards / compare) ── */
+/* ── Save button ── */
 .fd-save-btn {
     position: absolute;
     top: 0.55rem;
@@ -3364,153 +3344,30 @@ body.showroom-mode .fd-trigger {
 .fd-save-btn[data-saved="true"] { background: rgba(255,255,255,0.14); color: #fff; border-color: rgba(255,255,255,0.35); }
 .fd-save-btn[data-saved="true"] svg path { fill: currentColor; }
 
-/* Hide save button on depth-item backgrounds */
-.depth-item:not(.foreground) .fd-save-btn { display: none; }
-
-/* ── Catalog card: needs position:relative for save btn ── */
-.catalog-card { position: relative; }
-
-/* ── Back button (showroom) ── */
-.sr-back {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    font-size: 0.48rem;
-    letter-spacing: 0.22em;
-    text-transform: uppercase;
-    color: rgba(255,255,255,0.38);
-    text-decoration: none;
-    transition: color 0.2s;
-    margin-bottom: 0.6rem;
-}
-.sr-back:hover { color: rgba(255,255,255,0.8); }
-
-/* ── Showroom save button ── */
-.sr-save {
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
-    padding: 0.55rem 1.25rem;
-    border: 1px solid rgba(255,255,255,0.14);
-    background: transparent;
-    color: rgba(255,255,255,0.5);
-    font-size: 0.52rem;
-    letter-spacing: 0.18em;
-    text-transform: uppercase;
-    cursor: pointer;
-    transition: all 0.2s;
-    border-radius: 2px;
-    margin-top: 0.5rem;
-}
-.sr-save:hover { background: rgba(255,255,255,0.06); color: #fff; border-color: rgba(255,255,255,0.3); }
-.sr-save[data-saved="true"] { background: rgba(255,255,255,0.08); color: #fff; border-color: rgba(255,255,255,0.3); }
-.sr-save[data-saved="true"] svg path { fill: currentColor; }
-
-/* --- SPA SHELL & MUSIC PLAYER --- */
-
-.music-player-widget {
+/* Notes Trigger - Clean Background-Conscious Pill */
+.fd-trigger {
     position: fixed;
-    bottom: 2rem;
-    left: 2rem;
-    z-index: 9999;
-    background: #fff;
-    border: 1px solid #000;
-    padding: 0.75rem 1rem;
-    display: flex;
-    align-items: center;
-    gap: 1.5rem;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.05);
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.player-visual-wrap {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.player-waveform {
-    display: flex;
-    align-items: flex-end;
-    gap: 2px;
-    height: 20px;
-}
-
-.player-waveform span {
-    width: 2px;
-    height: 4px;
-    background: #000;
-    transition: height 0.2s ease;
-}
-
-.player-waveform.active span {
-    animation: wave 1s ease-in-out infinite;
-}
-
-.player-waveform.active span:nth-child(2) { animation-delay: 0.1s; }
-.player-waveform.active span:nth-child(3) { animation-delay: 0.2s; }
-.player-waveform.active span:nth-child(4) { animation-delay: 0.3s; }
-.player-waveform.active span:nth-child(5) { animation-delay: 0.4s; }
-
-@keyframes wave {
-    0%, 100% { height: 4px; }
-    50% { height: 20px; }
-}
-
-.player-info {
-    display: flex;
-    flex-direction: column;
-}
-
-.track-title {
-    font-family: var(--font-nav);
-    font-size: 0.7rem;
-    font-weight: 900;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-}
-
-.track-artist {
-    font-family: var(--font-nav);
-    font-size: 0.6rem;
-    opacity: 0.4;
-    text-transform: uppercase;
-}
-
-.player-controls {
-    display: flex;
-    gap: 0.5rem;
-}
-
-.p-btn {
-    background: none;
-    border: none;
-    font-family: var(--font-nav);
-    font-size: 0.65rem;
-    font-weight: 900;
+    bottom: 1.75rem;
+    right: 1.5rem;
+    padding: 0.6rem 1.2rem;
+    border-radius: 100px;
+    background: rgba(10, 10, 10, 0.9);
+    border: 1px solid rgba(255, 255, 255, 0.15);
     cursor: pointer;
-    padding: 0.2rem 0.4rem;
-    opacity: 0.6;
-    transition: opacity 0.2s;
+    z-index: 2500;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    mix-blend-mode: difference;
+    color: #fff;
+    transition: transform 0.3s ease;
 }
-
-.p-btn:hover {
-    opacity: 1;
-}
-
-.p-btn--main {
-    border: 1px solid #000;
-    padding: 0.2rem 0.8rem;
-}
-
-/* Page Transition Overlay */
-#root {
-    transition: opacity 0.4s ease-in-out, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-#root.loading {
-    opacity: 0;
-    transform: translateY(10px);
+.fd-trigger:hover { transform: translateY(-2px) scale(1.05); }
+.fd-trigger-label {
+    font-family: 'Great Vibes', cursive;
+    font-size: 1.4rem;
+    color: inherit;
+    line-height: 1;
 }
 
 /* Music Player Pill */
@@ -3518,101 +3375,63 @@ body.showroom-mode .fd-trigger {
     position: fixed;
     bottom: 1.5rem;
     left: 1.5rem;
-    background: rgba(255, 255, 255, 0.03);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: rgba(10, 10, 10, 0.9);
     border: 1px solid rgba(255, 255, 255, 0.1);
     padding: 6px;
     border-radius: 100px;
     display: flex;
     flex-direction: column;
-    z-index: 700;
+    z-index: 2000;
     transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
     cursor: default;
     user-select: none;
     max-width: 220px;
     overflow: hidden;
-    mix-blend-mode: difference; /* Background Aware */
+    mix-blend-mode: difference;
     color: #fff;
 }
-
 .music-player-pill.hidden, 
 body.drawer-open .music-player-pill {
-    opacity: 0;
-    transform: translateY(15px) scale(0.95);
-    pointer-events: none;
+    opacity: 0 !important;
+    transform: translateY(15px) scale(0.95) !important;
+    pointer-events: none !important;
 }
 
-/* Notes Trigger - High Visibility & Stacking */
-.fd-trigger {
-    position: fixed;
-    bottom: 1.75rem;
-    right: 1.5rem;
-    padding: 0.45rem 1.1rem 0.4rem 1rem;
-    border-radius: 100px;
-    background: #000; /* Solid dark background for visibility on white */
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    cursor: pointer;
-    z-index: 2500; /* Higher than anything else */
-    display: flex;
-    align-items: center;
-    gap: 0.45rem;
-    color: #fff;
-    transition: all 0.3s ease;
+/* Zone Page Overrides */
+body.is-zone-page .music-player-pill {
+    display: flex !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    visibility: visible !important;
+    z-index: 9999 !important;
 }
 
-body.showroom-mode .fd-trigger {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
+body.is-zone-page .fd-trigger {
+    display: flex !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+    visibility: visible !important;
+    z-index: 9999 !important;
 }
 
-.fd-trigger:hover {
-    transform: translateY(-2px);
-    background: #222;
-}
-
-.fd-trigger-label {
-    font-family: 'Great Vibes', cursive;
-    font-size: 1.35rem;
-    color: inherit;
-    line-height: 1;
-}
-
-/* Translucent Drawer */
-.fd-drawer {
-    background: rgba(10, 10, 10, 0.7) !important;
-    backdrop-filter: blur(50px) !important;
-    -webkit-backdrop-filter: blur(50px) !important;
-    border-left: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.fd-overlay {
-    background: rgba(0, 0, 0, 0.3);
-    backdrop-filter: blur(4px);
-}
-
-/* Page Awareness for Compare */
-.compare-wrapper .music-player-pill {
+/* Page Awareness for Compare — match catalog pill style */
+body.page-compare .music-player-pill {
     bottom: 2rem;
     left: 2rem;
+    background: transparent;
 }
-
-.fd-item {
-    background: rgba(255,255,255,0.02);
-    margin: 4px 10px;
-    border-radius: 12px;
-    border: 1px solid rgba(255,255,255,0.05);
+body.page-compare .fd-trigger {
+    background: transparent;
 }
 
 /* Showroom Mobile Positioning Fix */
 @media (max-width: 768px) {
     body.showroom-mode .music-player-pill {
         bottom: auto;
-        top: 3.5rem; /* Move up below nav on showroom mobile */
+        top: 3.5rem;
         left: 1rem;
         max-width: 180px;
     }
-    
     .music-player-pill {
         bottom: 1rem;
         left: 1rem;
@@ -3627,7 +3446,6 @@ body.showroom-mode .fd-trigger {
     gap: 4px;
     padding-right: 8px;
 }
-
 .player-content {
     display: flex;
     align-items: center;
@@ -3637,170 +3455,45 @@ body.showroom-mode .fd-trigger {
     flex: 1;
     min-width: 110px;
 }
-
-.player-content:hover {
-    background: rgba(255,255,255,0.03);
-    border-radius: 100px;
-}
-
-.player-visuals {
-    width: 20px;
-    height: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.waveform {
-    display: flex;
-    align-items: flex-end;
-    gap: 2px;
-    height: 10px;
-}
-
-.waveform span {
-    width: 1.5px;
-    height: 4px;
-    background: #fff;
-    border-radius: 1px;
-}
-
-.is-playing .waveform span {
-    animation: wave 1s ease-in-out infinite;
-}
-
+.player-content:hover { background: rgba(255,255,255,0.03); border-radius: 100px; }
+.player-visuals { width: 20px; height: 16px; display: flex; align-items: center; justify-content: center; }
+.waveform { display: flex; align-items: flex-end; gap: 2px; height: 10px; }
+.waveform span { width: 1.5px; height: 4px; background: #fff; border-radius: 1px; }
+.is-playing .waveform span { animation: wave 1s ease-in-out infinite; }
 .is-playing .waveform span:nth-child(1) { animation-delay: 0.0s; height: 8px; }
 .is-playing .waveform span:nth-child(2) { animation-delay: 0.2s; height: 5px; }
 .is-playing .waveform span:nth-child(3) { animation-delay: 0.4s; height: 10px; }
 .is-playing .waveform span:nth-child(4) { animation-delay: 0.6s; height: 6px; }
+@keyframes wave { 0%, 100% { height: 3px; } 50% { height: 10px; } }
 
-@keyframes wave {
-    0%, 100% { height: 3px; }
-    50% { height: 10px; }
-}
+.player-info { display: flex; flex-direction: column; overflow: hidden; }
+.player-title { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.player-artist { font-size: 7px; opacity: 0.4; text-transform: uppercase; letter-spacing: 0.08em; color: #fff; white-space: nowrap; }
 
-.player-info {
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.player-title {
-    font-size: 9px; /* Reduced */
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
-    color: #fff;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.player-artist {
-    font-size: 7px; /* Reduced */
-    opacity: 0.4;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    color: #fff;
-    white-space: nowrap;
-}
-
-.player-controls {
-    display: flex;
-    align-items: center;
-    gap: 2px;
-}
-
-.p-nav-btn, .player-toggle {
-    background: none;
-    border: none;
-    color: #fff;
-    padding: 6px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0.5;
-    transition: all 0.2s;
-    border-radius: 50%;
-}
-
+.player-controls { display: flex; align-items: center; gap: 2px; }
+.p-nav-btn, .player-toggle { background: none; border: none; color: #fff; padding: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; opacity: 0.5; transition: all 0.2s; border-radius: 50%; }
 .p-nav-btn svg { width: 8px; height: 8px; }
 .player-toggle svg { width: 10px; height: 12px; }
-
-.p-nav-btn:hover, .player-toggle:hover {
-    opacity: 1;
-    background: rgba(255,255,255,0.05);
-}
-
-.player-toggle svg.hidden {
-    display: none;
-}
+.p-nav-btn:hover, .player-toggle:hover { opacity: 1; background: rgba(255,255,255,0.05); }
+.player-toggle svg.hidden { display: none; }
 
 /* Tracklist */
-.player-tracklist {
-    max-height: 0;
-    transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+.player-tracklist { max-height: 0; transition: all 0.5s cubic-bezier(0.16, 1, 0.3, 1); opacity: 0; padding: 0 10px; }
+.music-player-pill.is-expanded { border-radius: 16px; background: rgba(12, 12, 12, 0.95); max-width: 220px; }
+.is-expanded .player-tracklist { max-height: 200px; opacity: 1; padding: 10px 10px 14px; }
+.tl-header { font-size: 7px; font-weight: 900; letter-spacing: 0.2em; opacity: 0.3; margin-bottom: 10px; color: #fff; }
+.tl-items { display: flex; flex-direction: column; gap: 2px; }
+.tl-item { display: flex; flex-direction: column; padding: 6px 8px; border-radius: 6px; cursor: pointer; transition: all 0.2s; }
+.tl-item:hover { background: rgba(255,255,255,0.05); }
+.tl-item.active { background: rgba(255,255,255,0.08); }
+.tl-name { font-size: 9px; font-weight: 700; color: #fff; text-transform: uppercase; }
+.tl-artist { font-size: 7px; opacity: 0.4; color: #fff; text-transform: uppercase; }
+
+/* Transitions */
+#main-content {
+    transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+#main-content.router-loading {
     opacity: 0;
-    padding: 0 10px;
+    transform: translateY(10px);
 }
-
-.music-player-pill.is-expanded {
-    border-radius: 16px;
-    background: rgba(12, 12, 12, 0.95);
-    max-width: 220px;
-}
-
-.is-expanded .player-tracklist {
-    max-height: 200px;
-    opacity: 1;
-    padding: 10px 10px 14px;
-}
-
-.tl-header {
-    font-size: 7px;
-    font-weight: 900;
-    letter-spacing: 0.2em;
-    opacity: 0.3;
-    margin-bottom: 10px;
-    color: #fff;
-}
-
-.tl-items {
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-}
-
-.tl-item {
-    display: flex;
-    flex-direction: column;
-    padding: 6px 8px;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.tl-item:hover {
-    background: rgba(255,255,255,0.05);
-}
-
-.tl-item.active {
-    background: rgba(255,255,255,0.08);
-}
-
-.tl-name {
-    font-size: 9px;
-    font-weight: 700;
-    color: #fff;
-    text-transform: uppercase;
-}
-
-.tl-artist {
-    font-size: 7px;
-    opacity: 0.4;
-    color: #fff;
-    text-transform: uppercase;
-}
-
-

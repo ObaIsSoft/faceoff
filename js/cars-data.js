@@ -1,4 +1,5 @@
-const CARS = {
+if (!window.CARS) {
+var CARS = {
     "mercedes-g-wagon": {
         name: "Mercedes-Benz G-Wagon",
         img: "assets/car_left.png",
@@ -341,8 +342,9 @@ const CARS = {
         }
     }
 };
+window.CARS = CARS;
 
-const BRANDS = [
+var BRANDS = [
     { name: "Rolls-Royce", logo: "assets/brands/rolls-royce.png" },
     { name: "Bentley", logo: "assets/brands/bentley.png" },
     { name: "Mercedes-Benz", logo: "assets/brands/mercedes.png" },
@@ -364,7 +366,9 @@ const BRANDS = [
     { name: "Chevrolet", logo: "assets/brands/chevrolet.png" },
     { name: "Volkswagen", logo: "assets/brands/volkswagen.png" }
 ];
+window.BRANDS = BRANDS;
+}
 
 if (typeof module !== 'undefined') {
-    module.exports = { CARS, BRANDS };
+    module.exports = { CARS: window.CARS, BRANDS: window.BRANDS };
 }

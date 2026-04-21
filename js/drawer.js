@@ -26,6 +26,7 @@
     }
 
     function formatPrice(str) {
+        if (!str) return '';
         const val = parseInt(str.replace(/[^0-9]/g, ''), 10);
         const currency = localStorage.getItem('faceoff_currency') || 'NGN';
         const rates = { 'NGN': { symbol: '₦', rate: 1 }, 'GHS': { symbol: 'GH₵', rate: 0.012 }, 'XOF-TG': { symbol: 'CFA', rate: 0.52 }, 'XOF-BJ': { symbol: 'CFA', rate: 0.52 } };
@@ -63,7 +64,7 @@
                         <div class="fd-item-info">
                             <span class="fd-item-name">${car.name}</span>
                             <span class="fd-item-price">${formatPrice(car.price)}</span>
-                            <span class="fd-item-meta">${car.details?.year || ''} · ${car.type || ''} · ${car.energy || ''}</span>
+                            <span class="fd-item-meta">${car.details?.year || ''} · ${car.type || ''}</span>
                         </div>
                     </a>
                     <button class="fd-item-remove" onclick="FaceoffDrawer.remove('${id}')" aria-label="Remove">✕</button>
@@ -126,7 +127,43 @@
     }
 
     function init() {
-        // ... (trigger/overlay/drawer creation)
+        if (document.getElementById('fd-drawer')) return;
+
+        // Trigger button
+        const trigger = document.createElement('button');
+        trigger.id = 'fd-trigger';
+        trigger.className = 'fd-trigger';
+        trigger.setAttribute('aria-label', 'Saved vehicles');
+        trigger.innerHTML = `<span class="fd-trigger-label">notes</span><span id="fd-badge" class="fd-badge" style="display:none">0</span>`;
+        trigger.addEventListener('click', openDrawer);
+        document.body.appendChild(trigger);
+
+        // Overlay
+        const overlay = document.createElement('div');
+        overlay.id = 'fd-overlay';
+        overlay.className = 'fd-overlay';
+        overlay.addEventListener('click', closeDrawer);
+        document.body.appendChild(overlay);
+
+        // Drawer
+        const drawer = document.createElement('div');
+        drawer.id = 'fd-drawer';
+        drawer.className = 'fd-drawer';
+        drawer.innerHTML = `
+            <div class="fd-header">
+                <div class="fd-header-left">
+                    <span class="fd-title">Saved</span>
+                    <span class="fd-count" id="fd-count"></span>
+                </div>
+                <button class="fd-close" onclick="FaceoffDrawer.close()" aria-label="Close">✕</button>
+            </div>
+            <div id="fd-list" class="fd-list"></div>
+            <div class="fd-footer">
+                <a href="catalog.html" class="fd-footer-link">Browse Catalog</a>
+                <a href="compare.html" class="fd-footer-link">Compare</a>
+            </div>`;
+        document.body.appendChild(drawer);
+
         document.body.addEventListener('mousemove', resetAutoCloseTimer);
         document.body.addEventListener('touchstart', resetAutoCloseTimer);
         document.body.addEventListener('scroll', resetAutoCloseTimer, true);
@@ -134,7 +171,23 @@
         refreshAll();
     }
 
-    window.FaceoffDrawer = { toggle: toggleSaved, remove: removeSaved, isSaved, open: openDrawer, close: closeDrawer, refresh: refreshAll, bookmarkSVG: BOOKMARK_SVG };
+    function showTrigger() {
+        console.log('FaceoffDrawer: showTrigger() called');
+        const trigger = document.getElementById('fd-trigger');
+        if (!trigger) {
+            init();
+        } else {
+            trigger.style.display = 'flex';
+        }
+    }
+
+    function hideTrigger() {
+        const trigger = document.getElementById('fd-trigger');
+        if (trigger) trigger.style.display = 'none';
+        closeDrawer();
+    }
+
+    window.FaceoffDrawer = { toggle: toggleSaved, remove: removeSaved, isSaved, open: openDrawer, close: closeDrawer, refresh: refreshAll, bookmarkSVG: BOOKMARK_SVG, show: showTrigger, hide: hideTrigger };
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', init);

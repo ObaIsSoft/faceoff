@@ -1,5 +1,6 @@
 
-const CatalogPage = {
+if (!window.CatalogPage) {
+var CatalogPage = {
     order: [
         "mercedes-g-wagon", "lexus-lx-600", "range-rover", "escalade-v",
         "_2026cadillac", "byd-ato3", "camry2025hybrid", "corolla2025",
@@ -170,3 +171,4 @@ const CatalogPage = {
 };
 
 window.CatalogPage = CatalogPage;
+}
