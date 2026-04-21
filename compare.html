@@ -7,21 +7,20 @@
     <link rel="stylesheet" href="css/index.css">
 </head>
 <body>
-    <header class="nav-top">
+    <header class="nav-top" id="persistent-nav">
         <nav>
             <ul class="nav-links">
                 <li><a href="index.html">home</a></li>
                 <li><a href="about.html">about</a></li>
                 <li><a href="catalog.html">catalog</a></li>
-                <li><a href="showroom.html">showroom</a></li>
+                <li><a href="compare.html">compare</a></li>
                 <li><a href="contact.html">contact</a></li>
             </ul>
         </nav>
     </header>
 
-    <main class="compare-wrapper">
+    <main class="compare-wrapper" id="main-content">
         <section class="faceoff-zone">
-
             <div class="faceoff-col">
                 <div class="stack-filter">
                     <div class="sf-group">
@@ -40,9 +39,7 @@
                     </div>
                     <div class="sf-group">
                         <span class="sf-label">BRAND</span>
-                        <div class="sf-control">
-                            <input type="text" class="sf-input" placeholder="SEARCH BRAND...">
-                        </div>
+                        <div class="sf-control"><input type="text" class="sf-input" placeholder="SEARCH BRAND..."></div>
                     </div>
                     <div class="sf-group">
                         <span class="sf-label">MAX MILEAGE</span>
@@ -53,12 +50,10 @@
                     </div>
                     <div class="sf-group">
                         <span class="sf-label">PRICE RANGE</span>
-                        <div class="sf-control">
-                            <input type="range" class="sf-range" min="100000" max="1000000000" value="1000000000" step="100000" oninput="syncPriceFromSlider(this)">
-                        </div>
+                        <div class="sf-control"><input type="range" class="sf-range" min="100000" max="1000000000" value="1000000000" step="100000"></div>
                         <div class="sf-range-bounds">
                             <span class="min-bound">₦100K</span>
-                            <input type="text" class="sf-range-val sf-price-input" value="₦1B" oninput="syncPriceFromInput(this)" onblur="formatPriceInput(this)">
+                            <input type="text" class="sf-range-val sf-price-input" value="₦1B">
                             <span class="max-bound">₦1B</span>
                         </div>
                     </div>
@@ -80,38 +75,34 @@
                     <div class="sf-group">
                         <span class="sf-label">VEHICLE TYPE</span>
                         <div class="sf-control">
-                            <select class="sf-select" onchange="handleFilterChange(this)"><option>ALL</option><option>SUV</option><option>SEDAN</option><option>TRUCK</option></select>
+                            <select class="sf-select"><option>ALL</option><option>SUV</option><option>SEDAN</option><option>TRUCK</option></select>
                             <span class="sf-chevron">∨</span>
                         </div>
                     </div>
                     <div class="sf-group">
                         <span class="sf-label">CATEGORY</span>
                         <div class="sf-control">
-                            <select class="sf-select" onchange="handleFilterChange(this)"><option>ALL</option><option>LUXURY</option><option>SPORT</option><option>OFF-ROAD</option><option>ADVENTURE</option><option>FAMILY</option><option>ECONOMY</option></select>
+                            <select class="sf-select"><option>ALL</option><option>LUXURY</option><option>SPORT</option><option>OFF-ROAD</option><option>ADVENTURE</option><option>FAMILY</option><option>ECONOMY</option></select>
                             <span class="sf-chevron">∨</span>
                         </div>
                     </div>
                     <div class="sf-group">
                         <span class="sf-label">BRAND</span>
-                        <div class="sf-control">
-                            <input type="text" class="sf-input" placeholder="SEARCH BRAND..." oninput="handleFilterChange(this)">
-                        </div>
+                        <div class="sf-control"><input type="text" class="sf-input" placeholder="SEARCH BRAND..."></div>
                     </div>
                     <div class="sf-group">
                         <span class="sf-label">MAX MILEAGE</span>
                         <div class="sf-control">
-                            <select class="sf-select" onchange="handleFilterChange(this)"><option>ANY</option><option>100</option><option>1,000</option><option>5,000</option><option>20,000</option></select>
+                            <select class="sf-select"><option>ANY</option><option>100</option><option>1,000</option><option>5,000</option><option>20,000</option></select>
                             <span class="sf-chevron">∨</span>
                         </div>
                     </div>
                     <div class="sf-group">
                         <span class="sf-label">PRICE RANGE</span>
-                        <div class="sf-control">
-                            <input type="range" class="sf-range" min="100000" max="1000000000" value="1000000000" step="100000" oninput="syncPriceFromSlider(this)">
-                        </div>
+                        <div class="sf-control"><input type="range" class="sf-range" min="100000" max="1000000000" value="1000000000" step="100000"></div>
                         <div class="sf-range-bounds">
                             <span class="min-bound">₦100K</span>
-                            <input type="text" class="sf-range-val sf-price-input" value="₦1B" oninput="syncPriceFromInput(this)" onblur="formatPriceInput(this)">
+                            <input type="text" class="sf-range-val sf-price-input" value="₦1B">
                             <span class="max-bound">₦1B</span>
                         </div>
                     </div>
@@ -125,477 +116,18 @@
                 </div>
                 <div id="right-stack" class="car-stack"></div>
             </div>
-
         </section>
     </main>
 
     <div id="faceoff-notification" class="faceoff-notification"></div>
 
+    <!-- Shell Scripts -->
     <script src="js/cars-data.js"></script>
-    <script>
-        function formatNaira(val) {
-            const currency = localStorage.getItem('faceoff_currency') || 'NGN';
-            const rates = {
-                'NGN': { symbol: '₦', rate: 1 },
-                'GHS': { symbol: 'GH₵', rate: 0.012 },
-                'XOF-TG': { symbol: 'CFA', rate: 0.52 },
-                'XOF-BJ': { symbol: 'CFA', rate: 0.52 }
-            };
-            const config = rates[currency] || rates['NGN'];
-            const converted = val * config.rate;
-
-            if (converted >= 1e9) return config.symbol + (converted / 1e9).toFixed(1) + 'B';
-            if (converted >= 1e6) return config.symbol + Math.round(converted / 1e6) + 'M';
-            if (converted >= 1e3) return config.symbol + Math.round(converted / 1e3) + 'K';
-            return config.symbol + Math.round(converted);
-        }
-
-        function parseNaira(str) {
-            const currency = localStorage.getItem('faceoff_currency') || 'NGN';
-            const rates = {
-                'NGN': { symbol: '₦', rate: 1 },
-                'GHS': { symbol: 'GH₵', rate: 0.012 },
-                'XOF-TG': { symbol: 'CFA', rate: 0.52 },
-                'XOF-BJ': { symbol: 'CFA', rate: 0.52 }
-            };
-            const config = rates[currency] || rates['NGN'];
-            
-            // Clean string of all currency symbols and formatting
-            str = str.replace(/[₦₵,CF\s]/g, '').toUpperCase();
-            let val = 0;
-            if (str.endsWith('B')) val = parseFloat(str) * 1e9;
-            else if (str.endsWith('M')) val = parseFloat(str) * 1e6;
-            else if (str.endsWith('K')) val = parseFloat(str) * 1e3;
-            else val = parseFloat(str);
-
-            // Convert back to base Naira
-            return val / config.rate;
-        }
-
-        function syncPriceFromSlider(slider) {
-            const input = slider.closest('.sf-group').querySelector('.sf-price-input');
-            input.value = formatNaira(slider.value);
-        }
-
-        function syncPriceFromInput(input) {
-            const raw = parseNaira(input.value);
-            if (!isNaN(raw)) {
-                const slider = input.closest('.sf-group').querySelector('.sf-range');
-                slider.value = Math.min(1e9, Math.max(1e5, raw));
-            }
-        }
-
-        function formatPriceInput(input) {
-            const raw = parseNaira(input.value);
-            if (!isNaN(raw)) input.value = formatNaira(Math.min(1e9, Math.max(1e5, raw)));
-            handleFilterChange(input);
-        }
-
-        function updateSliderBounds() {
-            document.querySelectorAll('.sf-group').forEach(group => {
-                const min = group.querySelector('.min-bound');
-                const max = group.querySelector('.max-bound');
-                const slider = group.querySelector('.sf-range');
-                const input = group.querySelector('.sf-price-input');
-
-                if (min && max && slider && input) {
-                    min.textContent = formatNaira(100000);
-                    max.textContent = formatNaira(1000000000);
-                    input.value = formatNaira(slider.value);
-                }
-            });
-        }
-
-        // Initialize bounds
-        window.addEventListener('load', updateSliderBounds);
-
-        function formatPrice(nairaString) {
-            const nairaValue = parseInt(nairaString.replace(/[^0-9]/g, ''), 10);
-            const currency = localStorage.getItem('faceoff_currency') || 'NGN';
-            
-            const rates = {
-                'NGN': { symbol: '₦', rate: 1 },
-                'GHS': { symbol: 'GH₵', rate: 0.012 },
-                'XOF-TG': { symbol: 'CFA', rate: 0.52 },
-                'XOF-BJ': { symbol: 'CFA', rate: 0.52 }
-            };
-
-            const config = rates[currency] || rates['NGN'];
-            const converted = nairaValue * config.rate;
-            
-            return config.symbol + Math.round(converted).toLocaleString();
-        }
-    </script>
-    <script>
-        function buildCar(id, overrides = {}) {
-            const car = CARS[id];
-            return {
-                id,
-                name: car.name,
-                img: car.img,
-                price: car.price,
-                specs: { 
-                    power: car.power, 
-                    speed: car.details ? car.details.zeroToSixty : 'N/A', 
-                    engine: car.details ? car.details.engineFull : 'N/A' 
-                },
-                ...overrides
-            };
-        }
-
-        // Define intrinsic orientation of assets (true = faces RIGHT by default)
-        const ASSET_FACES_RIGHT = {
-            "mercedes-g-wagon": true,   
-            "lexus-lx-600": false,      
-            "range-rover": false,       
-            "escalade-v": false,        // naturally faces LEFT
-            "_2026cadillac": true,      // naturally faces RIGHT
-            "byd-ato3": false,          // naturally faces LEFT
-            "camry2025hybrid": false,   // naturally faces LEFT
-            "corolla2025": false,       // naturally faces LEFT
-            "cybertruck": false,        // naturally faces LEFT
-            "kia2023sportage": true,    // naturally faces RIGHT
-            "mercedes2025sclass": true  // naturally faces RIGHT
-        };
-
-        function getOrientation(id, columnSide) {
-            const facesRight = ASSET_FACES_RIGHT[id] ?? false;
-            const isRightSide = columnSide === 'right' || columnSide === true;
-            
-            // Goal: Face CENTER (Left stack faces Right, Right stack faces Left)
-            if (isRightSide) {
-                // In Right Stack: We want it to face LEFT. 
-                // If it faces Right naturally, we FLIP [true] to face Left.
-                return facesRight; 
-            } else {
-                // In Left Stack: We want it to face RIGHT. 
-                // If it faces Left naturally (!facesRight), we FLIP [true] to face Right.
-                return !facesRight;
-            }
-        }
-
-        function getFilteredCars(stackSide) {
-            const col = stackSide === 'left' ? document.querySelectorAll('.faceoff-col')[0] : document.querySelectorAll('.faceoff-col')[1];
-            
-            // Get ID of car on the other side to exclude it (check DOM lock first)
-            const otherStackId = stackSide === 'left' ? 'right-stack' : 'left-stack';
-            const otherStackEl = document.getElementById(otherStackId);
-            const excludeId = otherStackEl ? otherStackEl.getAttribute('data-foreground-id') : null;
-
-            // Explicitly map selects based on their preceding label
-            const getSelectByLabel = (labelText) => {
-                const groups = Array.from(col.querySelectorAll('.sf-group'));
-                const group = groups.find(g => g.querySelector('.sf-label').textContent.trim().includes(labelText));
-                return group ? group.querySelector('select') : null;
-            };
-
-            const type     = getSelectByLabel('VEHICLE TYPE')?.value || 'ALL';
-            const category = getSelectByLabel('CATEGORY')?.value || 'ALL';
-            const mileage  = getSelectByLabel('MAX MILEAGE')?.value || 'ANY';
-            const energy   = getSelectByLabel('ENERGY')?.value || 'ALL';
-            const brand    = col.querySelector('.sf-input').value.toLowerCase();
-            const price    = parseNaira(col.querySelector('.sf-price-input').value);
-
-            const MAX_PRICE = 1e9;
-
-            return Object.keys(CARS).filter(id => {
-                const car = CARS[id];
-                const matchesExclusion = id !== excludeId;
-                const matchesType     = type === 'ALL' || car.type === type;
-                const matchesCategory = category === 'ALL' || car.category === category;
-                const matchesBrand    = !brand || [
-                    car.name,
-                    car.brand,
-                    car.details?.manufacturer
-                ].some(s => s && s.toLowerCase().includes(brand));
-                const matchesPrice    = price >= MAX_PRICE || parseNaira(car.price) <= price;
-                const matchesEnergy   = energy === 'ALL' || car.energy === energy;
-                const matchesMileage  = mileage === 'ANY' || car.mileage <= parseInt(mileage.replace(/,/g, ''));
-
-                return matchesExclusion && matchesType && matchesCategory && matchesBrand && matchesPrice && matchesEnergy && matchesMileage;
-            }).map(id => {
-                // Determine orientation based on global state if necessary
-                const flipped = getOrientation(id, stackSide);
-                return buildCar(id, { flipped });
-            });
-        }
-
-        let leftStack, rightStack;
-
-        function handleFilterChange(el) {
-            const col = el.closest('.faceoff-col');
-            const stackEl = col.querySelector('.car-stack');
-            const stackSide = stackEl.id === 'left-stack' ? 'left' : 'right';
-            
-            const newPool = getFilteredCars(stackSide);
-            
-            if (newPool.length === 0) {
-                showNotification(`No matches found in the ${stackSide.toUpperCase()} pool.`);
-                return;
-            }
-
-            if (stackSide === 'left') {
-                leftStack.cars = newPool;
-                leftStack.index = 0;
-                leftStack.render();
-            } else {
-                rightStack.cars = newPool;
-                rightStack.index = 0;
-                rightStack.render();
-            }
-            
-            // Preventive lock refresh
-            stackEl.setAttribute('data-foreground-id', newPool[0].id);
-        }
-
-        function showNotification(msg) {
-            const el = document.getElementById('faceoff-notification');
-            el.textContent = msg;
-            el.classList.add('visible');
-            setTimeout(() => el.classList.remove('visible'), 3000);
-        }
-
-        document.querySelectorAll('.sf-select, .sf-input, .sf-range').forEach(el => {
-            el.addEventListener('change', () => handleFilterChange(el));
-            el.addEventListener('input', () => {
-                const isContinuous = el.classList.contains('sf-input') || el.classList.contains('sf-range');
-                if (isContinuous) handleFilterChange(el);
-            });
-            el.addEventListener('keyup', (e) => {
-                if (e.key === 'Enter') handleFilterChange(el);
-            });
-        });
-
-        class CarStack {
-            constructor(containerId, carData) {
-                this.container = document.getElementById(containerId);
-                this.cars = carData;
-                this.index = 0;
-                this.isTransitioning = false;
-                
-                this.init();
-                this.setupEvents();
-            }
-
-            init() {
-                // Ensure initial IDs are locked into DOM for exclusion logic
-                const firstCarId = this.cars[0]?.id;
-                if (firstCarId) {
-                    this.container.setAttribute('data-foreground-id', firstCarId);
-                }
-                this.render();
-            }
-
-            render() {
-                this.container.innerHTML = '';
-                
-                // 5 Layers: Foreground + 4 Background
-                const layers = ['foreground', 'background', 'background-2', 'background-3', 'background-4'];
-                
-                layers.forEach((stateClass, i) => {
-                    const idx = (this.index + i) % this.cars.length;
-                    const item = this.createItem(idx, stateClass);
-                    this.container.appendChild(item);
-                });
-            }
-
-            createItem(idx, stateClass) {
-                const car = this.cars[idx];
-                const isForeground = stateClass.includes('foreground');
-                const div = document.createElement('div');
-                div.className = `depth-item ${stateClass}`;
-                
-                let specsHTML = '';
-                if (isForeground) {
-                    specsHTML = `
-                        <div class="car-specs-overlay">
-                            <div class="spec-pill"><span class="spec-val">${car.specs.power}</span><span class="spec-label">POWER</span></div>
-                            <div class="spec-pill"><span class="spec-val">${car.specs.speed}</span><span class="spec-label">0-100</span></div>
-                            <div class="spec-pill"><span class="spec-val">${car.specs.engine}</span><span class="spec-label">ENGINE</span></div>
-                        </div>
-                    `;
-                }
-
-                // RE-CALCULATE FLIP: Ensure the item knows its orientation for this column
-                const columnSide = this.container.id === 'left-stack' ? 'left' : 'right';
-                const isFlipped = getOrientation(car.id, columnSide);
-
-                const saveBtnHTML = isForeground ? `
-                    <button class="fd-save-btn" data-save-id="${car.id}"
-                        aria-label="Save vehicle"
-                        onclick="event.stopPropagation(); FaceoffDrawer.toggle('${car.id}');">
-                        <svg width="12" height="14" viewBox="0 0 12 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 1h8v12l-4-3-4 3V1z"/></svg>
-                    </button>` : '';
-
-                div.innerHTML = `
-                    ${specsHTML}
-                    ${saveBtnHTML}
-                    <div class="car-visual ${isFlipped ? 'flipped' : ''}" onclick="window.location.href='showroom.html?car=${car.id}${isFlipped ? '&flipped=true' : ''}&from=compare'">
-                        <img src="${car.img}" alt="${car.name}" class="car-image">
-                    </div>
-                    <span class="depth-label">${car.name}</span>
-                    <span class="depth-price">${formatPrice(car.price)}</span>
-                `;
-                return div;
-            }
-
-            swap() {
-                if (this.isTransitioning) return;
-                this.isTransitioning = true;
-
-                const foreground = this.container.querySelector('.foreground');
-                const b1 = this.container.querySelector('.background');
-                const b2 = this.container.querySelector('.background-2');
-
-                // 1. Exit foreground
-                foreground.classList.replace('foreground', 'exiting');
-
-                // 2. Promote B1 to Foreground
-                b1.classList.replace('background', 'foreground');
-                
-                // Add specs to newly promoted foreground
-                const b1CarIdx = (this.index + 1) % this.cars.length;
-                const car = this.cars[b1CarIdx];
-                const specsDiv = document.createElement('div');
-                specsDiv.className = 'car-specs-overlay';
-                specsDiv.innerHTML = `
-                    <div class="spec-pill"><span class="spec-val">${car.specs.power}</span><span class="spec-label">POWER</span></div>
-                    <div class="spec-pill"><span class="spec-val">${car.specs.speed}</span><span class="spec-label">0-100</span></div>
-                    <div class="spec-pill"><span class="spec-val">${car.specs.engine}</span><span class="spec-label">ENGINE</span></div>
-                `;
-                b1.prepend(specsDiv);
-
-                // 3. Promote B2 to B1
-                b2.classList.replace('background-2', 'background');
-
-                // 4. Instantiate new B2
-                const oldIndex = this.index;
-                this.index = (this.index + 1) % this.cars.length;
-                const nextB2Idx = (this.index + 2) % this.cars.length;
-                const nextItem = this.createItem(nextB2Idx, 'background-2 hidden');
-                this.container.appendChild(nextItem);
-
-                // PREVENTIVE: Notify other stack IMMEDIATELY at start of swap
-                const otherStack = this.container.id === 'left-stack' ? rightStack : leftStack;
-                if (otherStack && typeof otherStack.refreshAvailablePool === 'function') {
-                    // Lock the new ID into the DOM immediately
-                    const nextId = this.cars[(this.index + 1) % this.cars.length]?.id;
-                    this.container.setAttribute('data-foreground-id', nextId);
-                    
-                    // CRITICAL: Ensure other stack re-calculates pool now
-                    otherStack.refreshAvailablePool();
-                }
-
-                requestAnimationFrame(() => {
-                    nextItem.classList.remove('hidden');
-                });
-
-                // Cleanup
-                setTimeout(() => {
-                    foreground.remove();
-                    this.isTransitioning = false;
-                }, 1000);
-            }
-
-            getForegroundId() {
-                // Return the locked ID from DOM if available, otherwise fallback to current index
-                return this.container.getAttribute('data-foreground-id') || this.cars[this.index]?.id;
-            }
-
-            refreshAvailablePool() {
-                const stackSide = this.container.id === 'left-stack' ? 'left' : 'right';
-                const currentForegroundId = this.getForegroundId();
-                
-                // Get pool and filter out the OTHER side's current foreground
-                const otherStack = stackSide === 'left' ? rightStack : leftStack;
-                const forbiddenId = otherStack ? otherStack.getForegroundId() : null;
-
-                const newCars = getFilteredCars(stackSide).filter(c => c.id !== forbiddenId);
-                
-                if (newCars.length > 0) {
-                    this.cars = newCars;
-                    const newIdx = this.cars.findIndex(c => c.id === currentForegroundId);
-                    if (newIdx !== -1) {
-                        this.index = newIdx;
-                        // SILENT SWAP: Verify background layers haven't become "Forbidden"
-                        this.syncBackgroundLayers();
-                    } else {
-                        // Current car stolen! Preventive shift
-                        this.index = 0;
-                        this.render();
-                    }
-                }
-            }
-
-            syncBackgroundLayers() {
-                // Update DOM backgrounds to match current this.cars array
-                const items = Array.from(this.container.querySelectorAll('.depth-item'));
-                // Skip foreground (index 0)
-                for(let i = 1; i < items.length; i++) {
-                    const idx = (this.index + i) % this.cars.length;
-                    const car = this.cars[idx];
-                    const item = items[i];
-                    
-                    // Update visual and labels silently
-                    const visual = item.querySelector('.car-visual');
-                    const img = visual.querySelector('img');
-                    const label = item.querySelector('.depth-label');
-                    const price = item.querySelector('.depth-price');
-
-                    if (img.src !== car.img) {
-                        img.src = car.img;
-                        // RE-EVALUATE ORIENTATION: Ensure hot-swapped car faces correct way for this column
-                        const columnSide = this.container.id === 'left-stack' ? 'left' : 'right';
-                        const isFlipped = getOrientation(car.id, columnSide);
-                        visual.className = `car-visual ${isFlipped ? 'flipped' : ''}`;
-                        label.textContent = car.name;
-                        price.textContent = formatPrice(car.price);
-                    }
-                }
-            }
-
-            setupEvents() {
-                const handleScroll = (e) => {
-                    e.preventDefault();
-                    if (Math.abs(e.deltaY) > 50) {
-                        this.swap();
-                    }
-                };
-
-                this.container.addEventListener('wheel', handleScroll, { passive: false });
-
-                // Touch support
-                let touchStart = 0;
-                this.container.addEventListener('touchstart', (e) => {
-                    touchStart = e.touches[0].clientY;
-                });
-                this.container.addEventListener('touchmove', (e) => {
-                    const deltaY = touchStart - e.touches[0].clientY;
-                    if (Math.abs(deltaY) > 50) {
-                        this.swap();
-                        touchStart = e.touches[0].clientY;
-                    }
-                }, { passive: false });
-            }
-        }
-
-        // Initialize stacks with ALL results from registry
-        // 1. Create temporary placeholders
-        leftStack = { getForegroundId: () => null }; 
-        rightStack = { getForegroundId: () => null };
-
-        // 2. Initialize Left Stack
-        const leftPool = getFilteredCars('left');
-        leftStack = new CarStack("left-stack", leftPool);
-        
-        // Lock left initial ID
-        document.getElementById('left-stack').setAttribute('data-foreground-id', leftPool[0].id);
-        
-        // 3. Initialize Right Stack (it will now see leftStack's locked ID and EXCLUDE it)
-        const rightPool = getFilteredCars('right'); 
-        rightStack = new CarStack("right-stack", rightPool);
-        document.getElementById('right-stack').setAttribute('data-foreground-id', rightPool[0].id);
-    </script>
     <script src="js/drawer.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/pages/catalog.js"></script>
+    <script src="js/pages/compare.js"></script>
+    <script src="js/pages/showroom.js"></script>
+    <script src="js/router.js"></script>
 </body>
 </html>

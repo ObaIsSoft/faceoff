@@ -7,25 +7,24 @@
     <link rel="stylesheet" href="css/index.css">
 </head>
 <body class="scrollable-page">
-    <header class="nav-top">
+    <header class="nav-top" id="persistent-nav">
         <nav>
             <ul class="nav-links">
                 <li><a href="index.html">home</a></li>
                 <li><a href="about.html">about</a></li>
-                <li><a href="catalog.html" style="opacity: 1; font-weight: 900;">catalog</a></li>
+                <li><a href="catalog.html">catalog</a></li>
                 <li><a href="compare.html">compare</a></li>
                 <li><a href="contact.html">contact</a></li>
             </ul>
         </nav>
     </header>
 
-    <main class="catalog-container">
+    <main class="catalog-container" id="main-content">
         <header class="catalog-header">
             <h1 class="catalog-title">Lineup <br> Selection</h1>
-            <span class="catalog-count">[ 04 VEHICLES ]</span>
+            <span class="catalog-count">[ 00 VEHICLES ]</span>
         </header>
 
-        <!-- Filter Bar -->
         <div class="catalog-filters">
             <div class="caf-search-wrap">
                 <span class="caf-search-icon">⌕</span>
@@ -54,164 +53,19 @@
 
         <div id="catalog-empty" class="catalog-empty" style="display:none;">
             <span>No vehicles match your search.</span>
-            <button onclick="resetFilters()" class="catalog-empty-reset">Clear filters</button>
+            <button onclick="CatalogPage.resetFilters()" class="catalog-empty-reset">Clear filters</button>
         </div>
 
         <div id="catalog-grid" class="catalog-grid"></div>
     </main>
 
+    <!-- Shell Scripts -->
     <script src="js/cars-data.js"></script>
-    <script>
-        const CATALOG_ORDER = [
-            "mercedes-g-wagon", "lexus-lx-600", "range-rover", "escalade-v",
-            "_2026cadillac", "byd-ato3", "camry2025hybrid", "corolla2025",
-            "cybertruck", "kia2023sportage", "mercedes2025sclass"
-        ];
-
-        let activeEngine = '';
-        let activeSort   = '';
-        let activeSearch = '';
-
-        function parsePrice(str) {
-            return parseInt(str.replace(/[^0-9]/g, ''), 10);
-        }
-
-        function formatPrice(nairaString) {
-            const nairaValue = parsePrice(nairaString);
-            const currency = localStorage.getItem('faceoff_currency') || 'NGN';
-            
-            const rates = {
-                'NGN': { symbol: '₦', rate: 1 },
-                'GHS': { symbol: 'GH₵', rate: 0.012 },
-                'XOF-TG': { symbol: 'CFA', rate: 0.52 },
-                'XOF-BJ': { symbol: 'CFA', rate: 0.52 }
-            };
-
-            const config = rates[currency] || rates['NGN'];
-            const converted = nairaValue * config.rate;
-            
-            return config.symbol + Math.round(converted).toLocaleString();
-        }
-
-        function renderGrid() {
-            let results = CATALOG_ORDER.map(id => ({ id, ...CARS[id] }));
-
-            // Search
-            if (activeSearch) {
-                const q = activeSearch.toLowerCase();
-                results = results.filter(c =>
-                    c.name.toLowerCase().includes(q) ||
-                    (c.details && c.details.manufacturer.toLowerCase().includes(q)) ||
-                    c.power.toLowerCase().includes(q)
-                );
-            }
-
-            // Engine filter
-            if (activeEngine) {
-                results = results.filter(c => c.engine === activeEngine);
-            }
-
-            // Sort
-            if (activeSort === 'asc')  results.sort((a, b) => parsePrice(a.price) - parsePrice(b.price));
-            if (activeSort === 'desc') results.sort((a, b) => parsePrice(b.price) - parsePrice(a.price));
-
-            const grid  = document.getElementById('catalog-grid');
-            const empty = document.getElementById('catalog-empty');
-            const count = document.querySelector('.catalog-count');
-
-            if (results.length === 0) {
-                grid.innerHTML = '';
-                empty.style.display = 'flex';
-            } else {
-                empty.style.display = 'none';
-                grid.innerHTML = results.map(car => `
-                    <a href="showroom.html?car=${car.id}&from=catalog" class="catalog-card">
-                        <button class="fd-save-btn" data-save-id="${car.id}" aria-label="Save vehicle"
-                            onclick="event.preventDefault(); event.stopPropagation(); FaceoffDrawer.toggle('${car.id}');">
-                            <svg width="12" height="14" viewBox="0 0 12 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 1h8v12l-4-3-4 3V1z"/></svg>
-                        </button>
-                        <div class="catalog-visual">
-                            <img src="${car.img}" alt="${car.name}">
-                        </div>
-                        <div class="catalog-item-info">
-                            <div>
-                                <h2 class="catalog-item-name">${car.name}</h2>
-                                <p class="catalog-item-meta">${car.details ? car.details.year : ''} — ${car.power}</p>
-                            </div>
-                            <span class="catalog-item-price">${formatPrice(car.price)}</span>
-                        </div>
-                    </a>
-                `).join('');
-
-                const observer = new IntersectionObserver((entries) => {
-                    entries.forEach(e => {
-                        if (e.isIntersecting) {
-                            e.target.style.opacity  = '1';
-                            e.target.style.transform = 'translateY(0)';
-                        }
-                    });
-                }, { threshold: 0.05 });
-
-                document.querySelectorAll('.catalog-card').forEach(card => {
-                    card.style.opacity   = '0';
-                    card.style.transform = 'translateY(30px)';
-                    card.style.transition = 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)';
-                    observer.observe(card);
-                });
-            }
-
-            const n = results.length;
-            count.textContent = `[ 0${n} VEHICLE${n !== 1 ? 'S' : ''} ]`;
-
-            // Sync save-button states after new cards are rendered
-            if (typeof FaceoffDrawer !== 'undefined') FaceoffDrawer.refresh();
-        }
-
-        function resetFilters() {
-            activeSearch = activeEngine = activeSort = '';
-            document.getElementById('caf-search').value = '';
-            document.querySelectorAll('.caf-pill').forEach(p => {
-                p.classList.toggle('active', p.dataset.val === '');
-            });
-            renderGrid();
-        }
-
-        // Search input
-        document.getElementById('caf-search').addEventListener('input', e => {
-            activeSearch = e.target.value.trim();
-            document.getElementById('caf-clear').style.opacity = activeSearch ? '1' : '0';
-            renderGrid();
-        });
-
-        document.getElementById('caf-clear').addEventListener('click', () => {
-            document.getElementById('caf-search').value = '';
-            activeSearch = '';
-            document.getElementById('caf-clear').style.opacity = '0';
-            renderGrid();
-        });
-
-        // Pill toggles
-        document.getElementById('caf-engine').addEventListener('click', e => {
-            const pill = e.target.closest('.caf-pill');
-            if (!pill) return;
-            document.querySelectorAll('#caf-engine .caf-pill').forEach(p => p.classList.remove('active'));
-            pill.classList.add('active');
-            activeEngine = pill.dataset.val;
-            renderGrid();
-        });
-
-        document.getElementById('caf-sort').addEventListener('click', e => {
-            const pill = e.target.closest('.caf-pill');
-            if (!pill) return;
-            document.querySelectorAll('#caf-sort .caf-pill').forEach(p => p.classList.remove('active'));
-            pill.classList.add('active');
-            activeSort = pill.dataset.val;
-            renderGrid();
-        });
-
-        renderGrid();
-
-    </script>
     <script src="js/drawer.js"></script>
+    <script src="js/player.js"></script>
+    <script src="js/pages/catalog.js"></script>
+    <script src="js/pages/compare.js"></script>
+    <script src="js/pages/showroom.js"></script>
+    <script src="js/router.js"></script>
 </body>
 </html>
