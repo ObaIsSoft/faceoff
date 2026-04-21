@@ -791,6 +791,7 @@ header.nav-top .nav-links a:hover {
 body.scrollable-page {
     height: auto;
     overflow-y: auto;
+    overflow-x: hidden;
     position: relative;
 }
 
@@ -799,6 +800,8 @@ body.scrollable-page {
     margin: 0 auto;
     padding: 10rem 2rem 5rem;
     text-align: center;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .scrollable-page .about-section {
@@ -1102,6 +1105,9 @@ body.scrollable-page {
 
 .about-link-cta { margin-top: auto; padding-top: 2.5rem; align-self: flex-start; }
 
+/* Mobile-only image copy — hidden on desktop (two-class for specificity) */
+.about-hero-image.about-hero-image--mob { display: none; }
+
 .about-hero-image {
     display: flex;
     flex-direction: column;
@@ -1228,7 +1234,8 @@ body.scrollable-page {
     line-height: 1.3;
     text-align: center;
     max-width: 800px;
-    flex-shrink: 0;
+    flex-shrink: 1;
+    min-width: 0;
     font-style: normal;
     letter-spacing: 0.01em;
 }
@@ -1518,7 +1525,7 @@ body.scrollable-page {
 @media (max-width: 900px) {
     .about-container { padding: 0 1rem; }
     
-    .editorial-header { font-size: 3.5rem; margin-bottom: 2rem; }
+    .editorial-header { font-size: clamp(2.5rem, 7vw, 3.5rem); margin-bottom: 2rem; }
     
     .about-hero-grid,
     .ceo-section,
@@ -1547,6 +1554,9 @@ body.scrollable-page {
     .stat-val { font-size: 1.5rem; }
 
     .about-section-title { font-size: 2rem; }
+
+    /* Override inline font-size on standards headings */
+    .standards-grid h2 { font-size: clamp(1.6rem, 5vw, 2rem) !important; }
 
     .services-grid { grid-template-columns: 1fr; }
     .process-steps { flex-direction: column; gap: 2rem; }
@@ -2799,74 +2809,122 @@ body.showroom-light header.nav-top .nav-links a {
         padding: 0 1.25rem;
     }
     .about-section {
-        margin-bottom: 4rem;
+        margin-bottom: 3.5rem;
     }
     .editorial-header {
-        font-size: clamp(2.2rem, 9vw, 3.2rem);
-        margin-bottom: 1.25rem;
-        line-height: 1;
+        font-size: clamp(2rem, 8vw, 3rem);
+        margin-bottom: 1rem;
+        line-height: 1.05;
+    }
+    .about-eyebrow {
+        font-size: 0.6rem;
+        margin-bottom: 1rem;
     }
     .body-text {
-        font-size: 0.9rem;
+        font-size: 0.88rem;
         max-width: 100%;
+        line-height: 1.75;
     }
     /* Hero */
     .about-hero-grid {
         grid-template-columns: 1fr;
-        gap: 2rem;
+        gap: 0;
     }
-    .about-hero-image {
-        order: -1;
-        max-height: 52vw;
-        overflow: hidden;
+    /* Hide original desktop image column on mobile */
+    .about-hero-image:not(.about-hero-image--mob) {
+        display: none;
+    }
+    /* Show mobile copy inline between write-up and CTA */
+    .about-hero-image.about-hero-image--mob {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        width: 100%;
+        margin: 1.5rem 0 0.5rem;
     }
     .about-car-img {
         width: 100%;
-        height: 100%;
-        object-fit: cover;
+        object-fit: contain;
+        max-height: 52vw;
     }
     .about-hero-tag {
-        bottom: 0.6rem;
-        right: 0.6rem;
+        position: absolute;
+        bottom: 0.5rem;
+        right: 0;
+        padding: 0.6rem 1rem;
     }
+    .tag-val { font-size: 1.4rem; }
+    .tag-label { font-size: 0.45rem; }
+    .about-hero-text { text-align: left; }
     .about-link-cta {
-        margin-top: 1.5rem;
-        font-size: 0.72rem;
+        margin-top: 1.25rem;
+        font-size: 0.68rem;
     }
     /* Stats */
     .about-stat-bar {
-        display: grid;
+        display: grid !important;
         grid-template-columns: 1fr 1fr;
-        gap: 1.25rem;
-        padding: 2rem 0;
+        gap: 1.5rem 1rem;
+        padding: 1.75rem 0 !important;
         flex-wrap: unset;
+        margin-bottom: 3.5rem;
     }
     .stat-divider  { display: none; }
     .stat-item     { flex: unset; }
-    .stat-val      { font-size: 1.4rem; }
-    .stat-label    { font-size: 0.55rem; }
+    .stat-val      { font-size: 1.5rem; }
+    .stat-label    { font-size: 0.52rem; }
     /* Manifesto */
+    .about-manifesto {
+        padding: 3rem 0 !important;
+    }
     .manifesto-quote {
-        font-size: clamp(1rem, 4vw, 1.4rem);
-        padding: 0 0.5rem;
+        font-size: clamp(0.95rem, 3.8vw, 1.35rem);
+        padding: 0 0.25rem;
+        line-height: 1.4;
+        width: 100%;
+        max-width: 100%;
+        flex-shrink: 1;
+        min-width: 0;
     }
     .manifesto-rule { display: none; }
     /* CEO */
     .ceo-section {
         grid-template-columns: 1fr;
-        gap: 2rem;
+        gap: 2.5rem;
         text-align: left;
     }
-    .ceo-image-wrap { max-width: 100%; }
+    .ceo-image-wrap {
+        max-width: 100%;
+        max-height: 70vw;
+        overflow: hidden;
+    }
+    .ceo-image-wrap img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: top;
+    }
+    .ceo-id {
+        position: static;
+        margin-top: 0.75rem;
+        display: flex;
+        flex-direction: column;
+        gap: 0.15rem;
+        background: #000;
+        color: #fff;
+        padding: 0.7rem 1rem;
+        align-self: flex-start;
+    }
     .ceo-quote {
         border-left: none;
         border-top: 1px solid rgba(0,0,0,0.1);
         padding-left: 0;
         padding-top: 1.5rem;
     }
-    .ceo-text { font-size: 1rem; }
+    .ceo-text { font-size: 0.95rem; line-height: 1.75; }
+    .quote-mark { font-size: 2rem; }
     /* Process */
-    .about-section-title { font-size: 1.6rem; }
+    .about-section-title { font-size: 1.5rem; margin-bottom: 2rem; }
     .process-steps { flex-direction: column; gap: 0; }
     .process-step {
         border-left: none;
@@ -2875,33 +2933,56 @@ body.showroom-light header.nav-top .nav-links a {
     }
     .process-step:first-child { border-top: none; padding-top: 0; }
     .process-connector       { display: none; }
-    .process-heading         { font-size: 1.2rem; }
+    .process-num             { font-size: 2rem; }
+    .process-heading         { font-size: 1.1rem; }
+    .process-body            { font-size: 0.82rem; }
     /* Services */
-    .services-grid           { grid-template-columns: 1fr; gap: 1.5rem; }
+    .services-grid           { grid-template-columns: 1fr; gap: 2rem; }
+    .service-heading         { font-size: 1.3rem; }
     /* Categories */
-    .cat-item-rich           { gap: 0.75rem; }
-    .cat-name-rich           { font-size: 1rem; }
+    .cat-item-rich           { gap: 0.75rem; padding: 1.25rem 0; }
+    .cat-name-rich           { font-size: 0.95rem; }
+    .cat-desc                { font-size: 0.78rem; }
     /* Standards */
     .standards-grid          { grid-template-columns: 1fr; gap: 2rem; }
-    /* Full-bleed: remove negative margins */
+    /* Full-bleed: remove negative margins on mobile */
     .about-fullbleed {
         width: 100%;
         margin-left: 0;
         margin-right: 0;
         border-radius: 4px;
         overflow: hidden;
+        margin-bottom: 3.5rem;
     }
-    .about-fullbleed-img     { height: 45vw; min-height: 160px; }
+    .about-fullbleed-img     { height: 48vw; min-height: 180px; }
+    .about-fullbleed-caption { font-size: 0.55rem; bottom: 1rem; left: 1rem; }
     /* CTA section */
     .about-cta-section {
         margin-left: 0;
         margin-right: 0;
-        padding: 3rem 1.25rem;
+        padding: 3rem 1.25rem !important;
         border-radius: 4px;
     }
-    .about-cta-inner         { grid-template-columns: 1fr; gap: 2rem; text-align: center; }
-    /* Explosion */
-    .explosion-section       { height: 200vh; }
+    .about-cta-inner {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+        text-align: center;
+    }
+    .about-cta-car { max-width: 80%; margin: 0 auto; display: block; }
+    .about-cta-btns {
+        flex-direction: column;
+        align-items: center;
+        gap: 0.75rem;
+        margin-top: 1.75rem;
+    }
+    .about-cta-btn {
+        width: 100%;
+        text-align: center;
+    }
+    /* Explosion — same height as desktop so bloom plays at identical rhythm */
+    .explosion-section       { height: 320vh; }
+    .explosion-core          { width: 80px; height: 80px; }
+    .brand-fragment          { font-size: 0.52rem; letter-spacing: 0.08em; }
 
     /* ── CATALOG ──────────────────────────────────────────────── */
     .catalog-container       { padding: 4.5rem 1.25rem 3rem; }
