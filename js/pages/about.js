@@ -51,7 +51,7 @@ var AboutPage = {
             
             const isMobile = window.innerWidth < 768;
             const maxR = isMobile 
-                ? Math.min(cW, cH) * 0.40
+                ? Math.min(cW, cH) * 0.42
                 : Math.min(cW, cH) * 0.44;
 
             const center = document.getElementById('explosion-center');
@@ -65,16 +65,16 @@ var AboutPage = {
                 const eased = 1 - Math.pow(1 - Math.min(local, 1), 2.8);
                 const angle = i * GOLDEN;
                 
-                const baseRadiusMultiplier = isMobile ? (maxR - 50) : (maxR - 76);
-                const startRadius = isMobile ? 50 : 76;
-                const baseR = startRadius + i * (baseRadiusMultiplier / BRANDS.length);
-                const r = 68 + (baseR - 68) * eased;
+                const startRadius = isMobile ? 40 : 76;
+                const span = maxR - startRadius;
+                const baseR = startRadius + i * (span / BRANDS.length);
+                const r = startRadius + (baseR - startRadius) * eased;
                 const x = Math.cos(angle) * r;
                 const y = Math.sin(angle) * r;
 
                 el.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
                 el.style.opacity = Math.min(1, eased * 2.5);
-                if (isMobile) el.style.fontSize = '0.6rem';
+                if (isMobile) el.style.fontSize = '0.52rem';
             });
         };
 
