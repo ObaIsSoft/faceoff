@@ -299,7 +299,23 @@ class CarStack {
         const specs = document.createElement('div');
         specs.className = 'car-specs-overlay';
         specs.innerHTML = `<div class="spec-pill"><span class="spec-val">${car.specs.power}</span><span class="spec-label">POWER</span></div><div class="spec-pill"><span class="spec-val">${car.specs.speed}</span><span class="spec-label">0-100</span></div><div class="spec-pill"><span class="spec-val">${car.specs.engine}</span><span class="spec-label">ENGINE</span></div>`;
+        
+        const saveBtn = document.createElement('button');
+        saveBtn.className = 'fd-save-btn';
+        saveBtn.setAttribute('data-save-id', car.id);
+        saveBtn.setAttribute('aria-label', 'Save vehicle');
+        saveBtn.onclick = (event) => {
+            event.stopPropagation();
+            if (typeof FaceoffDrawer !== 'undefined') FaceoffDrawer.toggle(car.id);
+        };
+        saveBtn.innerHTML = typeof FaceoffDrawer !== 'undefined' && FaceoffDrawer.bookmarkSVG ? FaceoffDrawer.bookmarkSVG : `<svg width="12" height="14" viewBox="0 0 12 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 1h8v12l-4-3-4 3V1z"/></svg>`;
+        
+        b1.prepend(saveBtn);
         b1.prepend(specs);
+
+        if (typeof FaceoffDrawer !== 'undefined') {
+            requestAnimationFrame(() => FaceoffDrawer.refresh());
+        }
 
         if (b2) b2.classList.replace('background-2', 'background');
         
