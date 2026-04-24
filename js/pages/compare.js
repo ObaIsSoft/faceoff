@@ -78,13 +78,8 @@ var ComparePage = {
     },
 
     getOrientation(id, columnSide) {
-        const ASSET_FACES_RIGHT = {
-            "mercedes-g-wagon": true, "lexus-lx-600": false, "range-rover": false,
-            "escalade-v": false, "_2026cadillac": true, "byd-ato3": false,
-            "camry2025hybrid": false, "corolla2025": false, "cybertruck": false,
-            "kia2023sportage": true, "mercedes2025sclass": true
-        };
-        const facesRight = ASSET_FACES_RIGHT[id] ?? false;
+        const resolved = resolveUnit(id) || CARS[id];
+        const facesRight = resolved?.facesRight ?? false;
         const isRightSide = columnSide === 'right' || columnSide === true;
         
         return isRightSide ? facesRight : !facesRight;

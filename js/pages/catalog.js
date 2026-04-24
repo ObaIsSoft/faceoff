@@ -1,15 +1,12 @@
 
 if (!window.CatalogPage) {
 var CatalogPage = {
-    order: [
-        "mercedes-g-wagon", "lexus-lx-600", "range-rover", "escalade-v",
-        "_2026cadillac", "byd-ato3", "camry2025hybrid", "corolla2025",
-        "cybertruck", "kia2023sportage", "mercedes2025sclass"
-    ],
+    order: Object.keys(MODELS),
     state: {
         engine: '',
         sort: '',
-        search: ''
+        search: '',
+        condition: ''   // "" = all, "new", "used"
     },
 
     init() {
@@ -25,6 +22,7 @@ var CatalogPage = {
     },
 
     parsePrice(str) {
+        if (!str) return 0;
         return parseInt(str.replace(/[^0-9]/g, ''), 10);
     },
 
@@ -45,29 +43,89 @@ var CatalogPage = {
         return config.symbol + Math.round(converted).toLocaleString();
     },
 
+    /**
+     * Build a model-level card dataset from the 3-tier data.
+     * Each entry represents one MODEL with aggregated info from its units.
+     */
+    buildModelCards() {
+        return this.order.map(modelId => {
+            const model = MODELS[modelId];
+            if (!model) return null;
+
+            const units = getUnitsForModel(modelId);
+            if (units.length === 0) return null;  // no available units → hide model
+
+            const conditions = getConditions(modelId);
+            const fromPrice = getFromPrice(modelId);
+            const variants = getVariantsForModel(modelId);
+
+            // Cheapest unit to determine "From" label context
+            const cheapestUnit = units.reduce((min, u) =>
+                this.parsePrice(u.price) < this.parsePrice(min.price) ? u : min
+            , units[0]);
+
+            // Determine the hero image:
+            // If model has only used units, use the cheapest unit's first image
+            // Otherwise use the model's studio heroImg
+            const hasNew = conditions.includes('new');
+            const heroImg = hasNew ? model.heroImg : (cheapestUnit.imgs?.[0] || model.heroImg);
+
+            // Get the most representative variant for power display
+            const primaryVariant = variants[0]; // newest year first
+
+            // Get energy types across all variants
+            const energyTypes = [...new Set(variants.map(v => v.energy))];
+
+            return {
+                modelId,
+                name: model.name,
+                brand: model.brand,
+                type: model.type,
+                category: model.category,
+                heroImg,
+                fromPrice,
+                fromPriceNum: this.parsePrice(fromPrice),
+                cheapestCondition: cheapestUnit.condition,
+                conditions,
+                unitCount: units.length,
+                power: primaryVariant?.power || '',
+                energy: energyTypes,
+                engine: primaryVariant?.details?.engineFull || '',
+                manufacturer: primaryVariant?.details?.manufacturer || model.brand,
+                lowestMileage: Math.min(...units.map(u => u.mileage))
+            };
+        }).filter(Boolean);
+    },
+
     renderGrid() {
         if (!document.getElementById('catalog-grid')) return;
 
-        let results = this.order.map(id => ({ id, ...CARS[id] }));
+        let results = this.buildModelCards();
 
         // Search
         if (this.state.search) {
             const q = this.state.search.toLowerCase();
             results = results.filter(c =>
                 c.name.toLowerCase().includes(q) ||
-                (c.details && c.details.manufacturer.toLowerCase().includes(q)) ||
+                c.manufacturer.toLowerCase().includes(q) ||
+                c.brand.toLowerCase().includes(q) ||
                 c.power.toLowerCase().includes(q)
             );
         }
 
-        // Engine filter
+        // Engine filter (legacy — matches engine string)
         if (this.state.engine) {
-            results = results.filter(c => c.engine === this.state.engine);
+            results = results.filter(c => c.engine.includes(this.state.engine));
+        }
+
+        // Condition filter
+        if (this.state.condition) {
+            results = results.filter(c => c.conditions.includes(this.state.condition));
         }
 
         // Sort
-        if (this.state.sort === 'asc')  results.sort((a, b) => this.parsePrice(a.price) - this.parsePrice(b.price));
-        if (this.state.sort === 'desc') results.sort((a, b) => this.parsePrice(b.price) - this.parsePrice(a.price));
+        if (this.state.sort === 'asc')  results.sort((a, b) => a.fromPriceNum - b.fromPriceNum);
+        if (this.state.sort === 'desc') results.sort((a, b) => b.fromPriceNum - a.fromPriceNum);
 
         const grid  = document.getElementById('catalog-grid');
         const empty = document.getElementById('catalog-empty');
@@ -78,24 +136,45 @@ var CatalogPage = {
             empty.style.display = 'flex';
         } else {
             empty.style.display = 'none';
-            grid.innerHTML = results.map(car => `
-                <a href="showroom.html?car=${car.id}&from=catalog" class="catalog-card" data-router-link>
-                    <button class="fd-save-btn" data-save-id="${car.id}" aria-label="Save vehicle"
-                        onclick="event.preventDefault(); event.stopPropagation(); FaceoffDrawer.toggle('${car.id}');">
+            grid.innerHTML = results.map(card => {
+                // Condition badges
+                const badges = card.conditions.map(c =>
+                    c === 'new'
+                        ? '<span class="catalog-badge catalog-badge--new">NEW</span>'
+                        : '<span class="catalog-badge catalog-badge--used">PRE-OWNED</span>'
+                ).join('');
+
+                // "From" price label
+                const fromLabel = card.cheapestCondition === 'used'
+                    ? `From ${this.formatPrice(card.fromPrice)} <span class="catalog-from-condition">· Pre-owned</span>`
+                    : `From ${this.formatPrice(card.fromPrice)}`;
+
+                // Unit count
+                const unitLabel = card.unitCount === 1
+                    ? '1 available'
+                    : `${card.unitCount} available`;
+
+                return `
+                <a href="showroom.html?model=${card.modelId}&from=catalog" class="catalog-card" data-router-link>
+                    <button class="fd-save-btn" data-save-id="${card.modelId}" aria-label="Save vehicle"
+                        onclick="event.preventDefault(); event.stopPropagation(); FaceoffDrawer.toggle('${card.modelId}');">
                         <svg width="12" height="14" viewBox="0 0 12 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 1h8v12l-4-3-4 3V1z"/></svg>
                     </button>
                     <div class="catalog-visual">
-                        <img src="${car.img}" alt="${car.name}">
+                        <img src="${card.heroImg}" alt="${card.name}">
                     </div>
                     <div class="catalog-item-info">
                         <div>
-                            <h2 class="catalog-item-name">${car.name}</h2>
-                            <p class="catalog-item-meta">${car.details ? car.details.year : ''} — ${car.power}</p>
+                            <h2 class="catalog-item-name">${card.name}</h2>
+                            <p class="catalog-item-meta">${card.power} ${badges}</p>
                         </div>
-                        <span class="catalog-item-price">${this.formatPrice(car.price)}</span>
+                        <div class="catalog-item-pricing">
+                            <span class="catalog-item-price">${fromLabel}</span>
+                            <span class="catalog-item-units">${unitLabel}</span>
+                        </div>
                     </div>
                 </a>
-            `).join('');
+            `}).join('');
 
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(e => {
@@ -125,6 +204,7 @@ var CatalogPage = {
         const clearBtn = document.getElementById('caf-clear');
         const enginePills = document.getElementById('caf-engine');
         const sortPills = document.getElementById('caf-sort');
+        const conditionPills = document.getElementById('caf-condition');
 
         if (searchInput) {
             searchInput.addEventListener('input', e => {
@@ -164,10 +244,21 @@ var CatalogPage = {
                 this.renderGrid();
             });
         }
+
+        if (conditionPills) {
+            conditionPills.addEventListener('click', e => {
+                const pill = e.target.closest('.caf-pill');
+                if (!pill) return;
+                conditionPills.querySelectorAll('.caf-pill').forEach(p => p.classList.remove('active'));
+                pill.classList.add('active');
+                this.state.condition = pill.dataset.val;
+                this.renderGrid();
+            });
+        }
     },
 
     resetFilters() {
-        this.state = { search: '', engine: '', sort: '' };
+        this.state = { search: '', engine: '', sort: '', condition: '' };
         const searchInput = document.getElementById('caf-search');
         if (searchInput) searchInput.value = '';
         document.querySelectorAll('.caf-pill').forEach(p => {
