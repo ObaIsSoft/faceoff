@@ -44,3 +44,4 @@ src/
 *.log
 *.tmp
 *.bak
+genome.json
