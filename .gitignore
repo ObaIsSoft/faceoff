@@ -1,0 +1,46 @@
+# ─── macOS ────────────────────────────────────────────────────────────────────
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ─── Editor — VS Code ─────────────────────────────────────────────────────────
+.vscode/
+
+# ─── Editor — JetBrains (WebStorm, IntelliJ) ─────────────────────────────────
+.idea/
+*.iml
+
+# ─── Editor — Sublime Text ────────────────────────────────────────────────────
+*.sublime-project
+*.sublime-workspace
+
+# ─── Node (if a build step is ever added) ────────────────────────────────────
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+package-lock.json
+yarn.lock
+
+# ─── Build / dist artefacts ───────────────────────────────────────────────────
+dist/
+build/
+.cache/
+.parcel-cache/
+
+# ─── Env / secrets ────────────────────────────────────────────────────────────
+.env
+.env.local
+.env.*.local
+
+# ─── Empty scaffold folders ───────────────────────────────────────────────────
+src/
+
+# ─── Misc ─────────────────────────────────────────────────────────────────────
+*.log
+*.tmp
+*.bak
