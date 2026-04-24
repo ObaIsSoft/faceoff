@@ -123,7 +123,13 @@ var INVENTORY = [
         status: "available", condition: "used", grade: "excellent",
         mileage: 28400, price: "₦148,000,000",
         color: "Polar White",
-        imgs: ["assets/car_left.png"],
+        imgs: [
+            "assets/inventory/gwagon-2022-used-001/hero.jpg",
+            "assets/inventory/gwagon-2022-used-001/front.jpg",
+            "assets/inventory/gwagon-2022-used-001/rear.jpg",
+            "assets/inventory/gwagon-2022-used-001/interior.jpg",
+            "assets/inventory/gwagon-2022-used-001/odometer.jpg"
+        ],
         notes: "Single owner. Full Mercedes-Benz service history. No accidents recorded. Both keys present.",
         certificate: {
             type: "LACVIS",
@@ -131,7 +137,7 @@ var INVENTORY = [
             certNumber: "RWC-2024-00182",
             issuedDate: "2024-09-10",
             expiryDate: "2025-09-09",
-            scanPath: null,
+            scanPath: "assets/inventory/gwagon-2022-used-001/rwc.html",
             verifyUrl: "https://dvis.lg.gov.ng"
         }
     },
@@ -141,7 +147,13 @@ var INVENTORY = [
         status: "available", condition: "used", grade: "good",
         mileage: 41200, price: "₦162,000,000",
         color: "Carpathian Grey",
-        imgs: ["assets/2024RangeRover.png"],
+        imgs: [
+            "assets/inventory/rangerover-2022-used-001/hero.jpg",
+            "assets/inventory/rangerover-2022-used-001/front.jpg",
+            "assets/inventory/rangerover-2022-used-001/rear.jpg",
+            "assets/inventory/rangerover-2022-used-001/interior.jpg",
+            "assets/inventory/rangerover-2022-used-001/odometer.jpg"
+        ],
         notes: "Two previous owners. Serviced at Land Rover Lagos. Minor stone chips on front bumper. New tyres fitted 2024.",
         certificate: {
             type: "LACVIS",
@@ -149,7 +161,7 @@ var INVENTORY = [
             certNumber: "RWC-2024-00394",
             issuedDate: "2024-11-03",
             expiryDate: "2025-11-02",
-            scanPath: null,
+            scanPath: "assets/inventory/rangerover-2022-used-001/rwc.html",
             verifyUrl: "https://dvis.lg.gov.ng"
         }
     },
@@ -159,7 +171,13 @@ var INVENTORY = [
         status: "available", condition: "used", grade: "good",
         mileage: 39800, price: "₦28,500,000",
         color: "Reservoir Blue",
-        imgs: ["assets/corolla2025.png"],
+        imgs: [
+            "assets/inventory/corolla-2023-used-001/hero.jpg",
+            "assets/inventory/corolla-2023-used-001/front.jpg",
+            "assets/inventory/corolla-2023-used-001/rear.jpg",
+            "assets/inventory/corolla-2023-used-001/interior.jpg",
+            "assets/inventory/corolla-2023-used-001/odometer.jpg"
+        ],
         notes: "Clean interior. Recently serviced. Tints installed. Ideal second car or daily driver.",
         certificate: {
             type: "LACVIS",
@@ -167,7 +185,7 @@ var INVENTORY = [
             certNumber: "RWC-2025-00041",
             issuedDate: "2025-01-20",
             expiryDate: "2026-01-19",
-            scanPath: null,
+            scanPath: "assets/inventory/corolla-2023-used-001/rwc.html",
             verifyUrl: "https://dvis.lg.gov.ng"
         }
     }
