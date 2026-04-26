@@ -194,7 +194,7 @@ var CatalogPage = {
         }
 
         const n = results.length;
-        if (count) count.textContent = `[ 0${n} VEHICLE${n !== 1 ? 'S' : ''} ]`;
+        if (count) count.textContent = `[ ${String(n).padStart(2, '0')} VEHICLE${n !== 1 ? 'S' : ''} ]`;
 
         if (typeof FaceoffDrawer !== 'undefined') FaceoffDrawer.refresh();
     },
