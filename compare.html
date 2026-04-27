@@ -8,7 +8,7 @@
     <link rel="apple-touch-icon" href="favicon.png">
     <link rel="stylesheet" href="css/index.css">
 </head>
-<body>
+<body class="compare-page">
     <header class="nav-top" id="persistent-nav">
         <nav>
             <ul class="nav-links">
@@ -24,7 +24,16 @@
     <main class="compare-wrapper" id="main-content">
         <section class="faceoff-zone">
             <div class="faceoff-col">
+                <button class="sf-toggle" aria-label="Open left filters">
+                    <svg width="12" height="10" viewBox="0 0 12 10" fill="none" stroke="currentColor" stroke-width="1.4"><line x1="0" y1="2" x2="12" y2="2"/><line x1="2" y1="5" x2="10" y2="5"/><line x1="4" y1="8" x2="8" y2="8"/></svg>
+                    Filter
+                </button>
                 <div class="stack-filter">
+                    <button class="sf-close" aria-label="Close filters">Close ✕</button>
+                    <div class="sf-side-header">
+                        <span class="sf-side-name">Left Vehicle</span>
+                        <span class="sf-side-note">Filters this side only. Open the right filter to narrow the other column independently.</span>
+                    </div>
                     <div class="sf-group">
                         <span class="sf-label">VEHICLE TYPE</span>
                         <div class="sf-control">
@@ -46,7 +55,7 @@
                     <div class="sf-group">
                         <span class="sf-label">MAX MILEAGE</span>
                         <div class="sf-control">
-                            <select class="sf-select"><option>ANY</option><option>100</option><option>1,000</option><option>5,000</option><option>20,000</option></select>
+                            <select class="sf-select"><option>ANY</option><option>100</option><option>1,000</option><option>5,000</option><option>20,000</option><option>50,000</option><option>100,000</option></select>
                             <span class="sf-chevron">∨</span>
                         </div>
                     </div>
@@ -63,6 +72,20 @@
                         <span class="sf-label">ENERGY</span>
                         <div class="sf-control">
                             <select class="sf-select"><option>ALL</option><option>PETROL</option><option>HYBRID</option><option>ELECTRIC</option></select>
+                            <span class="sf-chevron">∨</span>
+                        </div>
+                    </div>
+                    <div class="sf-group">
+                        <span class="sf-label">CONDITION</span>
+                        <div class="sf-control">
+                            <select class="sf-select"><option value="ALL">ALL</option><option value="new">NEW</option><option value="used">PRE-OWNED</option></select>
+                            <span class="sf-chevron">∨</span>
+                        </div>
+                    </div>
+                    <div class="sf-group">
+                        <span class="sf-label">YEAR</span>
+                        <div class="sf-control">
+                            <select class="sf-select sf-year-select"><option value="ALL">ALL</option></select>
                             <span class="sf-chevron">∨</span>
                         </div>
                     </div>
@@ -73,7 +96,16 @@
             <div class="vs-divider">VS</div>
 
             <div class="faceoff-col">
+                <button class="sf-toggle" aria-label="Open right filters">
+                    Filter
+                    <svg width="12" height="10" viewBox="0 0 12 10" fill="none" stroke="currentColor" stroke-width="1.4"><line x1="0" y1="2" x2="12" y2="2"/><line x1="2" y1="5" x2="10" y2="5"/><line x1="4" y1="8" x2="8" y2="8"/></svg>
+                </button>
                 <div class="stack-filter">
+                    <button class="sf-close" aria-label="Close filters">✕ Close</button>
+                    <div class="sf-side-header">
+                        <span class="sf-side-name">Right Vehicle</span>
+                        <span class="sf-side-note">Filters this side only. Open the left filter to narrow the other column independently.</span>
+                    </div>
                     <div class="sf-group">
                         <span class="sf-label">VEHICLE TYPE</span>
                         <div class="sf-control">
@@ -95,7 +127,7 @@
                     <div class="sf-group">
                         <span class="sf-label">MAX MILEAGE</span>
                         <div class="sf-control">
-                            <select class="sf-select"><option>ANY</option><option>100</option><option>1,000</option><option>5,000</option><option>20,000</option></select>
+                            <select class="sf-select"><option>ANY</option><option>100</option><option>1,000</option><option>5,000</option><option>20,000</option><option>50,000</option><option>100,000</option></select>
                             <span class="sf-chevron">∨</span>
                         </div>
                     </div>
@@ -115,10 +147,27 @@
                             <span class="sf-chevron">∨</span>
                         </div>
                     </div>
+                    <div class="sf-group">
+                        <span class="sf-label">CONDITION</span>
+                        <div class="sf-control">
+                            <select class="sf-select"><option value="ALL">ALL</option><option value="new">NEW</option><option value="used">PRE-OWNED</option></select>
+                            <span class="sf-chevron">∨</span>
+                        </div>
+                    </div>
+                    <div class="sf-group">
+                        <span class="sf-label">YEAR</span>
+                        <div class="sf-control">
+                            <select class="sf-select sf-year-select"><option value="ALL">ALL</option></select>
+                            <span class="sf-chevron">∨</span>
+                        </div>
+                    </div>
                 </div>
                 <div id="right-stack" class="car-stack"></div>
             </div>
         </section>
+
+        <p class="compare-hint">Swipe to cycle · each side filters independently</p>
+        <div id="sf-overlay" class="sf-panel-overlay"></div>
     </main>
 
     <div id="faceoff-notification" class="faceoff-notification"></div>
