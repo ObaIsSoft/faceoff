@@ -49,22 +49,36 @@
             return;
         }
 
-        if (typeof CARS === 'undefined') {
+        if (typeof resolveUnit === 'undefined') {
             list.innerHTML = '<p class="fd-empty">Loading…</p>';
             return;
         }
 
         list.innerHTML = saved.map(id => {
-            const car = CARS[id];
+            const car = resolveUnit(id);
             if (!car) return '';
+
+            const condBadge = car.condition === 'used'
+                ? `<span class="fd-cond fd-cond--used">Pre-owned</span>`
+                : `<span class="fd-cond fd-cond--new">New</span>`;
+
+            const mileLabel = car.condition === 'used' && car.mileage > 0
+                ? `${car.mileage.toLocaleString()} km`
+                : 'New · 0 km';
+
+            const variantLabel = [car.year, car.trim].filter(Boolean).join(' ');
+
             return `
                 <div class="fd-item" data-id="${id}">
-                    <a href="showroom.html?car=${id}&from=saved" class="fd-item-link">
+                    <a href="showroom.html?unit=${id}&from=saved" class="fd-item-link" data-router-link>
                         <img src="${car.img}" alt="${car.name}" class="fd-item-img">
                         <div class="fd-item-info">
                             <span class="fd-item-name">${car.name}</span>
-                            <span class="fd-item-price">${formatPrice(car.price)}</span>
-                            <span class="fd-item-meta">${car.details?.year || ''} · ${car.type || ''}</span>
+                            <div class="fd-item-meta-row">
+                                ${condBadge}
+                                <span class="fd-item-price">${formatPrice(car.price)}</span>
+                            </div>
+                            <span class="fd-item-sub">${variantLabel} · ${mileLabel}</span>
                         </div>
                     </a>
                     <button class="fd-item-remove" onclick="FaceoffDrawer.remove('${id}')" aria-label="Remove">✕</button>

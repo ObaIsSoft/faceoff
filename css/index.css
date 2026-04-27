@@ -717,6 +717,54 @@ header.nav-top .nav-links a:hover {
     opacity: 0.7;
 }
 
+/* Condition badge + price row */
+.depth-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    justify-content: center;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    margin-top: 0.3rem;
+}
+.depth-item.foreground .depth-meta { opacity: 1; }
+
+.depth-condition {
+    font-family: var(--font-nav);
+    font-size: 0.38rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    font-weight: 900;
+    padding: 0.18rem 0.42rem;
+    border-radius: 3px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+.depth-condition--new {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.14);
+    color: rgba(255,255,255,0.55);
+}
+.depth-condition--used {
+    background: rgba(212,165,80,0.1);
+    border: 1px solid rgba(212,165,80,0.3);
+    color: rgb(212,165,80);
+}
+
+/* Mileage label below the meta row */
+.depth-mileage {
+    font-family: var(--font-nav);
+    font-size: 0.42rem;
+    letter-spacing: 0.1em;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+    color: rgba(255,255,255,0.35);
+    margin-top: 0.1rem;
+    text-align: center;
+    display: block;
+}
+.depth-item.foreground .depth-mileage { opacity: 1; }
+
 @media (max-width: 900px) {
     .car-stack { height: 300px; }
     .depth-item.background { transform: translateZ(-200px) translateY(-30px) scale(0.6); }
@@ -1689,6 +1737,13 @@ body.scrollable-page {
     font-weight: 700;
 }
 
+.contact-car-meta {
+    font-size: 0.42rem;
+    letter-spacing: 0.08em;
+    opacity: 0.42;
+    margin-top: 0.1rem;
+}
+
 .contact-context-note {
     font-family: var(--font-nav);
     font-size: 0.85rem;
@@ -2057,12 +2112,12 @@ body.showroom-light header.nav-top .nav-links a {
 
 @media (max-width: 768px) {
     .sr-back {
-        top: 12rem;
-        left: 1.5rem;
-        font-size: 0.72rem;
-        opacity: 0.9;
-        font-weight: 600;
-        text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+        top: 3.2rem;
+        left: 1.2rem;
+        font-size: 0.65rem;
+        opacity: 0.7;
+        font-weight: 500;
+        text-shadow: 0 2px 8px rgba(0,0,0,0.6);
     }
 }
 
@@ -2330,6 +2385,8 @@ body.showroom-light header.nav-top .nav-links a {
     width: 100%;
     min-width: 0;
 }
+
+.sf-toggle, .sf-close { display: none; }
 
 .stack-filter {
     display: flex;
@@ -2619,29 +2676,30 @@ body.showroom-light header.nav-top .nav-links a {
 /* Showcase Page (Showroom) Typography Polish */
 .showroom-title {
     font-family: var(--font-display) !important;
-    font-size: clamp(3rem, 10vw, 6rem) !important;
+    font-size: clamp(1.8rem, 4vw, 2.8rem) !important;
     text-transform: uppercase;
-    letter-spacing: -0.02em;
-    line-height: 0.9;
+    letter-spacing: 0.01em;
+    line-height: 1;
     margin-bottom: 0.2rem;
 }
 
 .showroom-price {
     font-family: var(--font-nav) !important;
-    font-size: 1.2rem !important;
-    letter-spacing: 0.1em;
+    font-size: 1rem !important;
+    letter-spacing: 0.12em;
     opacity: 0.6;
-    margin-bottom: 2rem;
+    margin-bottom: 0.5rem;
 }
 
 .sp-section-label {
-    font-family: var(--font-display) !important;
-    font-size: 1.5rem !important;
+    font-family: var(--font-nav) !important;
+    font-size: 0.42rem !important;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
-    margin-bottom: 1.5rem;
+    letter-spacing: 0.3em;
+    margin-top: 1rem;
+    margin-bottom: 0.4rem;
     color: #fff;
-    opacity: 0.9;
+    opacity: 0.28;
 }
 
 .sp-label {
@@ -2988,6 +3046,106 @@ body.showroom-light header.nav-top .nav-links a {
 .sr-chip:not(:disabled):hover {
     border-color: rgba(255,255,255,0.38);
     color: rgba(255,255,255,0.88);
+}
+
+/* ── Year timeline (models with >5 years of stock) ── */
+.sr-year-timeline {
+    position: relative;
+    width: 100%;
+    max-width: 340px;
+}
+/* Fade edges — teases that there's more to scroll */
+.sr-year-timeline::before,
+.sr-year-timeline::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0;
+    width: 2.5rem;
+    z-index: 2;
+    pointer-events: none;
+}
+.sr-year-timeline::before {
+    left: 0;
+    background: linear-gradient(to right, rgba(10,10,10,1) 20%, transparent);
+}
+.sr-year-timeline::after {
+    right: 0;
+    background: linear-gradient(to left, rgba(10,10,10,1) 20%, transparent);
+}
+.sr-year-track {
+    display: flex;
+    align-items: flex-end;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    scroll-behavior: smooth;
+    padding: 0.6rem 2.5rem 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    gap: 0;
+}
+.sr-year-track::-webkit-scrollbar { display: none; }
+
+/* Decade label — subtle era marker */
+.sr-year-decade {
+    font-family: var(--font-nav);
+    font-size: 0.34rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.16);
+    flex-shrink: 0;
+    padding: 0 0.5rem 0.6rem 0.2rem;
+    white-space: nowrap;
+    align-self: flex-end;
+    line-height: 1;
+}
+/* Year tick */
+.sr-year-tick {
+    font-family: var(--font-nav);
+    font-size: 0.44rem;
+    letter-spacing: 0.05em;
+    color: rgba(255,255,255,0.22);
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    white-space: nowrap;
+    flex-shrink: 0;
+    padding: 0.25rem 0.4rem 0.5rem;
+    margin-bottom: -1px;
+    transition: color 0.2s ease, border-color 0.2s ease, font-size 0.2s ease;
+    position: relative;
+    line-height: 1;
+}
+/* Tick notch */
+.sr-year-tick::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 1px;
+    height: 3px;
+    background: rgba(255,255,255,0.12);
+    transition: background 0.2s ease, height 0.2s ease;
+}
+.sr-year-tick--active {
+    color: #fff;
+    font-size: 0.54rem;
+    font-weight: 700;
+    border-bottom-color: #fff;
+}
+.sr-year-tick--active::after {
+    background: #fff;
+    height: 5px;
+    width: 2px;
+}
+.sr-year-tick--unavail { opacity: 0.18; cursor: not-allowed; }
+.sr-year-tick:not(:disabled):not(.sr-year-tick--active):hover {
+    color: rgba(255,255,255,0.65);
+    border-bottom-color: rgba(255,255,255,0.28);
+}
+.sr-year-tick:not(:disabled):not(.sr-year-tick--active):hover::after {
+    background: rgba(255,255,255,0.4);
 }
 
 /* ── Unit selector ── */
@@ -3427,108 +3585,44 @@ body.showroom-light header.nav-top .nav-links a {
     .catalog-visual          { aspect-ratio: 16/9; }
 
     /* ── COMPARE ──────────────────────────────────────────────── */
+    body.compare-page             { overflow: hidden; height: 100dvh; }
     .compare-wrapper {
-        height: auto;
-        min-height: 100dvh;
-        overflow-y: auto;
-        overflow-x: hidden;
-        padding-top: 3.5rem;
-        padding-bottom: 3rem;
-    }
-    /*
-     * 3-row grid:
-     *  row 1 → [empty]      | —  | [right filter, text-right]
-     *  row 2 → [left car →] | VS | [← right car]
-     *  row 3 → [left filter]| —  | [empty]
-     */
-    .faceoff-zone {
-        display: grid;
-        grid-template-columns: 1fr 2.5rem 1fr;
-        grid-template-rows: auto auto auto;
-        padding: 0 0.75rem;
-        gap: 0;
-        overflow: visible;
-        height: auto;
-        align-items: start;
-    }
-    /* make faceoff-col wrappers invisible to the grid */
-    .faceoff-col             { display: contents; }
-
-    /* left car: row 2, col 1 */
-    .faceoff-col:first-child .car-stack {
-        grid-column: 1;
-        grid-row: 2;
-    }
-    /* left filter: row 3, col 1 — left-aligned, 30% wider into right space */
-    .faceoff-col:first-child .stack-filter {
-        grid-column: 1;
-        grid-row: 3;
-        margin-top: 4rem;
-        width: 130%;
-    }
-    .faceoff-col:first-child .sf-label,
-    .faceoff-col:first-child .sf-group { text-align: left; }
-
-    /* VS: row 2, col 2 */
-    .vs-divider {
-        grid-column: 2;
-        grid-row: 2;
-        font-size: 1.6rem;
-        align-self: center;
-        justify-self: center;
-        margin: 0;
+        position: fixed;
+        inset: 0;
+        top: 2.5rem;
+        overflow: hidden;
         padding: 0;
     }
-
-    /* right filter: row 1, col 3 — right-aligned, 30% wider into left space */
-    .faceoff-col:last-child .stack-filter {
-        grid-column: 3;
-        grid-row: 1;
-        margin-bottom: 0.5rem;
-        width: 130%;
-        margin-left: -30%;
-    }
-    .faceoff-col:last-child .sf-label,
-    .faceoff-col:last-child .sf-group { text-align: right; }
-    .faceoff-col:last-child .sf-control { justify-content: flex-end; }
-
-    /* right car: row 2, col 3 */
-    .faceoff-col:last-child .car-stack {
-        grid-column: 3;
-        grid-row: 2;
-    }
-
-    /* Compact shared filter styles */
-    .stack-filter {
-        position: static;
+    .faceoff-zone {
+        display: flex;
+        flex-direction: row;
         width: 100%;
+        height: 100%;
+        padding: 0;
+        gap: 0;
+        overflow: hidden;
+        align-items: stretch;
+    }
+    /* Columns are real flex children — restore from display:contents */
+    .faceoff-col {
         display: flex;
         flex-direction: column;
-        gap: 0;
-        padding: 0.5rem 0.4rem;
-        background: rgba(0,0,0,0.02);
-        border-radius: 4px;
-        border: 1px solid rgba(0,0,0,0.06);
+        flex: 1;
+        overflow: hidden;
+        position: relative;
     }
-    .sf-group {
-        padding: 0.3rem 0;
-        border-bottom: 1px solid rgba(0,0,0,0.05);
+    /* Car stack fills column — swipe cycles vehicles */
+    .car-stack {
+        flex: 1;
+        height: auto;
+        overflow: visible;
+        touch-action: none;
     }
-    .sf-group:last-child     { border-bottom: none; }
-    .sf-label                { font-size: 0.38rem; letter-spacing: 0.15em; }
-    .sf-select               { font-size: 0.55rem; width: 100%; }
-    .sf-input                { font-size: 0.55rem; width: 100%; }
-    .sf-range                { width: 100%; }
-    .sf-range-bounds         { font-size: 0.32rem; }
-    .sf-price-input          { width: 2.5rem; font-size: 0.4rem; }
-    /* Car stack — no overflow:hidden (kills preserve-3d); clip at zone level instead */
-    .car-stack               { height: 220px; overflow: visible; }
-    .faceoff-zone            { overflow-x: clip; }
     .car-visual              { max-width: 100%; aspect-ratio: 16/9; }
-    /* Foreground: slight offset (mirrors desktop -15%/+15% scaled to -6%/+6%) */
+    /* Foreground: slight offset */
     .depth-item.foreground              { transform: translateX(-6%) translateZ(0); }
     #right-stack .depth-item.foreground { transform: translateX(6%)  translateZ(0); }
-    /* Left backgrounds recede rightward (toward VS) — desktop ÷2.5 */
+    /* Left backgrounds recede rightward */
     #left-stack .depth-item.background   { transform: translateX(8%)  scale(0.6); opacity: 0.3;  filter: blur(3px); }
     #left-stack .depth-item.background-2 { transform: translateX(18%) scale(0.4); opacity: 0.15; filter: blur(6px); }
     #left-stack .depth-item.background-3 { transform: translateX(26%) scale(0.3); opacity: 0.08; filter: blur(9px); }
@@ -3538,11 +3632,203 @@ body.showroom-light header.nav-top .nav-links a {
     #right-stack .depth-item.background-2 { transform: translateX(-18%) scale(0.4); opacity: 0.15; filter: blur(6px); }
     #right-stack .depth-item.background-3 { transform: translateX(-26%) scale(0.3); opacity: 0.08; filter: blur(9px); }
     #right-stack .depth-item.background-4 { transform: translateX(-32%) scale(0.2); opacity: 0.04; filter: blur(12px); }
-    /* Bring label close under image — 2rem desktop margin is too tall for short stack */
     .depth-label             { margin-top: 0.4rem; font-size: 0.42rem; letter-spacing: 0.12em; }
     .depth-price             { font-size: 0.4rem; margin-top: 0.15rem; }
-    /* Hide spec pills — unreadable at this width */
     .car-specs-overlay       { display: none; }
+    /* VS divider — slim vertical separator */
+    .vs-divider {
+        writing-mode: vertical-rl;
+        text-orientation: mixed;
+        font-size: 0.5rem;
+        letter-spacing: 0.3em;
+        opacity: 0.18;
+        align-self: center;
+        flex-shrink: 0;
+        margin: 0;
+        padding: 0 0.2rem;
+    }
+    /* Filter toggle pill — floats at top corner of each column */
+    .sf-toggle {
+        display: flex;
+        align-items: center;
+        gap: 0.3rem;
+        position: absolute;
+        top: 0.65rem;
+        z-index: 20;
+        background: rgba(255,255,255,0.88);
+        border: 1px solid rgba(0,0,0,0.09);
+        color: rgba(0,0,0,0.62);
+        font-family: var(--font-nav);
+        font-size: 0.48rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        padding: 0.3rem 0.6rem;
+        border-radius: 2rem;
+        cursor: pointer;
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        box-shadow: 0 1px 6px rgba(0,0,0,0.08);
+    }
+    .faceoff-col:first-child .sf-toggle { left:  0.55rem; }
+    .faceoff-col:last-child  .sf-toggle { right: 0.55rem; }
+    /* Slide-in filter drawer */
+    .stack-filter {
+        position: fixed;
+        top: 2.5rem;
+        bottom: 5.5rem;
+        width: 72%;
+        max-width: 280px;
+        z-index: 300;
+        background: rgba(250,250,250,0.96);
+        backdrop-filter: blur(28px) saturate(200%);
+        -webkit-backdrop-filter: blur(28px) saturate(200%);
+        border: none;
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+        padding: 1rem 1.2rem 2rem;
+        overflow-y: auto;
+        scrollbar-width: none;
+        /* spring-like entry */
+        transition: transform 0.42s cubic-bezier(0.16, 1, 0.3, 1),
+                    opacity  0.3s  ease;
+        opacity: 0;
+    }
+    .stack-filter::-webkit-scrollbar { display: none; }
+    .faceoff-col:first-child .stack-filter {
+        left: 0;
+        right: auto;
+        border-right: 1px solid rgba(0,0,0,0.05);
+        border-radius: 0 0 16px 0;
+        box-shadow: 6px 0 32px rgba(0,0,0,0.1), 1px 0 0 rgba(0,0,0,0.04);
+        transform: translateX(-100%);
+    }
+    .faceoff-col:last-child .stack-filter {
+        right: 0;
+        left: auto;
+        border-left: 1px solid rgba(0,0,0,0.05);
+        border-radius: 0 0 0 16px;
+        box-shadow: -6px 0 32px rgba(0,0,0,0.1), -1px 0 0 rgba(0,0,0,0.04);
+        transform: translateX(100%);
+    }
+    .stack-filter.sf-open {
+        transform: translateX(0) !important;
+        opacity: 1;
+    }
+    /* Close button inside drawer */
+    .sf-close {
+        display: flex;
+        align-items: center;
+        background: none;
+        border: none;
+        color: rgba(0,0,0,0.3);
+        font-family: var(--font-nav);
+        font-size: 0.46rem;
+        letter-spacing: 0.16em;
+        text-transform: uppercase;
+        cursor: pointer;
+        padding: 0.2rem 0 0.75rem;
+        margin-bottom: 0;
+        border-bottom: 1px solid rgba(0,0,0,0.06);
+        width: 100%;
+    }
+    .faceoff-col:first-child .sf-close { justify-content: flex-start; }
+    .faceoff-col:last-child  .sf-close { justify-content: flex-end; }
+    /* Filter groups inside drawer */
+    .sf-group {
+        padding: 0.45rem 0;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+        border-right: none;
+    }
+    .sf-group:last-child  { border-bottom: none; }
+    .sf-group:first-child { padding-left: 0; }
+    .sf-label {
+        font-size: 0.38rem;
+        letter-spacing: 0.22em;
+        color: rgba(0,0,0,0.3);
+        opacity: 1;
+        margin-bottom: 0.1rem;
+        display: block;
+    }
+    .sf-control {
+        border-bottom: 1px solid rgba(0,0,0,0.08);
+        padding-bottom: 0.15rem;
+    }
+    .sf-select, .sf-input {
+        font-size: 0.62rem;
+        width: 100%;
+        background: transparent;
+        border: none;
+        color: rgba(0,0,0,0.8);
+        letter-spacing: 0.03em;
+        padding: 0.1rem 0;
+    }
+    .sf-range           { width: 100%; margin: 0.2rem 0 0; }
+    .sf-range-bounds    { font-size: 0.34rem; color: rgba(0,0,0,0.28); margin-top: 0.1rem; }
+    .sf-price-input {
+        width: 3rem;
+        font-size: 0.4rem;
+        background: transparent;
+        border: none;
+        color: rgba(0,0,0,0.5);
+        text-align: center;
+    }
+    .sf-chevron { display: none; }
+    /* Overlay backdrop */
+    .sf-panel-overlay {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 250;
+        background: rgba(0,0,0,0.18);
+        backdrop-filter: blur(2px);
+        -webkit-backdrop-filter: blur(2px);
+    }
+    .sf-panel-overlay.sf-overlay-open { display: block; }
+    /* Side header inside drawer */
+    .sf-side-header {
+        display: flex;
+        flex-direction: column;
+        gap: 0.2rem;
+        padding: 0.5rem 0 0.65rem;
+        margin-bottom: 0;
+        border-bottom: 1px solid rgba(0,0,0,0.06);
+    }
+    .sf-side-name {
+        font-family: var(--font-nav);
+        font-size: 0.52rem;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        font-weight: 700;
+        color: rgba(0,0,0,0.68);
+    }
+    .sf-side-note {
+        font-size: 0.44rem;
+        color: rgba(0,0,0,0.32);
+        line-height: 1.45;
+    }
+    /* Hint bar at bottom of compare view */
+    .compare-hint {
+        position: absolute;
+        bottom: 8rem;
+        left: 50%;
+        transform: translateX(-50%);
+        font-family: var(--font-nav);
+        font-size: 0.42rem;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: rgba(0,0,0,0.45);
+        white-space: nowrap;
+        pointer-events: none;
+        z-index: 5;
+        margin: 0;
+        background: rgba(255,255,255,0.75);
+        backdrop-filter: blur(6px);
+        -webkit-backdrop-filter: blur(6px);
+        padding: 0.35rem 0.9rem;
+        border-radius: 2rem;
+        border: 1px solid rgba(0,0,0,0.07);
+    }
 
     /* ── SHOWROOM ─────────────────────────────────────────────── */
     body.showroom-mode       { overflow: hidden; height: 100dvh; }
@@ -3627,8 +3913,8 @@ body.showroom-light header.nav-top .nav-links a {
         transform: translateY(0);
         pointer-events: auto;
     }
-    .sr-modal--top           { top: 3.4rem; }
-    .sr-modal--bot           { bottom: 0.9rem; }
+    .sr-modal--top           { top: auto; bottom: 10.5rem; }
+    .sr-modal--bot           { bottom: 5rem; }
     .sr-modal-label {
         font-family: var(--font-nav, sans-serif);
         font-size: 0.4rem;
@@ -3862,12 +4148,39 @@ body.showroom-light header.nav-top .nav-links a {
     overflow: hidden;
     text-overflow: ellipsis;
 }
+.fd-item-meta-row {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+    margin-top: 0.1rem;
+}
 .fd-item-price { font-size: 0.58rem; color: rgba(255,255,255,0.55); }
-.fd-item-meta {
-    font-size: 0.46rem;
-    color: rgba(255,255,255,0.28);
+.fd-item-sub {
+    font-size: 0.42rem;
+    color: rgba(255,255,255,0.25);
+    letter-spacing: 0.06em;
+    margin-top: 0.1rem;
+}
+/* Condition badges inside drawer */
+.fd-cond {
+    font-size: 0.34rem;
+    letter-spacing: 0.14em;
     text-transform: uppercase;
-    letter-spacing: 0.1em;
+    font-weight: 900;
+    padding: 0.14rem 0.35rem;
+    border-radius: 2px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+.fd-cond--new {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.12);
+    color: rgba(255,255,255,0.5);
+}
+.fd-cond--used {
+    background: rgba(212,165,80,0.08);
+    border: 1px solid rgba(212,165,80,0.28);
+    color: rgb(212,165,80);
 }
 .fd-item-remove {
     background: none;

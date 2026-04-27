@@ -39,9 +39,13 @@ var ShowroomPage = {
         this._currentUnit = unit;
         this._populate(unit, from);
 
-        // Update document title
+        // Update document title + meta description
         const cond = unit.condition === 'new' ? 'New' : 'Pre-owned';
         document.title = `${unit.name} ${unit.year} · ${cond} · ${this.formatPrice(unit.price)} | Faceoff`;
+        let metaDesc = document.querySelector('meta[name="description"]');
+        if (!metaDesc) { metaDesc = document.createElement('meta'); metaDesc.name = 'description'; document.head.appendChild(metaDesc); }
+        const mileDesc = unit.mileage === 0 ? '0 km · New' : `${unit.mileage.toLocaleString()} km`;
+        metaDesc.content = `${unit.year} ${unit.name} — ${cond} — ${this.formatPrice(unit.price)} — ${mileDesc}. Available at Faceoff Automotive.`;
     },
 
     // ─── Populate all DOM slots ────────────────────────────────────────────────
@@ -172,44 +176,127 @@ var ShowroomPage = {
     },
 
     // ─── Variant selector ──────────────────────────────────────────────────────
+    // Year row: chips (≤5 years) or scrollable timeline with decade markers (>5 years).
+    // Trim row: chip strip filtered to the selected year — shown only when year has >1 trim.
     _renderVariantSelector(modelId, activeVariantId) {
         const el = document.getElementById('variant-selector');
         if (!el) return;
-        const variants = getVariantsForModel(modelId);
-        if (variants.length <= 1) { el.style.display = 'none'; return; }
+        const variants = getVariantsForModel(modelId); // newest-first
+
+        const vList = variants.map(v => ({
+            ...v,
+            id: Object.keys(VARIANTS).find(k => VARIANTS[k] === v)
+        })).filter(v => v.id);
+
+        if (vList.length <= 1) { el.style.display = 'none'; return; }
+
+        const byYear = {};
+        vList.forEach(v => {
+            if (!byYear[v.year]) byYear[v.year] = [];
+            byYear[v.year].push(v);
+        });
+        const yearsDesc = Object.keys(byYear);          // newest-first
+        const yearsAsc  = [...yearsDesc].reverse();     // oldest-first for timeline L→R
+
+        const activeYear   = (VARIANTS[activeVariantId]?.year) || yearsDesc[0];
+        const trimsForYear = byYear[activeYear] || [];
+
+        const hasMultipleYears = yearsDesc.length > 1;
+        const hasMultipleTrims = trimsForYear.length > 1;
+
+        if (!hasMultipleYears && !hasMultipleTrims) { el.style.display = 'none'; return; }
+
+        const availUnits = id => (typeof INVENTORY !== 'undefined')
+            ? INVENTORY.filter(u => u.variantId === id && u.status === 'available')
+            : [];
+
+        let html = '';
+
+        if (hasMultipleYears) {
+            if (yearsDesc.length > 5) {
+                // ── Scrollable timeline with decade markers ─────────────────
+                let lastDecade = null;
+                const ticks = yearsAsc.map(y => {
+                    const decade = Math.floor(parseInt(y) / 10) * 10;
+                    let sep = '';
+                    if (decade !== lastDecade) {
+                        lastDecade = decade;
+                        sep = `<span class="sr-year-decade">${decade}s</span>`;
+                    }
+                    const ok = byYear[y].some(v => availUnits(v.id).length > 0);
+                    const active = y === activeYear;
+                    return `${sep}<button class="sr-year-tick${active ? ' sr-year-tick--active' : ''}${!ok ? ' sr-year-tick--unavail' : ''}"
+                        data-year="${y}"${!ok ? ' disabled' : ''}>${y}</button>`;
+                }).join('');
+                html += `<div class="sr-selector-label">Year</div>
+                    <div class="sr-year-timeline"><div class="sr-year-track">${ticks}</div></div>`;
+            } else {
+                // ── Plain chips ─────────────────────────────────────────────
+                html += `<div class="sr-selector-label">Year</div>
+                    <div class="sr-selector-chips">
+                        ${yearsDesc.map(y => {
+                            const ok = byYear[y].some(v => availUnits(v.id).length > 0);
+                            return `<button class="sr-chip${y === activeYear ? ' sr-chip--active' : ''}${!ok ? ' sr-chip--unavail' : ''}"
+                                data-year="${y}"${!ok ? ' disabled' : ''}>${y}</button>`;
+                        }).join('')}
+                    </div>`;
+            }
+        }
+
+        if (hasMultipleTrims) {
+            html += `<div class="sr-selector-label" style="margin-top:0.65rem">Variant</div>
+                <div class="sr-selector-chips">
+                    ${trimsForYear.map(v => {
+                        const units = availUnits(v.id);
+                        const isActive = v.id === activeVariantId;
+                        return `<button class="sr-chip${isActive ? ' sr-chip--active' : ''}${!units.length ? ' sr-chip--unavail' : ''}"
+                            data-variant-id="${v.id}"${!units.length ? ' disabled title="No available units"' : ''}>${v.trim}</button>`;
+                    }).join('')}
+                </div>`;
+        }
 
         el.style.display = '';
-        el.innerHTML = `
-            <div class="sr-selector-label">Variant</div>
-            <div class="sr-selector-chips">
-                ${variants.map(v => {
-                    const vId = Object.keys(VARIANTS).find(k => VARIANTS[k] === v);
-                    const units = (typeof INVENTORY !== 'undefined')
-                        ? INVENTORY.filter(u => u.variantId === vId && u.status === 'available')
-                        : [];
-                    const isActive = vId === activeVariantId;
-                    const hasUnits = units.length > 0;
-                    return `<button class="sr-chip ${isActive ? 'sr-chip--active' : ''} ${!hasUnits ? 'sr-chip--unavail' : ''}"
-                        data-variant-id="${vId}" ${!hasUnits ? 'disabled title="No available units"' : ''}>
-                        ${v.year} ${v.trim}
-                    </button>`;
-                }).join('')}
-            </div>`;
+        el.innerHTML = html;
 
-        el.addEventListener('click', e => {
-            const btn = e.target.closest('.sr-chip');
-            if (!btn || btn.disabled) return;
-            const vId = btn.dataset.variantId;
-            const units = (typeof INVENTORY !== 'undefined')
-                ? INVENTORY.filter(u => u.variantId === vId && u.status === 'available')
-                : [];
-            if (units.length === 0) return;
-            const newUnit = resolveUnit(units[0].id);
-            if (!newUnit) return;
-            history.replaceState(null, '', `showroom.html?unit=${units[0].id}`);
-            this._reset();
-            this._currentUnit = newUnit;
-            this._populate(newUnit, null);
+        // Auto-scroll timeline to active year tick
+        requestAnimationFrame(() => {
+            const track  = el.querySelector('.sr-year-track');
+            const active = el.querySelector('.sr-year-tick--active');
+            if (track && active) {
+                track.scrollLeft = active.offsetLeft - track.clientWidth / 2 + active.offsetWidth / 2;
+            }
+        });
+
+        // Year listeners — shared by chips and timeline ticks via [data-year]
+        el.querySelectorAll('[data-year]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const yr  = btn.dataset.year;
+                const first = (byYear[yr] || []).find(v => availUnits(v.id).length > 0);
+                if (!first) return;
+                const inv = availUnits(first.id)[0];
+                if (!inv) return;
+                const newUnit = resolveUnit(inv.id);
+                if (!newUnit) return;
+                history.replaceState(null, '', `showroom.html?unit=${inv.id}`);
+                this._reset();
+                this._currentUnit = newUnit;
+                this._populate(newUnit, null);
+            });
+        });
+
+        // Trim listeners
+        el.querySelectorAll('[data-variant-id]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (btn.disabled) return;
+                const units = availUnits(btn.dataset.variantId);
+                if (!units.length) return;
+                const newUnit = resolveUnit(units[0].id);
+                if (!newUnit) return;
+                history.replaceState(null, '', `showroom.html?unit=${units[0].id}`);
+                this._reset();
+                this._currentUnit = newUnit;
+                this._populate(newUnit, null);
+            });
         });
     },
 

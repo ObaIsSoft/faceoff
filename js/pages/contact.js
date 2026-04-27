@@ -2,16 +2,21 @@
 if (!window.ContactPage) {
 var ContactPage = {
     init() {
-        const params = new URLSearchParams(window.location.search);
-        const type = params.get('type');
-        const carId = params.get('car');
-        const from = params.get('from');
-        const car = carId ? CARS[carId] : null;
+        const params  = new URLSearchParams(window.location.search);
+        const type    = params.get('type');
+        const from    = params.get('from');
+
+        // Prefer ?unit=, fallback ?car= (legacy)
+        const unitId = params.get('unit') || params.get('car');
+        const car    = unitId && typeof resolveUnit === 'function'
+            ? resolveUnit(unitId)
+            : (unitId && typeof CARS !== 'undefined' ? CARS[unitId] : null);
 
         // Dynamic page title
-        if (type === 'inspection') document.title = 'Book Inspection | Faceoff';
-        else if (type === 'enquiry' && car) document.title = `Enquiry – ${car.name} | Faceoff`;
-        else if (type === 'enquiry') document.title = 'Make an Enquiry | Faceoff';
+        if (type === 'inspection' && car) document.title = `Book Inspection — ${car.name} ${car.year || ''} | Faceoff`;
+        else if (type === 'inspection')   document.title = 'Book Inspection | Faceoff';
+        else if (type === 'enquiry' && car) document.title = `Enquiry — ${car.name} ${car.year || ''} | Faceoff`;
+        else if (type === 'enquiry')      document.title = 'Make an Enquiry | Faceoff';
 
         this.buildContext(type, car, from);
         this.buildForm(type, car, from);
@@ -23,6 +28,14 @@ var ContactPage = {
         const rates = { 'NGN': { symbol: '₦', rate: 1 }, 'GHS': { symbol: 'GH₵', rate: 0.012 }, 'XOF-TG': { symbol: 'CFA', rate: 0.52 }, 'XOF-BJ': { symbol: 'CFA', rate: 0.52 } };
         const cfg = rates[currency] || rates['NGN'];
         return cfg.symbol + Math.round(val * cfg.rate).toLocaleString();
+    },
+
+    _carMeta(car) {
+        if (!car) return '';
+        const condLabel  = car.condition === 'used' ? 'Pre-owned' : 'New';
+        const mileLabel  = car.mileage > 0 ? `${car.mileage.toLocaleString()} km` : '0 km';
+        const yearStr    = car.year || '';
+        return [yearStr, condLabel, mileLabel].filter(Boolean).join(' · ');
     },
 
     buildContext(type, car, from) {
@@ -38,6 +51,7 @@ var ContactPage = {
                     <div class="contact-car-badge">
                         <span class="contact-car-name">${car.name}</span>
                         <span class="contact-car-price">${this.formatPrice(car.price)}</span>
+                        <span class="contact-car-meta">${this._carMeta(car)}</span>
                     </div>
                 </div>
                 <p class="contact-context-note">Our team will confirm availability within 24 hours.</p>
@@ -53,6 +67,7 @@ var ContactPage = {
                     <div class="contact-car-badge">
                         <span class="contact-car-name">${car.name}</span>
                         <span class="contact-car-price">${this.formatPrice(car.price)}</span>
+                        <span class="contact-car-meta">${this._carMeta(car)}</span>
                     </div>
                 </div>
                 <p class="contact-context-note">We'll respond with full documentation and pricing.</p>`;
@@ -73,8 +88,11 @@ var ContactPage = {
 
         const today = new Date().toISOString().split('T')[0];
         let msg = '';
-        if (type === 'inspection' && car) msg = `Hi Faceoff, I'd like to book an inspection for the ${car.name}.`;
-        else if (type === 'enquiry' && car) msg = `Hi Faceoff, I'd like to make enquiries about the ${car.name}.`;
+        if (type === 'inspection' && car) {
+            msg = `Hi Faceoff,\n\nI'd like to book an inspection for the ${car.year || ''} ${car.name}${car.condition === 'used' ? ' (Pre-owned, ' + (car.mileage > 0 ? car.mileage.toLocaleString() + ' km' : '0 km') + ')' : ' (New)'}.\n\nListed price: ${this.formatPrice(car.price)}\n\nPlease confirm availability.`;
+        } else if (type === 'enquiry' && car) {
+            msg = `Hi Faceoff,\n\nI'd like to make an enquiry about the ${car.year || ''} ${car.name}${car.condition === 'used' ? ' (Pre-owned, ' + (car.mileage > 0 ? car.mileage.toLocaleString() + ' km' : '0 km') + ')' : ' (New)'}.\n\nListed price: ${this.formatPrice(car.price)}\n\nPlease share full documentation and availability.`;
+        }
 
         fields.innerHTML = `
             <div class="cf-group">
