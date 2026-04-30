@@ -1,4 +1,223 @@
 
+if (!window.DrumWheel) {
+// Direct port of jquery.drum.js + jquery.watch-drag.js to vanilla JS.
+// Logic and structure unchanged from the reference; only jQuery API replaced.
+class DrumWheel {
+    constructor(el, items, onChange) {
+        this._viewport    = el;
+        this.items        = items;
+        this._onChange    = onChange;
+        this._drumOffset  = 0;
+        this._state       = 'standby';
+        this._edgeLimit   = 0.8;
+        this._acceleration = 300;
+        this._maxSpinOffset = 500;
+        this._minDragInterval = 100;
+        this._render();
+        this._bindDrag();
+        this._bindWheel();
+    }
+
+    // ── _render: mirrors jquery.drum.js _render ──────────────────────────────
+    _render() {
+        this._viewport.innerHTML = '';
+        this._drumEl = document.createElement('div');
+        this._drumEl.style.cssText = 'position:relative;';
+        this._drawItems();
+        this._viewport.appendChild(this._drumEl);
+    }
+
+    // ── _drawItems: mirrors jquery.drum.js _drawItems ─────────────────────────
+    _drawItems() {
+        this._drumEl.innerHTML = this.items.map(item =>
+            `<div class="drum-item${item.disabled ? ' drum-item--disabled' : ''}" data-value="${item.id}">${item.label}</div>`
+        ).join('');
+    }
+
+    // ── _scrollToOffset: mirrors jquery.drum.js _scrollToOffset ──────────────
+    _scrollToOffset(offset) {
+        offset = this._processOffset(offset);
+        this._drumOffset = offset;
+        this._drumEl.style.transform = `translate(0,${offset}px)`;
+    }
+
+    // ── _processOffset: mirrors jquery.drum.js _processOffset ────────────────
+    _processOffset(offset) {
+        var q  = this._edgeLimit;
+        var vh = this._viewport.clientHeight;
+        var dh = this._drumEl.offsetHeight;
+        return Math.max(Math.min(offset, q * vh), -dh + vh * (1 - q));
+    }
+
+    // ── _getCurrentOffset: mirrors jquery.drum.js _getCurrentOffset ──────────
+    _getCurrentOffset() {
+        return this._drumEl.getBoundingClientRect().top - this._viewport.getBoundingClientRect().top;
+    }
+
+    // ── _getItemInView: mirrors jquery.drum.js _getItemInView ─────────────────
+    _getItemInView() {
+        var vBB     = this._viewport.getBoundingClientRect();
+        var vCenterY = vBB.top + vBB.height / 2;
+        var dBB     = this._drumEl.getBoundingClientRect();
+        var items   = this._drumEl.querySelectorAll('.drum-item');
+        var i = Math.max(0, Math.min(
+            items.length - 1,
+            Math.floor((vCenterY - dBB.top) / dBB.height * items.length)
+        ));
+        var ret = items[i];
+        if (!ret || !ret.classList.contains('drum-item')) {
+            ret = this._drumOffset > 0 ? items[0] : items[items.length - 1];
+        }
+        return ret;
+    }
+
+    // ── _centerView: mirrors jquery.drum.js _centerView ───────────────────────
+    _centerView(itemInView, animate) {
+        animate = animate !== false;
+        itemInView = itemInView || this._getItemInView();
+        this._drumEl.querySelectorAll('.drum-item').forEach(el => el.classList.remove('drum-item-current'));
+        itemInView.classList.add('drum-item-current');
+        var offset = -itemInView.offsetTop + this._viewport.clientHeight / 2 - itemInView.offsetHeight / 2;
+        clearTimeout(this._timer);
+        if (animate) {
+            this._drumEl.style.transition = 'transform .13s cubic-bezier(0,.5,.85,1)';
+            this._timer = setTimeout(() => { this._drumEl.style.transition = 'none'; }, 200);
+        } else {
+            this._drumEl.style.transition = 'none';
+        }
+        this._scrollToOffset(offset);
+        return itemInView;
+    }
+
+    // ── _stopRevolving: mirrors jquery.drum.js _stopRevolving ─────────────────
+    _stopRevolving() {
+        if (this._state === 'standby') return;
+        var item = this._centerView();
+        this._state = 'standby';
+        if (item && !item.classList.contains('drum-item--disabled')) {
+            this._onChange && this._onChange(item.dataset.value);
+        }
+    }
+
+    // ── Public API ────────────────────────────────────────────────────────────
+    setActive(id) {
+        var items = this._drumEl.querySelectorAll('.drum-item');
+        var target = null;
+        items.forEach(el => { if (el.dataset.value === String(id)) target = el; });
+        if (target) this._centerView(target, false);
+    }
+
+    setDisabled(predicate) {
+        this.items.forEach(item => { item.disabled = !!predicate(item.id); });
+        this._drumEl.querySelectorAll('.drum-item').forEach((el, i) => {
+            if (this.items[i]) el.classList.toggle('drum-item--disabled', !!this.items[i].disabled);
+        });
+    }
+
+    // ── _bindWheel: keyboard/mouse-wheel ─────────────────────────────────────
+    _bindWheel() {
+        this._viewport.addEventListener('wheel', e => {
+            e.preventDefault();
+            if (this._state === 'revolving') {
+                this._scrollToOffset(this._getCurrentOffset());
+                this._state = 'standby';
+            }
+            var all = [...this._drumEl.querySelectorAll('.drum-item')];
+            var cur = this._getItemInView();
+            var dir = e.deltaY > 0 ? 1 : -1;
+            var next = all.indexOf(cur) + dir;
+            while (next >= 0 && next < all.length && all[next].classList.contains('drum-item--disabled')) next += dir;
+            if (next < 0 || next >= all.length) return;
+            this._centerView(all[next], true);
+            if (!all[next].classList.contains('drum-item--disabled'))
+                this._onChange && this._onChange(all[next].dataset.value);
+        }, { passive: false });
+    }
+
+    // ── _bindDrag: port of jquery.watch-drag.js ───────────────────────────────
+    _bindDrag() {
+        var that   = this;
+        var coords = { x: null, y: null, t: null, dx: 0, dy: 0, dt: 0 };
+
+        function getXY(ev) {
+            var isTouch = /touch/.test(ev.type);
+            return {
+                x: isTouch ? ev.touches[0].pageX : ev.pageX,
+                y: isTouch ? ev.touches[0].pageY : ev.pageY
+            };
+        }
+
+        function onStart(ev) {
+            if (ev.type === 'mousedown' && ev.which !== 1) return;
+            ev.preventDefault();
+            ev.stopPropagation();
+
+            if (that._state === 'revolving') {
+                that._scrollToOffset(that._getCurrentOffset());
+            }
+            that._state = 'dragging';
+            that._drumEl.style.transition = 'none';
+
+            var p = getXY(ev);
+            coords = { x: p.x, y: p.y, t: Date.now(), dx: 0, dy: 0, dt: 0 };
+
+            window.addEventListener('mousemove', onMove);
+            window.addEventListener('touchmove', onMove, { passive: false });
+            window.addEventListener('mouseup',   onEnd);
+            window.addEventListener('touchend',  onEnd);
+        }
+
+        function onMove(ev) {
+            var p  = getXY(ev);
+            var t  = Date.now();
+            var dx = p.x - coords.x;
+            var dy = p.y - coords.y;
+            var dt = t   - coords.t;
+            coords = { x: p.x, y: p.y, t: t, dx: dx, dy: dy, dt: dt };
+            that._scrollToOffset(that._drumOffset + dy);
+        }
+
+        function onEnd(ev) {
+            ev.preventDefault();
+            ev.stopPropagation();
+
+            window.removeEventListener('mousemove', onMove);
+            window.removeEventListener('touchmove', onMove);
+            window.removeEventListener('mouseup',   onEnd);
+            window.removeEventListener('touchend',  onEnd);
+
+            var vy = 0, vx = 0;
+            if (Date.now() - coords.t <= that._minDragInterval) {
+                vx = coords.dx / coords.dt * 1000;
+                vy = coords.dy / coords.dt * 1000;
+            }
+
+            var v = Math.abs(vy);
+            var a = that._acceleration;
+
+            if (v) {
+                var offset = Math.pow(v, 2) / (2 * a);
+                if (offset > that._maxSpinOffset) offset = that._maxSpinOffset;
+                offset = offset * Math.sign(vy);
+                offset = that._drumOffset + offset;
+                offset = that._processOffset(offset);
+                var t = 2 * Math.abs(offset - that._drumOffset) / v;
+                that._drumEl.style.transition = `transform ${t}s cubic-bezier(0.25,0.46,0.45,0.94)`;
+                that._scrollToOffset(offset);
+                that._state = 'revolving';
+                setTimeout(() => that._stopRevolving(), t * 1000 + 40);
+            } else {
+                that._stopRevolving();
+            }
+        }
+
+        this._viewport.addEventListener('mousedown',  onStart);
+        this._viewport.addEventListener('touchstart', onStart, { passive: false });
+    }
+}
+window.DrumWheel = DrumWheel;
+}
+
 if (!window.ShowroomPage) {
 var ShowroomPage = {
     _modalInterval: null,
@@ -97,11 +316,8 @@ var ShowroomPage = {
         if (insp) insp.href = `contact.html?type=inspection&unit=${unit.id}`;
         if (enq)  enq.href  = `contact.html?type=enquiry&unit=${unit.id}`;
 
-        // Variant selector
-        this._renderVariantSelector(effectiveModelId, effectiveVariantId);
-
-        // Unit selector
-        this._renderUnitSelector(effectiveModelId, unit.id);
+        // Drum wheel selector (replaces year chips + unit cards)
+        this._renderDrumSelector(effectiveModelId, unit.id);
 
         // Spec panels
         const sl = document.getElementById('specs-left');
@@ -300,6 +516,129 @@ var ShowroomPage = {
         });
     },
 
+    // ─── Multi-column drum selector ────────────────────────────────────────────
+    _renderDrumSelector(modelId, activeUnitId) {
+        const varEl = document.getElementById('variant-selector');
+        if (varEl) varEl.style.display = 'none';
+
+        const el = document.getElementById('unit-selector');
+        if (!el || typeof INVENTORY === 'undefined' || typeof VARIANTS === 'undefined') return;
+
+        // Enrich all units for this model with variant fields
+        const allUnits = INVENTORY
+            .filter(u => { const v = VARIANTS[u.variantId]; return v && v.modelId === modelId; })
+            .map(u => {
+                const v = VARIANTS[u.variantId] || {};
+                return { ...u, year: String(v.year || ''), trim: v.trim || '' };
+            });
+
+        if (allUnits.length <= 1) { el.style.display = 'none'; return; }
+
+        // Which dimensions have multiple unique values?
+        const dims = [
+            { key: 'year',      label: 'Year'      },
+            { key: 'trim',      label: 'Edition'   },
+            { key: 'color',     label: 'Colour'    },
+            { key: 'condition', label: 'Condition',
+              fmt: v => v === 'new' ? 'New' : 'Pre-owned' }
+        ].map(d => ({
+            ...d,
+            values: [...new Set(allUnits.map(u => u[d.key]).filter(Boolean))]
+                .sort((a, b) => d.key === 'year' ? b - a : String(a).localeCompare(String(b)))
+        })).filter(d => d.values.length > 1);
+
+        if (dims.length === 0) { el.style.display = 'none'; return; }
+
+        // Seed selection from active unit
+        const activeRaw = allUnits.find(u => u.id === activeUnitId) || allUnits[0];
+        const sel = {};
+        dims.forEach(d => { sel[d.key] = activeRaw[d.key] || d.values[0]; });
+
+        // Find best-matching available unit for current sel state
+        const findMatch = () => {
+            const avail = allUnits.filter(u => u.status === 'available');
+            if (!avail.length) return allUnits[0];
+            const score = u => dims.reduce((n, d) => n + (u[d.key] === sel[d.key] ? 1 : 0), 0);
+            return avail.reduce((best, u) => score(u) > score(best) ? u : best, avail[0]);
+        };
+
+        const wheels = {};
+
+        // After any sel change: disable invalid values in OTHER drums, snap if needed
+        const refreshWheelStates = () => {
+            dims.forEach(targetDim => {
+                const otherFilters = dims.filter(d => d.key !== targetDim.key);
+                const valid = new Set(
+                    allUnits
+                        .filter(u => u.status === 'available' &&
+                            otherFilters.every(f => u[f.key] === sel[f.key]))
+                        .map(u => u[targetDim.key]).filter(Boolean)
+                );
+                // Snap current selection if it's now invalid
+                if (!valid.has(sel[targetDim.key])) {
+                    const first = targetDim.values.find(v => valid.has(v));
+                    if (first) {
+                        sel[targetDim.key] = first;
+                        wheels[targetDim.key]?.setActive(first);
+                    }
+                }
+                wheels[targetDim.key]?.setDisabled(id => !valid.has(id));
+            });
+        };
+
+        const navigate = () => {
+            const match = findMatch();
+            if (!match || match.id === activeUnitId) return;
+            const newUnit = resolveUnit(match.id);
+            if (!newUnit) return;
+            history.replaceState(null, '', `showroom.html?unit=${match.id}`);
+            this._reset();
+            this._currentUnit = newUnit;
+            this._populate(newUnit, null);
+        };
+
+        const onWheelChange = (key, val) => {
+            sel[key] = val;
+            refreshWheelStates();
+            clearTimeout(this._drumNavTimer);
+            this._drumNavTimer = setTimeout(navigate, 380);
+        };
+
+        // Render
+        el.style.display = '';
+        el.innerHTML = '<div class="multi-drum-row"></div>';
+        const row = el.querySelector('.multi-drum-row');
+
+        dims.forEach(d => {
+            const col = document.createElement('div');
+            col.className = 'multi-drum-col';
+
+            const lbl = document.createElement('div');
+            lbl.className = 'drum-col-label';
+            lbl.textContent = d.label;
+            col.appendChild(lbl);
+
+            const wheelEl = document.createElement('div');
+            wheelEl.className = 'drum-wheel';
+            col.appendChild(wheelEl);
+            row.appendChild(col);
+
+            const items = d.values.map(v => ({
+                id: v,
+                label: d.fmt ? d.fmt(v) : v,
+                sub: null,
+                disabled: false
+            }));
+
+            const wheel = new DrumWheel(wheelEl, items, val => onWheelChange(d.key, val));
+            wheel.setActive(sel[d.key]);
+            wheels[d.key] = wheel;
+        });
+
+        // Set initial disabled states
+        refreshWheelStates();
+    },
+
     // ─── Unit selector ─────────────────────────────────────────────────────────
     _renderUnitSelector(modelId, activeUnitId) {
         const el = document.getElementById('unit-selector');
@@ -477,16 +816,17 @@ var ShowroomPage = {
         const saveBtn = document.createElement('button');
         saveBtn.className = 'sr-save';
         saveBtn.setAttribute('data-save-id', unitId);
+        saveBtn.setAttribute('aria-label', 'Save vehicle');
 
         const update = () => {
             const saved = typeof FaceoffDrawer !== 'undefined' && FaceoffDrawer.isSaved(unitId);
             saveBtn.setAttribute('data-saved', saved ? 'true' : 'false');
-            saveBtn.innerHTML = `<svg width="12" height="14" viewBox="0 0 12 14" fill="${saved ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 1h8v12l-4-3-4 3V1z"/></svg> ${saved ? 'Saved' : 'Save Vehicle'}`;
+            saveBtn.innerHTML = `<svg width="13" height="15" viewBox="0 0 12 14" fill="${saved ? 'currentColor' : 'none'}" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 1h8v12l-4-3-4 3V1z"/></svg>`;
         };
         saveBtn.addEventListener('click', () => {
             if (typeof FaceoffDrawer !== 'undefined') { FaceoffDrawer.toggle(unitId); update(); }
         });
-        cta.insertAdjacentElement('afterend', saveBtn);
+        cta.appendChild(saveBtn);
         update();
     },
 
@@ -585,7 +925,7 @@ var ShowroomPage = {
     },
 
     _reset() {
-        // Clear injected elements before re-populating
+        clearTimeout(this._drumNavTimer);
         document.querySelectorAll('.sr-back, .sr-save, .sr-modal, .spec-panel--mobile').forEach(el => el.remove());
         ['car-gallery', 'variant-selector', 'unit-selector', 'lacvis-block', 'seller-notes'].forEach(id => {
             const el = document.getElementById(id);
