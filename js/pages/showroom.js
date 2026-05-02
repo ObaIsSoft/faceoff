@@ -326,8 +326,10 @@ var ShowroomPage = {
         // CTAs
         const insp = document.getElementById('cta-inspection');
         const enq  = document.getElementById('cta-enquiry');
+        const cust = document.getElementById('cta-customize');
         if (insp) insp.href = `contact.html?type=inspection&unit=${unit.id}`;
         if (enq)  enq.href  = `contact.html?type=enquiry&unit=${unit.id}`;
+        if (cust) cust.href = `customize.html?unit=${unit.id}`;
 
         // Drum wheel selector (replaces year chips + unit cards)
         this._renderDrumSelector(effectiveModelId, unit.id);

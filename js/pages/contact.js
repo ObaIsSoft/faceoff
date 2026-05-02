@@ -94,6 +94,15 @@ var ContactPage = {
             msg = `Hi Faceoff,\n\nI'd like to make an enquiry about the ${car.year || ''} ${car.name}${car.condition === 'used' ? ' (Pre-owned, ' + (car.mileage > 0 ? car.mileage.toLocaleString() + ' km' : '0 km') + ')' : ' (New)'}.\n\nListed price: ${this.formatPrice(car.price)}\n\nPlease share full documentation and availability.`;
         }
 
+        // Append customisation summary if it was saved for this unit
+        if (unitId) {
+            const configSummary = localStorage.getItem('faceoff_last_config_summary');
+            const configUnitId  = localStorage.getItem('faceoff_last_config_unitId');
+            if (configSummary && configUnitId === unitId) {
+                msg += `\n\nCustomisation: ${configSummary}`;
+            }
+        }
+
         fields.innerHTML = `
             <div class="cf-group">
                 <label class="cf-label">Full Name</label>

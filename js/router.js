@@ -31,6 +31,12 @@ var Router = {
 
     async navigate(url) {
         if (url === window.location.pathname + window.location.search) return;
+        // Bypass SPA for customize page — Three.js ES modules can't re-execute inside innerHTML swap
+        const targetPath = url.split('?')[0].split('/').pop();
+        if (targetPath === 'customize.html') {
+            window.location.href = url;
+            return;
+        }
         history.pushState(null, '', url);
         await this.handleRoute(url);
     },

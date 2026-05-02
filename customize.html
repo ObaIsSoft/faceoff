@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Customise | Faceoff</title>
+    <link rel="icon" type="image/png" href="favicon.png">
+    <link rel="apple-touch-icon" href="favicon.png">
+    <link rel="stylesheet" href="css/index.css">
+    <script type="importmap">
+    {
+      "imports": {
+        "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+      }
+    }
+    </script>
+</head>
+<body class="customize-mode">
+    <header class="nav-top" id="persistent-nav">
+        <nav>
+            <ul class="nav-links">
+                <li><a href="index.html">home</a></li>
+                <li><a href="about.html">about</a></li>
+                <li><a href="catalog.html">catalog</a></li>
+                <li><a href="compare.html">compare</a></li>
+                <li><a href="contact.html">contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main class="customize-stage" id="main-content">
+        <div class="customize-layout">
+
+            <!-- Three.js viewport -->
+            <div class="customize-viewport">
+                <div class="cz-top-bar">
+                    <button id="cz-back" class="cz-back-btn">&#8592; Back</button>
+                    <span id="cz-car-name" class="cz-car-title"></span>
+                    <span class="cz-hint-inline">Drag to rotate &middot; Scroll to zoom</span>
+                </div>
+                <div class="cz-canvas-wrap">
+                    <canvas id="cz-canvas"></canvas>
+                </div>
+            </div>
+
+            <!-- Config panel -->
+            <aside class="customize-panel">
+                <div class="cz-panel-header">
+                    <p class="cz-panel-eyebrow">Vehicle</p>
+                    <h2 class="cz-panel-title">Configure</h2>
+                </div>
+
+                <div class="cz-section">
+                    <h3 class="cz-section-title">Body Paint</h3>
+                    <div class="cz-paint-presets" id="cz-paint-presets"></div>
+                    <div class="cz-paint-types" id="cz-paint-types"></div>
+                </div>
+
+                <div class="cz-section">
+                    <h3 class="cz-section-title">Rim Finish</h3>
+                    <div class="cz-rims-grid" id="cz-rims-grid"></div>
+                </div>
+
+                <div class="cz-section">
+                    <h3 class="cz-section-title">Window Tint</h3>
+                    <div class="cz-tint-row">
+                        <input type="range" id="cz-tint-slider" min="0" max="90" value="20" class="cz-slider">
+                        <span id="cz-tint-val" class="cz-slider-val">20%</span>
+                    </div>
+                </div>
+
+                <div class="cz-section">
+                    <h3 class="cz-section-title">Brake Calipers</h3>
+                    <div class="cz-calipers-grid" id="cz-calipers-grid"></div>
+                </div>
+
+                <div class="cz-section">
+                    <h3 class="cz-section-title">Interior Trim</h3>
+                    <div class="cz-interior-grid" id="cz-interior-grid"></div>
+                </div>
+
+                <div class="cz-panel-footer">
+                    <button id="cz-reset" class="cz-btn cz-btn--ghost">Reset</button>
+                    <a id="cz-done" href="showroom.html" class="cz-btn cz-btn--primary">Done &mdash; View in Showroom</a>
+                </div>
+            </aside>
+        </div>
+    </main>
+
+    <script src="js/inventory.js"></script>
+    <script src="js/cars-data.js"></script>
+    <script type="module" src="js/pages/customize.js"></script>
+</body>
+</html>

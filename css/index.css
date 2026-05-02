@@ -4666,3 +4666,383 @@ body.page-compare .music-player-pill {
     opacity: 0;
     transform: translateY(10px);
 }
+
+/* ─── Customize Page ──────────────────────────────────────────────────────── */
+.customize-mode {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
+    background: #fafafa;
+}
+
+.customize-mode .nav-top {
+    flex-shrink: 0;
+    background: rgba(250, 250, 250, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+}
+
+.customize-mode .nav-links a {
+    color: #111;
+    opacity: 0.45;
+}
+
+.customize-mode .nav-links a:hover { opacity: 1; }
+
+.customize-stage {
+    flex: 1;
+    overflow: hidden;
+    min-height: 0;
+}
+
+.customize-layout {
+    display: flex;
+    height: 100%;
+}
+
+/* ── Viewport (canvas side) */
+.customize-viewport {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+    background: #fafafa;
+}
+
+.cz-top-bar {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.75rem 1.25rem;
+    flex-shrink: 0;
+}
+
+.cz-back-btn {
+    background: none;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    font-size: 0.78rem;
+    color: #555;
+    cursor: pointer;
+    padding: 0.35rem 0.75rem;
+    border-radius: 4px;
+    transition: color 0.15s, border-color 0.15s;
+}
+.cz-back-btn:hover { color: #111; border-color: #555; }
+
+.cz-car-title {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #222;
+    letter-spacing: 0.02em;
+    flex: 1;
+}
+
+.cz-hint-inline {
+    font-size: 0.68rem;
+    color: rgba(0, 0, 0, 0.28);
+    letter-spacing: 0.04em;
+}
+
+.cz-canvas-wrap {
+    flex: 1;
+    position: relative;
+    min-height: 0;
+}
+
+#cz-canvas {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+/* ── Config Panel */
+.customize-panel {
+    width: 320px;
+    min-width: 260px;
+    background: #fff;
+    border-left: 1px solid rgba(0, 0, 0, 0.07);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+}
+
+.cz-panel-header {
+    padding: 1.4rem 1.4rem 0.75rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.cz-panel-eyebrow {
+    font-size: 0.62rem;
+    font-weight: 700;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #bbb;
+    margin: 0 0 0.15rem;
+}
+
+.cz-panel-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #111;
+    margin: 0;
+    letter-spacing: -0.01em;
+}
+
+.cz-section {
+    padding: 1.1rem 1.4rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.cz-section-title {
+    font-size: 0.66rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: #aaa;
+    margin: 0 0 0.75rem;
+}
+
+/* Paint swatches */
+.cz-paint-presets {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 7px;
+    margin-bottom: 0.75rem;
+}
+
+.cz-color-swatch {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    outline: none;
+    flex-shrink: 0;
+}
+.cz-color-swatch:hover { transform: scale(1.15); }
+.cz-color-swatch.active {
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #111;
+    transform: scale(1.08);
+}
+
+/* Paint type pills */
+.cz-paint-types {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.cz-type-btn {
+    padding: 0.28rem 0.7rem;
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    border-radius: 4px;
+    background: none;
+    font-size: 0.72rem;
+    color: #555;
+    cursor: pointer;
+    transition: all 0.15s;
+}
+.cz-type-btn:hover { border-color: #555; color: #111; }
+.cz-type-btn.active { background: #111; border-color: #111; color: #fff; }
+
+/* Rim options */
+.cz-rims-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.cz-rim-option {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0.45rem 0.7rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    background: none;
+    cursor: pointer;
+    font-size: 0.76rem;
+    color: #333;
+    text-align: left;
+    transition: all 0.15s;
+}
+.cz-rim-option:hover { border-color: #555; }
+.cz-rim-option.active { border-color: #111; background: #111; color: #fff; }
+
+.cz-rim-swatch {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+}
+.cz-rim-option.active .cz-rim-swatch { border-color: rgba(255, 255, 255, 0.25); }
+
+/* Tint slider */
+.cz-tint-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.cz-slider {
+    flex: 1;
+    height: 3px;
+    -webkit-appearance: none;
+    appearance: none;
+    background: #e0e0e0;
+    border-radius: 2px;
+    outline: none;
+    cursor: pointer;
+}
+.cz-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #111;
+    cursor: pointer;
+}
+.cz-slider::-moz-range-thumb {
+    width: 15px;
+    height: 15px;
+    border-radius: 50%;
+    background: #111;
+    border: none;
+    cursor: pointer;
+}
+
+.cz-slider-val {
+    font-size: 0.72rem;
+    color: #666;
+    min-width: 2.2rem;
+    text-align: right;
+}
+
+/* Caliper options */
+.cz-calipers-grid {
+    display: flex;
+    gap: 5px;
+    flex-wrap: wrap;
+}
+
+.cz-caliper-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 0.3rem 0.65rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 4px;
+    background: none;
+    cursor: pointer;
+    font-size: 0.72rem;
+    color: #333;
+    transition: all 0.15s;
+}
+.cz-caliper-option:hover { border-color: #555; }
+.cz-caliper-option.active { border-color: #111; background: #111; color: #fff; }
+
+.cz-caliper-swatch {
+    width: 12px;
+    height: 12px;
+    border-radius: 2px;
+    flex-shrink: 0;
+}
+
+/* Interior options */
+.cz-interior-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.cz-interior-option {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.55rem 0.8rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 6px;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+    transition: all 0.15s;
+}
+.cz-interior-option:hover { border-color: #555; }
+.cz-interior-option.active { border-color: #111; background: #111; }
+
+.cz-interior-title {
+    font-size: 0.76rem;
+    font-weight: 600;
+    color: #222;
+}
+.cz-interior-option.active .cz-interior-title { color: #fff; }
+
+.cz-interior-desc {
+    font-size: 0.65rem;
+    color: #999;
+    margin-top: 2px;
+}
+.cz-interior-option.active .cz-interior-desc { color: rgba(255, 255, 255, 0.55); }
+
+/* Panel footer */
+.cz-panel-footer {
+    margin-top: auto;
+    padding: 1.1rem 1.4rem;
+    display: flex;
+    gap: 7px;
+    border-top: 1px solid rgba(0, 0, 0, 0.07);
+    flex-shrink: 0;
+}
+
+.cz-btn {
+    flex: 1;
+    padding: 0.65rem 0.9rem;
+    border-radius: 6px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.cz-btn--ghost {
+    border: 1px solid rgba(0, 0, 0, 0.14);
+    background: none;
+    color: #555;
+}
+.cz-btn--ghost:hover { border-color: #555; color: #111; }
+
+.cz-btn--primary {
+    background: #111;
+    border: 1px solid #111;
+    color: #fff;
+}
+.cz-btn--primary:hover { background: #333; border-color: #333; }
+
+/* ── Showroom: Customise CTA */
+.cta-btn--outline {
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    color: rgba(255, 255, 255, 0.75);
+    background: none;
+    text-align: center;
+}
+.cta-btn--outline:hover {
+    border-color: rgba(255, 255, 255, 0.6);
+    color: #fff;
+    background: rgba(255, 255, 255, 0.06);
+}
+
+@media (max-width: 768px) {
+    .customize-layout { flex-direction: column; }
+    .customize-panel { width: 100%; min-width: unset; border-left: none; border-top: 1px solid rgba(0,0,0,0.07); max-height: 55vh; }
+    .customize-viewport { min-height: 40vh; }
+    .cz-hint-inline { display: none; }
+}
