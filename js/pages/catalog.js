@@ -80,6 +80,7 @@ var CatalogPage = {
                 modelId,
                 name: model.name,
                 brand: model.brand,
+                logo: model.logo || null,
                 type: model.type,
                 category: model.category,
                 heroImg,
@@ -161,6 +162,7 @@ var CatalogPage = {
                         <svg width="12" height="14" viewBox="0 0 12 14" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M2 1h8v12l-4-3-4 3V1z"/></svg>
                     </button>
                     <div class="catalog-visual">
+                        ${card.logo ? `<img class="catalog-brand-badge" src="${card.logo}" alt="${card.brand}">` : ''}
                         <img src="${card.heroImg}" alt="${card.name}">
                     </div>
                     <div class="catalog-item-info">

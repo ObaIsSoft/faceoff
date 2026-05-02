@@ -6,58 +6,100 @@ if (!window.MODELS) {
 var MODELS = {
     "mercedes-g-wagon": {
         name: "Mercedes-Benz G-Wagon", brand: "Mercedes-Benz",
-        logo: "assets/brands/mercedes.png", type: "SUV", category: "LUXURY",
+        logo: "assets/brands/mercedes.svg", type: "SUV", category: "LUXURY",
         heroImg: "assets/car_left.png"
     },
     "lexus-lx-600": {
         name: "Lexus LX 600", brand: "Lexus",
-        logo: "assets/brands/lexus.png", type: "SUV", category: "LUXURY",
+        logo: null, type: "SUV", category: "LUXURY",
         heroImg: "assets/car_right.png"
     },
     "range-rover": {
         name: "Range Rover Autobiography", brand: "Land Rover",
-        logo: "assets/brands/landrover.png", type: "SUV", category: "ADVENTURE",
+        logo: null, type: "SUV", category: "ADVENTURE",
         heroImg: "assets/2024RangeRover.png"
     },
     "cadillac-escalade-v": {
         name: "Cadillac Escalade V", brand: "Cadillac",
-        logo: "assets/brands/cadillac.png", type: "SUV", category: "SPORT",
+        logo: null, type: "SUV", category: "SPORT",
         heroImg: "assets/escalade2025.png"
     },
     "cadillac-escalade-iq": {
         name: "Cadillac Escalade IQ", brand: "Cadillac",
-        logo: "assets/brands/cadillac.png", type: "SUV", category: "LUXURY",
-        heroImg: "assets/_2026cadillac.png"
+        logo: null, type: "SUV", category: "LUXURY",
+        heroImg: "assets/_2026cadillac.png",
+        paintProfile: { bodyLightnessRange: [8, 60], usesAlphaMask: true, saturationBoost: 58 }
     },
     "byd-atto-3": {
         name: "BYD Atto 3", brand: "BYD",
-        logo: "assets/brands/byd.png", type: "SUV", category: "ECONOMY",
+        logo: "assets/brands/byd.svg", type: "SUV", category: "ECONOMY",
         heroImg: "assets/byd-ato3.png"
     },
     "toyota-camry": {
         name: "Toyota Camry Hybrid", brand: "Toyota",
-        logo: "assets/brands/toyota.png", type: "SEDAN", category: "ECONOMY",
+        logo: "assets/brands/toyota.svg", type: "SEDAN", category: "ECONOMY",
         heroImg: "assets/camry2025hybrid.png"
     },
     "toyota-corolla": {
         name: "Toyota Corolla", brand: "Toyota",
-        logo: "assets/brands/toyota.png", type: "SEDAN", category: "ECONOMY",
+        logo: "assets/brands/toyota.svg", type: "SEDAN", category: "ECONOMY",
         heroImg: "assets/corolla2025.png"
     },
     "tesla-cybertruck": {
         name: "Tesla Cybertruck", brand: "Tesla",
-        logo: "assets/brands/tesla.png", type: "TRUCK", category: "OFF-ROAD",
-        heroImg: "assets/cybertruck.png"
+        logo: "assets/brands/tesla.svg", type: "TRUCK", category: "OFF-ROAD",
+        heroImg: "assets/cybertruck.png",
+        paintProfile: { bodyLightnessRange: [10, 88], usesAlphaMask: true, saturationBoost: 55 }
     },
     "kia-sportage": {
         name: "Kia Sportage", brand: "Kia",
-        logo: "assets/brands/kia.png", type: "SUV", category: "FAMILY",
+        logo: null, type: "SUV", category: "FAMILY",
         heroImg: "assets/kia2023sportage.png"
     },
     "mercedes-s-class": {
         name: "Mercedes-Benz S-Class", brand: "Mercedes-Benz",
-        logo: "assets/brands/mercedes.png", type: "SEDAN", category: "LUXURY",
+        logo: "assets/brands/mercedes.svg", type: "SEDAN", category: "LUXURY",
         heroImg: "assets/mercedes2025sclass.png"
+    },
+    "mercedes-gle": {
+        name: "Mercedes-Benz GLE 63 AMG", brand: "Mercedes-Benz",
+        logo: "assets/brands/mercedes.svg", type: "SUV", category: "SPORT",
+        heroImg: "assets/inventory/gle63-2024-new-001/hero.jpg"
+    },
+    "bmw-x5m": {
+        name: "BMW X5 M Competition", brand: "BMW",
+        logo: "assets/brands/bmw.svg", type: "SUV", category: "SPORT",
+        heroImg: "assets/inventory/bmw-x5m-2024-new-001/hero.jpg"
+    },
+    "bmw-7series": {
+        name: "BMW 7 Series 760i", brand: "BMW",
+        logo: "assets/brands/bmw.svg", type: "SEDAN", category: "LUXURY",
+        heroImg: "assets/inventory/bmw-7series-2024-new-001/hero.jpg"
+    },
+    "porsche-cayenne": {
+        name: "Porsche Cayenne Turbo GT", brand: "Porsche",
+        logo: null, type: "SUV", category: "SPORT",
+        heroImg: "assets/inventory/porsche-cayenne-2024-new-001/hero.jpg"
+    },
+    "bentley-bentayga": {
+        name: "Bentley Bentayga EWB", brand: "Bentley",
+        logo: null, type: "SUV", category: "LUXURY",
+        heroImg: "assets/inventory/bentley-bentayga-2024-new-001/hero.jpg"
+    },
+    "rolls-royce-cullinan": {
+        name: "Rolls-Royce Cullinan", brand: "Rolls-Royce",
+        logo: "assets/brands/rollsroyce.svg", type: "SUV", category: "LUXURY",
+        heroImg: "assets/inventory/cullinan-2024-new-001/hero.jpg"
+    },
+    "audi-q8": {
+        name: "Audi Q8 S-Line", brand: "Audi",
+        logo: "assets/brands/audi.svg", type: "SUV", category: "LUXURY",
+        heroImg: "assets/inventory/audi-q8-2024-new-001/hero.jpg"
+    },
+    "jeep-grand-wagoneer": {
+        name: "Jeep Grand Wagoneer", brand: "Jeep",
+        logo: "assets/brands/jeep.svg", type: "SUV", category: "ADVENTURE",
+        heroImg: "assets/inventory/jeep-grandwagoneer-2024-new-001/hero.jpg"
     }
 };
 window.MODELS = MODELS;
@@ -261,6 +303,244 @@ var VARIANTS = {
             heatedSeats: "Energizing Comfort", stereo: "Burmester High-End 4D",
             headlights: "Digital Light", ai: "Level 3 Drive Pilot",
             funFact: "The S-Class has long been considered the 'World's Best Car' by industry critics."
+        }
+    },
+    "sclass-2023-s500": {
+        modelId: "mercedes-s-class", year: "2023", trim: "S 500 Long",
+        energy: "HYBRID", facesRight: true,
+        power: "429hp", topSpeed: "250km/h", torque: "520nm",
+        img: "assets/inventory/sclass-2023-used-001/hero.jpg",
+        details: {
+            manufacturer: "Mercedes-Benz", production: "Sindelfingen, Germany", limited: "Long Wheelbase",
+            zeroToSixty: "4.9s", zeroToHundred: "5.0s", engineFull: "3.0L I6 Biturbo w/ Mild Hybrid",
+            seating: "5 Adults", cargo: "540 Liters", leather: "Exclusive Nappa",
+            heatedSeats: "Energizing Comfort", stereo: "Burmester 3D",
+            headlights: "Digital Light", ai: "Level 3 Drive Pilot",
+            funFact: "The S-Class S 500 LWB rear seat rivals business class aircraft cabins."
+        }
+    },
+    "gle63-2024-amg": {
+        modelId: "mercedes-gle", year: "2024", trim: "GLE 63 S AMG",
+        energy: "HYBRID", facesRight: false,
+        power: "603hp", topSpeed: "280km/h", torque: "850nm",
+        img: "assets/inventory/gle63-2024-new-001/hero.jpg",
+        details: {
+            manufacturer: "Mercedes-Benz", production: "Graz, Austria", limited: "AMG Performance",
+            zeroToSixty: "3.7s", zeroToHundred: "3.8s", engineFull: "4.0L V8 Biturbo + EQ Boost",
+            seating: "5 Adults", cargo: "630 Liters", leather: "AMG Nappa Sport",
+            heatedSeats: "Front & Rear", stereo: "Burmester Surround",
+            headlights: "Multibeam LED", ai: "AMG Ride Control+",
+            funFact: "The GLE 63 S can sprint to 100km/h faster than many dedicated sports cars."
+        }
+    },
+    "gle63-2022-amg": {
+        modelId: "mercedes-gle", year: "2022", trim: "GLE 63 S AMG",
+        energy: "HYBRID", facesRight: false,
+        power: "603hp", topSpeed: "280km/h", torque: "850nm",
+        img: "assets/inventory/gle63-2022-used-001/hero.jpg",
+        details: {
+            manufacturer: "Mercedes-Benz", production: "Graz, Austria", limited: "AMG Performance",
+            zeroToSixty: "3.8s", zeroToHundred: "3.9s", engineFull: "4.0L V8 Biturbo + EQ Boost",
+            seating: "5 Adults", cargo: "630 Liters", leather: "AMG Nappa Sport",
+            heatedSeats: "Front & Rear", stereo: "Burmester Surround",
+            headlights: "Multibeam LED", ai: "AMG Ride Control+",
+            funFact: "The GLE 63 S can sprint to 100km/h faster than many dedicated sports cars."
+        }
+    },
+    "bmw-x5m-2024-competition": {
+        modelId: "bmw-x5m", year: "2024", trim: "M Competition",
+        energy: "PETROL", facesRight: false,
+        power: "617hp", topSpeed: "290km/h", torque: "750nm",
+        img: "assets/inventory/bmw-x5m-2024-new-001/hero.jpg",
+        details: {
+            manufacturer: "BMW", production: "Spartanburg, USA", limited: "M Competition",
+            zeroToSixty: "3.7s", zeroToHundred: "3.8s", engineFull: "4.4L V8 M TwinPower Turbo",
+            seating: "5 Adults", cargo: "645 Liters", leather: "Merino Full Leather",
+            heatedSeats: "Front & Rear", stereo: "Bowers & Wilkins Diamond",
+            headlights: "Laser Light", ai: "BMW Active Driving Assistant Pro",
+            funFact: "The X5 M Competition can reach 290km/h — faster than most supercars from the '90s."
+        }
+    },
+    "bmw-x5m-2022-competition": {
+        modelId: "bmw-x5m", year: "2022", trim: "M Competition",
+        energy: "PETROL", facesRight: false,
+        power: "617hp", topSpeed: "290km/h", torque: "750nm",
+        img: "assets/inventory/bmw-x5m-2022-used-001/hero.jpg",
+        details: {
+            manufacturer: "BMW", production: "Spartanburg, USA", limited: "M Competition",
+            zeroToSixty: "3.8s", zeroToHundred: "3.9s", engineFull: "4.4L V8 M TwinPower Turbo",
+            seating: "5 Adults", cargo: "645 Liters", leather: "Merino Full Leather",
+            heatedSeats: "Front & Rear", stereo: "Bowers & Wilkins Diamond",
+            headlights: "Laser Light", ai: "BMW Active Driving Assistant Pro",
+            funFact: "The X5 M Competition can reach 290km/h — faster than most supercars from the '90s."
+        }
+    },
+    "bmw-7series-2024-760i": {
+        modelId: "bmw-7series", year: "2024", trim: "760i xDrive",
+        energy: "PETROL", facesRight: true,
+        power: "544hp", topSpeed: "250km/h", torque: "750nm",
+        img: "assets/inventory/bmw-7series-2024-new-001/hero.jpg",
+        details: {
+            manufacturer: "BMW", production: "Dingolfing, Germany", limited: "M Sport Package",
+            zeroToSixty: "4.1s", zeroToHundred: "4.2s", engineFull: "4.4L V8 M TwinPower Turbo",
+            seating: "5 Adults", cargo: "500 Liters", leather: "Merino Extended Leather",
+            heatedSeats: "Executive Lounge Rear", stereo: "Bowers & Wilkins Diamond 36-Spk",
+            headlights: "BMW Iconic Glow Crystal", ai: "Level 2+ Personal Pilot",
+            funFact: "The new G70 7 Series features a 31-inch 8K Theatre Screen for rear passengers."
+        }
+    },
+    "bmw-7series-2023-740i": {
+        modelId: "bmw-7series", year: "2023", trim: "740i M Sport",
+        energy: "PETROL", facesRight: true,
+        power: "375hp", topSpeed: "250km/h", torque: "540nm",
+        img: "assets/inventory/bmw-7series-2023-used-001/hero.jpg",
+        details: {
+            manufacturer: "BMW", production: "Dingolfing, Germany", limited: "M Sport Package",
+            zeroToSixty: "5.2s", zeroToHundred: "5.3s", engineFull: "3.0L I6 TwinPower Turbo",
+            seating: "5 Adults", cargo: "500 Liters", leather: "Merino Leather",
+            heatedSeats: "Front & Executive Rear", stereo: "Bowers & Wilkins 18-Spk",
+            headlights: "Adaptive LED", ai: "Level 2 Active Driving Assistant",
+            funFact: "The 7 Series has been the benchmark of executive luxury sedans for over 40 years."
+        }
+    },
+    "porsche-cayenne-2024-turbogt": {
+        modelId: "porsche-cayenne", year: "2024", trim: "Turbo GT",
+        energy: "PETROL", facesRight: false,
+        power: "659hp", topSpeed: "300km/h", torque: "870nm",
+        img: "assets/inventory/porsche-cayenne-2024-new-001/hero.jpg",
+        details: {
+            manufacturer: "Porsche", production: "Leipzig, Germany", limited: "Turbo GT",
+            zeroToSixty: "3.3s", zeroToHundred: "3.4s", engineFull: "4.0L V8 Twin-Turbo",
+            seating: "5 Adults", cargo: "770 Liters", leather: "Race-Tex / Leather Combination",
+            heatedSeats: "18-way Sport Plus", stereo: "Burmester High-End 3D",
+            headlights: "HD Matrix LED with PDLS+", ai: "Porsche InnoDrive",
+            funFact: "The Cayenne Turbo GT set a new SUV lap record at the Nürburgring Nordschleife."
+        }
+    },
+    "porsche-cayenne-2023-turbo": {
+        modelId: "porsche-cayenne", year: "2023", trim: "Turbo",
+        energy: "PETROL", facesRight: false,
+        power: "542hp", topSpeed: "286km/h", torque: "770nm",
+        img: "assets/inventory/porsche-cayenne-2023-used-001/hero.jpg",
+        details: {
+            manufacturer: "Porsche", production: "Leipzig, Germany", limited: "Turbo",
+            zeroToSixty: "3.9s", zeroToHundred: "4.0s", engineFull: "4.0L V8 Twin-Turbo",
+            seating: "5 Adults", cargo: "770 Liters", leather: "Two-Tone Leather",
+            heatedSeats: "18-way Adaptive Sport", stereo: "Burmester Surround",
+            headlights: "LED Matrix with PDLS", ai: "Porsche Active Safe",
+            funFact: "The Cayenne Turbo shares its engine architecture with the Panamera Turbo."
+        }
+    },
+    "bentley-bentayga-2024-ewb": {
+        modelId: "bentley-bentayga", year: "2024", trim: "EWB Azure",
+        energy: "PETROL", facesRight: true,
+        power: "542hp", topSpeed: "290km/h", torque: "770nm",
+        img: "assets/inventory/bentley-bentayga-2024-new-001/hero.jpg",
+        details: {
+            manufacturer: "Bentley", production: "Crewe, UK", limited: "EWB Azure Edition",
+            zeroToSixty: "4.5s", zeroToHundred: "4.6s", engineFull: "4.0L V8 Twin-Turbo",
+            seating: "4 Adults", cargo: "430 Liters", leather: "Handcrafted Hide",
+            heatedSeats: "Airline-style Rear Seats", stereo: "Naim for Bentley 20-Spk",
+            headlights: "Matrix LED", ai: "Bentley Dynamic Ride",
+            funFact: "A single Bentayga dashboard takes over 150 hours of hand-finishing to complete."
+        }
+    },
+    "bentley-bentayga-2022-v8": {
+        modelId: "bentley-bentayga", year: "2022", trim: "V8",
+        energy: "PETROL", facesRight: true,
+        power: "542hp", topSpeed: "290km/h", torque: "770nm",
+        img: "assets/inventory/bentley-bentayga-2022-used-001/hero.jpg",
+        details: {
+            manufacturer: "Bentley", production: "Crewe, UK", limited: "V8",
+            zeroToSixty: "4.5s", zeroToHundred: "4.6s", engineFull: "4.0L V8 Twin-Turbo",
+            seating: "5 Adults", cargo: "430 Liters", leather: "Hide Leather",
+            heatedSeats: "Front & Rear Ventilated", stereo: "Naim for Bentley",
+            headlights: "Matrix LED with ADB", ai: "Bentley All-Terrain Specification",
+            funFact: "Every Bentayga is hand-assembled by a dedicated craftsperson team in Crewe, England."
+        }
+    },
+    "cullinan-2024-series2": {
+        modelId: "rolls-royce-cullinan", year: "2024", trim: "Series II",
+        energy: "PETROL", facesRight: true,
+        power: "591hp", topSpeed: "250km/h", torque: "900nm",
+        img: "assets/inventory/cullinan-2024-new-001/hero.jpg",
+        details: {
+            manufacturer: "Rolls-Royce", production: "Goodwood, UK", limited: "Series II",
+            zeroToSixty: "5.0s", zeroToHundred: "5.2s", engineFull: "6.75L V12 Twin-Turbo",
+            seating: "5 Adults", cargo: "560 Liters", leather: "Bespoke Leather & Veneer",
+            heatedSeats: "Serenity Rear Package", stereo: "Bespoke Audio 18-Spk",
+            headlights: "LED Illuminated Pantheon Grille", ai: "Night Vision w/ Pedestrian Alert",
+            funFact: "Every Rolls-Royce Cullinan can be entirely bespoke — no two are identical."
+        }
+    },
+    "cullinan-2022-blackbadge": {
+        modelId: "rolls-royce-cullinan", year: "2022", trim: "Black Badge",
+        energy: "PETROL", facesRight: true,
+        power: "591hp", topSpeed: "250km/h", torque: "900nm",
+        img: "assets/inventory/cullinan-2022-used-001/hero.jpg",
+        details: {
+            manufacturer: "Rolls-Royce", production: "Goodwood, UK", limited: "Black Badge",
+            zeroToSixty: "5.0s", zeroToHundred: "5.2s", engineFull: "6.75L V12 Twin-Turbo",
+            seating: "5 Adults", cargo: "560 Liters", leather: "Black Leather & Carbon Fibre",
+            heatedSeats: "Serenity Rear Package", stereo: "Bespoke Audio 18-Spk",
+            headlights: "LED with Signature DRL", ai: "Night Vision",
+            funFact: "The Black Badge edition rejects chrome in favour of darkened titanium and carbon fibre."
+        }
+    },
+    "audi-q8-2024-sline": {
+        modelId: "audi-q8", year: "2024", trim: "55 TFSI S-Line",
+        energy: "PETROL", facesRight: false,
+        power: "340hp", topSpeed: "250km/h", torque: "500nm",
+        img: "assets/inventory/audi-q8-2024-new-001/hero.jpg",
+        details: {
+            manufacturer: "Audi", production: "Bratislava, Slovakia", limited: "S-Line Competition",
+            zeroToSixty: "5.9s", zeroToHundred: "6.0s", engineFull: "3.0L V6 TFSI Turbo",
+            seating: "5 Adults", cargo: "605 Liters", leather: "Valcona Leather",
+            heatedSeats: "Sport Contour", stereo: "Bang & Olufsen 3D 23-Spk",
+            headlights: "HD Matrix LED with Laser", ai: "Audi Pre Sense 360",
+            funFact: "The Q8 uses the same MLB Evo platform shared with Bentley and Lamborghini."
+        }
+    },
+    "audi-q8-2022-sline": {
+        modelId: "audi-q8", year: "2022", trim: "55 TFSI S-Line",
+        energy: "PETROL", facesRight: false,
+        power: "340hp", topSpeed: "250km/h", torque: "500nm",
+        img: "assets/inventory/audi-q8-2022-used-001/hero.jpg",
+        details: {
+            manufacturer: "Audi", production: "Bratislava, Slovakia", limited: "S-Line",
+            zeroToSixty: "6.0s", zeroToHundred: "6.1s", engineFull: "3.0L V6 TFSI Turbo",
+            seating: "5 Adults", cargo: "605 Liters", leather: "Milano Leather",
+            heatedSeats: "Sport Contour", stereo: "Bang & Olufsen 3D",
+            headlights: "HD Matrix LED", ai: "Audi Pre Sense",
+            funFact: "The Q8 was Audi's first SUV coupé, pioneering the segment for the brand."
+        }
+    },
+    "jeep-grandwagoneer-2024-series3": {
+        modelId: "jeep-grand-wagoneer", year: "2024", trim: "Series III Obsidian",
+        energy: "PETROL", facesRight: false,
+        power: "510hp", topSpeed: "210km/h", torque: "637nm",
+        img: "assets/inventory/jeep-grandwagoneer-2024-new-001/hero.jpg",
+        details: {
+            manufacturer: "Jeep", production: "Warren, USA", limited: "Series III Obsidian",
+            zeroToSixty: "4.4s", zeroToHundred: "4.5s", engineFull: "6.4L V8 HEMI",
+            seating: "8 Adults", cargo: "1,146 Liters", leather: "McEvoy Mills Wool & Leather",
+            heatedSeats: "Front, Mid & Third Row", stereo: "McIntosh MX950 23-Spk",
+            headlights: "Full LED w/ Adaptive Driving Beam", ai: "Level 2 Highway Assist",
+            funFact: "The Grand Wagoneer's McIntosh audio system is the first in any vehicle from the brand."
+        }
+    },
+    "jeep-grandwagoneer-2023-series2": {
+        modelId: "jeep-grand-wagoneer", year: "2023", trim: "Series II",
+        energy: "PETROL", facesRight: false,
+        power: "471hp", topSpeed: "210km/h", torque: "637nm",
+        img: "assets/inventory/jeep-grandwagoneer-2023-used-001/hero.jpg",
+        details: {
+            manufacturer: "Jeep", production: "Warren, USA", limited: "Series II",
+            zeroToSixty: "4.8s", zeroToHundred: "4.9s", engineFull: "6.4L V8 HEMI",
+            seating: "8 Adults", cargo: "1,146 Liters", leather: "Palermo Leather",
+            heatedSeats: "Front & Mid Row", stereo: "McIntosh MX950",
+            headlights: "Full LED Projector", ai: "ParkSense & LaneSense",
+            funFact: "The original Jeep Wagoneer was the world's first luxury SUV, launched in 1963."
         }
     }
 };

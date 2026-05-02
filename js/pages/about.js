@@ -24,6 +24,17 @@ var AboutPage = {
             "RAM", "GMC", "Alfa Romeo", "Mini", "Subaru", "Nissan", "Infiniti", "Rivian"
         ];
 
+        const BRAND_LOGOS = {
+            "Rolls-Royce":  "assets/brands/rollsroyce.svg",
+            "Mercedes-Benz":"assets/brands/mercedes.svg",
+            "BMW":          "assets/brands/bmw.svg",
+            "Audi":         "assets/brands/audi.svg",
+            "Toyota":       "assets/brands/toyota.svg",
+            "Tesla":        "assets/brands/tesla.svg",
+            "Jeep":         "assets/brands/jeep.svg",
+            "BYD":          "assets/brands/byd.svg"
+        };
+
         const GOLDEN = 2.39996; // golden angle in radians
         const root = document.getElementById('explosion-root');
         const section = document.getElementById('brand-spiral-section');
@@ -36,7 +47,18 @@ var AboutPage = {
         BRANDS.forEach(name => {
             const el = document.createElement('span');
             el.className = 'brand-fragment';
-            el.textContent = name;
+            const logo = BRAND_LOGOS[name];
+            if (logo) {
+                const img = document.createElement('img');
+                img.src = logo;
+                img.alt = name;
+                img.className = 'brand-logo-img';
+                el.appendChild(img);
+            }
+            const label = document.createElement('span');
+            label.className = 'brand-name';
+            label.textContent = name;
+            el.appendChild(label);
             root.appendChild(el);
         });
 

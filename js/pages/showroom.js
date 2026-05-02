@@ -282,6 +282,19 @@ var ShowroomPage = {
         // Gallery
         this._renderGallery(unit);
 
+        // Brand logo badge
+        const logoEl = document.getElementById('car-brand-logo');
+        if (logoEl) {
+            const model = (window.MODELS || {})[effectiveModelId];
+            if (model?.logo) {
+                logoEl.src = model.logo;
+                logoEl.alt = model.brand;
+                logoEl.style.display = '';
+            } else {
+                logoEl.style.display = 'none';
+            }
+        }
+
         // Name + condition badge + price
         const nameEl  = document.getElementById('car-name');
         const condEl  = document.getElementById('car-condition');
