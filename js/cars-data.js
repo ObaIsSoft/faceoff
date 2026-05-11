@@ -7,28 +7,33 @@ var MODELS = {
     "mercedes-g-wagon": {
         name: "Mercedes-Benz G-Wagon", brand: "Mercedes-Benz",
         logo: "assets/brands/mercedes.svg", type: "SUV", category: "LUXURY",
-        heroImg: "assets/car_left.png"
+        heroImg: "assets/car_left.png",
+        model3d: "assets/models/mercedes-g-wagon/model.glb"
     },
     "lexus-lx-600": {
         name: "Lexus LX 600", brand: "Lexus",
         logo: null, type: "SUV", category: "LUXURY",
-        heroImg: "assets/car_right.png"
+        heroImg: "assets/car_right.png",
+        model3d: "assets/models/lexus-lx-600/model.glb"
     },
     "range-rover": {
         name: "Range Rover Autobiography", brand: "Land Rover",
         logo: null, type: "SUV", category: "ADVENTURE",
-        heroImg: "assets/2024RangeRover.png"
+        heroImg: "assets/2024RangeRover.png",
+        model3d: "assets/models/range-rover/model.glb"
     },
     "cadillac-escalade-v": {
         name: "Cadillac Escalade V", brand: "Cadillac",
         logo: null, type: "SUV", category: "SPORT",
-        heroImg: "assets/escalade2025.png"
+        heroImg: "assets/escalade2025.png",
+        model3d: "assets/models/cadillac-escalade-v/model.glb"
     },
     "cadillac-escalade-iq": {
         name: "Cadillac Escalade IQ", brand: "Cadillac",
         logo: null, type: "SUV", category: "LUXURY",
         heroImg: "assets/_2026cadillac.png",
-        paintProfile: { bodyLightnessRange: [8, 60], usesAlphaMask: true, saturationBoost: 58 }
+        paintProfile: { bodyLightnessRange: [8, 60], usesAlphaMask: true, saturationBoost: 58 },
+        model3d: "assets/models/cadillac-escalade-iq/model.glb"
     },
     "byd-atto-3": {
         name: "BYD Atto 3", brand: "BYD",
@@ -43,13 +48,15 @@ var MODELS = {
     "toyota-corolla": {
         name: "Toyota Corolla", brand: "Toyota",
         logo: "assets/brands/toyota.svg", type: "SEDAN", category: "ECONOMY",
-        heroImg: "assets/corolla2025.png"
+        heroImg: "assets/corolla2025.png",
+        model3d: "assets/models/toyota-corolla/model.glb"
     },
     "tesla-cybertruck": {
         name: "Tesla Cybertruck", brand: "Tesla",
         logo: "assets/brands/tesla.svg", type: "TRUCK", category: "OFF-ROAD",
         heroImg: "assets/cybertruck.png",
-        paintProfile: { bodyLightnessRange: [10, 88], usesAlphaMask: true, saturationBoost: 55 }
+        paintProfile: { bodyLightnessRange: [10, 88], usesAlphaMask: true, saturationBoost: 55 },
+        model3d: "assets/models/tesla-cybertruck/model.glb"
     },
     "kia-sportage": {
         name: "Kia Sportage", brand: "Kia",
@@ -59,42 +66,50 @@ var MODELS = {
     "mercedes-s-class": {
         name: "Mercedes-Benz S-Class", brand: "Mercedes-Benz",
         logo: "assets/brands/mercedes.svg", type: "SEDAN", category: "LUXURY",
-        heroImg: "assets/mercedes2025sclass.png"
+        heroImg: "assets/mercedes2025sclass.png",
+        model3d: "assets/models/mercedes-s-class/model.glb"
     },
     "mercedes-gle": {
         name: "Mercedes-Benz GLE 63 AMG", brand: "Mercedes-Benz",
         logo: "assets/brands/mercedes.svg", type: "SUV", category: "SPORT",
-        heroImg: "assets/inventory/gle63-2024-new-001/hero.jpg"
+        heroImg: "assets/inventory/gle63-2024-new-001/hero.jpg",
+        model3d: "assets/models/mercedes-gle/model.glb"
     },
     "bmw-x5m": {
         name: "BMW X5 M Competition", brand: "BMW",
         logo: "assets/brands/bmw.svg", type: "SUV", category: "SPORT",
-        heroImg: "assets/inventory/bmw-x5m-2024-new-001/hero.jpg"
+        heroImg: "assets/inventory/bmw-x5m-2024-new-001/hero.jpg",
+        model3d: "assets/models/bmw-x5m/model.glb"
     },
     "bmw-7series": {
         name: "BMW 7 Series 760i", brand: "BMW",
         logo: "assets/brands/bmw.svg", type: "SEDAN", category: "LUXURY",
-        heroImg: "assets/inventory/bmw-7series-2024-new-001/hero.jpg"
+        heroImg: "assets/inventory/bmw-7series-2024-new-001/hero.jpg",
+        model3d: "assets/models/bmw-7series/model.glb"
     },
     "porsche-cayenne": {
         name: "Porsche Cayenne Turbo GT", brand: "Porsche",
         logo: null, type: "SUV", category: "SPORT",
-        heroImg: "assets/inventory/porsche-cayenne-2024-new-001/hero.jpg"
+        heroImg: "assets/inventory/porsche-cayenne-2024-new-001/hero.jpg",
+        model3d: "assets/models/porsche-cayenne/model.glb"
     },
     "bentley-bentayga": {
         name: "Bentley Bentayga EWB", brand: "Bentley",
         logo: null, type: "SUV", category: "LUXURY",
-        heroImg: "assets/inventory/bentley-bentayga-2024-new-001/hero.jpg"
+        heroImg: "assets/inventory/bentley-bentayga-2024-new-001/hero.jpg",
+        model3d: "assets/models/bentley-bentayga/model.glb"
     },
     "rolls-royce-cullinan": {
         name: "Rolls-Royce Cullinan", brand: "Rolls-Royce",
         logo: "assets/brands/rollsroyce.svg", type: "SUV", category: "LUXURY",
-        heroImg: "assets/inventory/cullinan-2024-new-001/hero.jpg"
+        heroImg: "assets/inventory/cullinan-2024-new-001/hero.jpg",
+        model3d: "assets/models/rolls-royce-cullinan/model.glb"
     },
     "audi-q8": {
         name: "Audi Q8 S-Line", brand: "Audi",
         logo: "assets/brands/audi.svg", type: "SUV", category: "LUXURY",
-        heroImg: "assets/inventory/audi-q8-2024-new-001/hero.jpg"
+        heroImg: "assets/inventory/audi-q8-2024-new-001/hero.jpg",
+        model3d: "assets/models/audi-q8/model.glb"
     },
     "jeep-grand-wagoneer": {
         name: "Jeep Grand Wagoneer", brand: "Jeep",

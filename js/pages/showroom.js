@@ -275,7 +275,10 @@ var ShowroomPage = {
         // Hero image
         const display = document.getElementById('car-display');
         if (display) {
-            display.innerHTML = `<img src="${unit.img}" alt="${unit.name}" style="width:100%;object-fit:contain;">`;
+            const configSummaryEarly = localStorage.getItem('faceoff_last_config_summary');
+            const configUnitIdEarly  = localStorage.getItem('faceoff_last_config_unitId');
+            const isConfiguredEarly  = !!(configSummaryEarly && configUnitIdEarly === unit.id);
+            display.innerHTML = `<img src="${unit.img}" alt="${unit.name}" style="width:100%;object-fit:contain;">` + (isConfiguredEarly ? `<div id="config-badge" class="sr-config-badge"><div class="sr-config-header"><span class="sr-config-dot"></span><span class="sr-config-label">Configured</span></div><span class="sr-config-summary">${configSummaryEarly}</span><a href="customize.html?unit=${unit.id}" class="sr-config-edit">Edit</a></div>` : '<div id="config-badge" class="sr-config-badge" style="display:none"></div>');
             if (unit.facesRight === false) display.classList.add('flipped');
         }
 
@@ -330,6 +333,18 @@ var ShowroomPage = {
         if (insp) insp.href = `contact.html?type=inspection&unit=${unit.id}`;
         if (enq)  enq.href  = `contact.html?type=enquiry&unit=${unit.id}`;
         if (cust) cust.href = `customize.html?unit=${unit.id}`;
+
+        // Customise button state
+        const isConfigured = !!(localStorage.getItem('faceoff_last_config_summary') && localStorage.getItem('faceoff_last_config_unitId') === unit.id);
+        if (cust) {
+            if (isConfigured) {
+                cust.textContent = 'Recustomise';
+                cust.classList.add('cta-btn--configured');
+            } else {
+                cust.textContent = 'Customise';
+                cust.classList.remove('cta-btn--configured');
+            }
+        }
 
         // Drum wheel selector (replaces year chips + unit cards)
         this._renderDrumSelector(effectiveModelId, unit.id);
