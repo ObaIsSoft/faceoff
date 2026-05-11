@@ -3980,7 +3980,10 @@ body.showroom-light header.nav-top .nav-links a {
     /* Explosion — same height as desktop so bloom plays at identical rhythm */
     .explosion-section       { height: 320vh; }
     .explosion-core          { width: 80px; height: 80px; }
-    .brand-fragment          { font-size: 0.52rem; letter-spacing: 0.08em; }
+    .brand-fragment          { font-size: 0.44rem; letter-spacing: 0.06em; gap: 0; }
+    .brand-logo-img          { width: 18px; height: 18px; }
+    /* Logo brands: hide text label on mobile — logo alone is enough */
+    .brand-fragment:has(.brand-logo-img) .brand-name { display: none; }
 
     /* ── CATALOG ──────────────────────────────────────────────── */
     .catalog-container       { padding: 4.5rem 1.25rem 3rem; }

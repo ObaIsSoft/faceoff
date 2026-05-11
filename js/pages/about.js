@@ -101,8 +101,8 @@ var AboutPage = {
             const cH = root.offsetHeight;
             
             const isMobile = window.innerWidth < 768;
-            const maxR = isMobile 
-                ? Math.min(cW, cH) * 0.42
+            const maxR = isMobile
+                ? cW * 0.48
                 : Math.min(cW, cH) * 0.44;
 
             const center = document.getElementById('explosion-center');
@@ -116,7 +116,7 @@ var AboutPage = {
                 const eased = 1 - Math.pow(1 - Math.min(local, 1), 2.8);
                 const angle = i * GOLDEN;
                 
-                const startRadius = isMobile ? 40 : 76;
+                const startRadius = isMobile ? 24 : 76;
                 const span = maxR - startRadius;
                 const baseR = startRadius + i * (span / BRANDS.length);
                 const r = startRadius + (baseR - startRadius) * eased;
