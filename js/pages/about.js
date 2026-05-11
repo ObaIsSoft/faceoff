@@ -3,6 +3,35 @@ var AboutPage = {
     init() {
         this.setupObserver();
         this.initSpiralBloom();
+        this.initCatAccordion();
+    },
+
+    initCatAccordion() {
+        const isMobile = () => window.innerWidth <= 768;
+        const panels = document.querySelectorAll('.cat-panel');
+        if (!panels.length) return;
+
+        const sync = () => {
+            if (isMobile()) {
+                if (!document.querySelector('.cat-panel.is-open')) {
+                    panels[0].classList.add('is-open');
+                }
+            } else {
+                panels.forEach(p => p.classList.remove('is-open'));
+            }
+        };
+
+        sync();
+        window.addEventListener('resize', sync);
+
+        panels.forEach(panel => {
+            panel.addEventListener('click', () => {
+                if (!isMobile()) return;
+                const isOpen = panel.classList.contains('is-open');
+                panels.forEach(p => p.classList.remove('is-open'));
+                if (!isOpen) panel.classList.add('is-open');
+            });
+        });
     },
 
     setupObserver() {

@@ -1546,22 +1546,28 @@ body.scrollable-page {
 
 /* Categories Rich */
 /* ── Category accordion ── */
-.about-section--full { padding-left: 0; padding-right: 0; }
+.about-section--full {
+    width: 100%;
+    margin-top: -6rem;
+    overflow: visible;
+}
 
 .cat-accordion {
     display: flex;
+    width: 90vw;
     height: 560px;
     gap: 2px;
     overflow: hidden;
-    border-radius: 8px;
+    border-radius: 6px;
 }
 
 .cat-panel {
     position: relative;
     flex: 1;
-    background-image: var(--cat-bg);
     background-size: 200%;
-    background-position: center;
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-color: #1a1a1a;
     overflow: hidden;
     cursor: pointer;
     transition: flex 0.55s cubic-bezier(0.4, 0, 0.2, 1),
@@ -1579,7 +1585,7 @@ body.scrollable-page {
 
 .cat-panel:hover {
     flex: 5;
-    background-size: 120%;
+    background-size: 130%;
 }
 
 .cat-panel:hover::before {
@@ -1599,13 +1605,13 @@ body.scrollable-page {
 
 .cat-panel-label {
     position: absolute;
-    bottom: 2rem;
+    bottom: 38%;
     left: 50%;
     transform: translateX(-50%) rotate(-90deg);
     transform-origin: center center;
     white-space: nowrap;
     font-family: var(--font-nav);
-    font-size: 0.42rem;
+    font-size: 0.58rem;
     letter-spacing: 0.22em;
     text-transform: uppercase;
     color: rgba(255,255,255,0.75);
@@ -3911,14 +3917,20 @@ body.showroom-light header.nav-top .nav-links a {
     /* Services */
     .services-grid           { grid-template-columns: 1fr; gap: 2rem; }
     .service-heading         { font-size: 1.3rem; }
-    /* Categories accordion */
-    .cat-accordion           { height: 70vw; flex-direction: column; border-radius: 6px; }
-    .cat-panel               { flex: 1; background-size: cover; }
-    .cat-panel:hover         { flex: 3; background-size: cover; }
-    .cat-panel-label         { writing-mode: horizontal-tb; transform: none; bottom: auto; top: 50%; left: 1rem; transform: translateY(-50%); font-size: 0.5rem; }
-    .cat-panel:hover .cat-panel-label { opacity: 0; }
-    .cat-panel-title         { font-size: 1.2rem; }
-    .cat-panel-desc          { font-size: 0.65rem; }
+    /* Categories accordion — mobile tap-to-expand */
+    .about-section--full     { margin-top: -2rem; }
+    .cat-accordion           { flex-direction: column; height: auto; border-radius: 8px; gap: 3px; }
+    .cat-panel               { flex: none; height: 56px; background-size: cover; background-position: center; transition: height 0.45s cubic-bezier(0.4,0,0.2,1), background-size 0.45s ease; }
+    .cat-panel               { flex: none; height: 56px; background-size: cover; background-position: center; transition: height 0.45s cubic-bezier(0.4,0,0.2,1); }
+    .cat-panel.is-open       { height: 260px; background-size: 120%; }
+    .cat-panel:hover         { flex: none; background-size: cover; }
+    .cat-panel-num           { top: 50%; transform: translateY(-50%); font-size: 0.45rem; }
+    .cat-panel.is-open .cat-panel-num { top: 1rem; transform: none; }
+    .cat-panel-label         { writing-mode: horizontal-tb; transform: translateY(-50%); bottom: auto; top: 50%; left: 2.2rem; font-size: 0.52rem; letter-spacing: 0.2em; }
+    .cat-panel-content       { padding: 1.2rem 1.2rem 1.4rem; }
+    .cat-panel-title         { font-size: 1.3rem; margin-bottom: 0.3rem; }
+    .cat-panel-desc          { font-size: 0.62rem; max-width: none; margin-bottom: 0.6rem; }
+    .cat-panel-cta           { font-size: 0.44rem; }
     /* Standards */
     .standards-grid          { grid-template-columns: 1fr; gap: 2rem; }
     /* Full-bleed: remove negative margins on mobile */
