@@ -416,6 +416,17 @@ function fmtNaira(num) {
     return symbol + Math.round(num * rate).toLocaleString();
 }
 
+function displayPrice(priceStr) {
+    if (!priceStr) return '';
+    const num = parseInt(priceStr.replace(/[^0-9]/g, ''), 10);
+    if (isNaN(num)) return priceStr;
+    const { symbol, rate } = getCurrencyConfig();
+    const converted = Math.round(num * rate);
+    if (converted >= 1000000) return symbol + (converted / 1000000).toFixed(1).replace('.0', '') + 'M';
+    if (converted >= 1000)    return symbol + Math.round(converted / 1000) + 'K';
+    return symbol + converted.toLocaleString();
+}
+
 function calcAddonsTotal() {
     if (!config.spec || !config.addons.length) return 0;
     return config.addons.reduce((sum, id) => {
@@ -749,17 +760,19 @@ function _buildSummaryStep(el) {
             </span>
         </div>`;
 
+    const p = str => str ? displayPrice(str) : 'Included';
+
     // Collect extra exterior option selections
     const extOptRows = Object.entries(spec.exterior)
         .filter(([k, s]) => !['paint','rims','tint','calipers'].includes(k) && s?.type === 'options')
         .map(([k, s]) => {
             const sel = s.options.find(o => o.id === config.extras[k]);
-            return sel ? row(s.label, sel.label, sel.price || 'Included') : '';
+            return sel ? row(s.label, sel.label, p(sel.price)) : '';
         }).join('');
 
     const exteriorRows = [
-        row('Paint',  paint    ? paint.label    : '—', paint?.price    || 'Included'),
-        row('Wheels', rimOpt   ? rimOpt.label   : '—', rimOpt?.price   || 'Included'),
+        row('Paint',  paint    ? paint.label    : '—', p(paint?.price)),
+        row('Wheels', rimOpt   ? rimOpt.label   : '—', p(rimOpt?.price)),
         row('Tint',   `${config.tint}%`,                    'Included'),
         spec.exterior.calipers
             ? row('Calipers', CALIPER_COLORS.find(c => c.id === config.caliperId)?.label || '—', 'Included')
@@ -772,13 +785,13 @@ function _buildSummaryStep(el) {
         .filter(([k, s]) => k !== 'trim' && s?.type === 'options')
         .map(([k, s]) => {
             const sel = s.options.find(o => o.id === config.extras[k]);
-            return sel ? row(s.label, sel.label, sel.price || 'Included') : '';
+            return sel ? row(s.label, sel.label, p(sel.price)) : '';
         }).join('');
 
-    const interiorRows = (intOpt ? row(intOpt.label, intOpt.desc.split(' · ')[0], intOpt.price || 'Included') : '')
+    const interiorRows = (intOpt ? row(intOpt.label, intOpt.desc.split(' · ')[0], p(intOpt.price)) : '')
         + intOptRows;
 
-    const addonRows = selAddons.map(a => row(a.label, '', a.price)).join('');
+    const addonRows = selAddons.map(a => row(a.label, '', p(a.price))).join('');
 
     const totalHtml = total > 0 ? `
         <div class="cz-summary-total">
@@ -809,7 +822,7 @@ function _buildSummaryStep(el) {
 
     document.getElementById('cz-enquiry-btn')?.addEventListener('click', () => {
         saveConfig();
-        window.location.href = 'contact.html';
+        window.location.href = `contact.html?type=enquiry&unit=${config.unitId}`;
     });
 }
 
