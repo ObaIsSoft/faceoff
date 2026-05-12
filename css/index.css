@@ -4881,6 +4881,7 @@ body.page-compare .music-player-pill {
     gap: 1rem;
     padding: 0.75rem 1.25rem;
     flex-shrink: 0;
+    font-family: var(--font-nav);
 }
 
 .cz-back-btn {
@@ -4970,6 +4971,11 @@ body.page-compare .music-player-pill {
 }
 
 /* ── Config Panel */
+.customize-panel,
+.customize-panel * {
+    font-family: var(--font-nav);
+}
+
 .customize-panel {
     width: 320px;
     min-width: 260px;
