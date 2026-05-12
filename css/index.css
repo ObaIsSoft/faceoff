@@ -2756,13 +2756,11 @@ body.showroom-light header.nav-top .nav-links a {
     width: 60px;
     height: 60px;
     object-fit: contain;
-    filter: grayscale(1) invert(0); /* Black logos on white bg */
     transition: all 0.3s ease;
-    opacity: 0.4;
+    opacity: 0.7;
 }
 
 .brand-fragment:hover .brand-logo-img {
-    filter: grayscale(0) invert(0);
     opacity: 1;
     transform: scale(1.1);
 }
@@ -2773,6 +2771,11 @@ body.showroom-light header.nav-top .nav-links a {
     letter-spacing: 0.1em;
     text-transform: uppercase;
     font-weight: 700;
+}
+
+/* Hide label when a logo is present — text-only brands still show their name */
+.brand-fragment:has(.brand-logo-img) .brand-name {
+    display: none;
 }
 
 /* --- Contact Page Mobile Refinement --- */
@@ -3977,13 +3980,11 @@ body.showroom-light header.nav-top .nav-links a {
         width: 100%;
         text-align: center;
     }
-    /* Explosion — same height as desktop so bloom plays at identical rhythm */
-    .explosion-section       { height: 320vh; }
+    /* Taller on mobile so elliptical bloom has room to stagger across full height */
+    .explosion-section       { height: 420vh; }
     .explosion-core          { width: 80px; height: 80px; }
-    .brand-fragment          { font-size: 0.44rem; letter-spacing: 0.06em; gap: 0; }
-    .brand-logo-img          { width: 18px; height: 18px; }
-    /* Logo brands: hide text label on mobile — logo alone is enough */
-    .brand-fragment:has(.brand-logo-img) .brand-name { display: none; }
+    .brand-fragment          { font-size: 0.5rem; letter-spacing: 0.06em; gap: 0; }
+    .brand-logo-img          { width: 34px; height: 34px; opacity: 0.9; }
 
     /* ── CATALOG ──────────────────────────────────────────────── */
     .catalog-container       { padding: 4.5rem 1.25rem 3rem; }

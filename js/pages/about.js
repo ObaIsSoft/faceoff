@@ -54,14 +54,38 @@ var AboutPage = {
         ];
 
         const BRAND_LOGOS = {
-            "Rolls-Royce":  "assets/brands/rollsroyce.svg",
-            "Mercedes-Benz":"assets/brands/mercedes.svg",
-            "BMW":          "assets/brands/bmw.svg",
-            "Audi":         "assets/brands/audi.svg",
-            "Toyota":       "assets/brands/toyota.svg",
-            "Tesla":        "assets/brands/tesla.svg",
-            "Jeep":         "assets/brands/jeep.svg",
-            "BYD":          "assets/brands/byd.svg"
+            "Rolls-Royce":   "assets/brands/rollsroyce.svg",
+            "Bentley":       "assets/brands/bentley.svg",
+            "Mercedes-Benz": "assets/brands/mercedes.svg",
+            "BMW":           "assets/brands/bmw.svg",
+            "Audi":          "assets/brands/audi.svg",
+            "Land Rover":    "assets/brands/landrover.svg",
+            "Porsche":       "assets/brands/porsche.svg",
+            "Cadillac":      "assets/brands/cadillac.svg",
+            "Ferrari":       "assets/brands/ferrari.svg",
+            "Lamborghini":   "assets/brands/lamborghini.svg",
+            "McLaren":       "assets/brands/mclaren.svg",
+            "Aston Martin":  "assets/brands/astonmartin.svg",
+            "Bugatti":       "assets/brands/bugatti.svg",
+            "Koenigsegg":    "assets/brands/koenigsegg.svg",
+            "Maserati":      "assets/brands/maserati.svg",
+            "Toyota":        "assets/brands/toyota.svg",
+            "Honda":         "assets/brands/honda.svg",
+            "Ford":          "assets/brands/ford.svg",
+            "Chevrolet":     "assets/brands/chevrolet.svg",
+            "Tesla":         "assets/brands/tesla.svg",
+            "Volkswagen":    "assets/brands/volkswagen.svg",
+            "Volvo":         "assets/brands/volvo.svg",
+            "Jaguar":        "assets/brands/jaguar.svg",
+            "Hyundai":       "assets/brands/hyundai.svg",
+            "Kia":           "assets/brands/kia.svg",
+            "Jeep":          "assets/brands/jeep.svg",
+            "RAM":           "assets/brands/ram.svg",
+            "Alfa Romeo":    "assets/brands/alfaromeo.svg",
+            "Mini":          "assets/brands/mini.svg",
+            "Subaru":        "assets/brands/subaru.svg",
+            "Nissan":        "assets/brands/nissan.svg",
+            "Infiniti":      "assets/brands/infiniti.svg"
         };
 
         const GOLDEN = 2.39996; // golden angle in radians
@@ -101,9 +125,10 @@ var AboutPage = {
             const cH = root.offsetHeight;
             
             const isMobile = window.innerWidth < 768;
-            const maxR = isMobile
-                ? cW * 0.48
-                : Math.min(cW, cH) * 0.44;
+
+            // Elliptical spread on mobile: use full viewport height, cap width to screen
+            const maxRx = isMobile ? cW * 0.46 : Math.min(cW, cH) * 0.44;
+            const maxRy = isMobile ? cH * 0.44 : Math.min(cW, cH) * 0.44;
 
             const center = document.getElementById('explosion-center');
             if (center) {
@@ -115,17 +140,20 @@ var AboutPage = {
                 const local = Math.max(0, (p - birth) / (1 - (birth - 0.001)));
                 const eased = 1 - Math.pow(1 - Math.min(local, 1), 2.8);
                 const angle = i * GOLDEN;
-                
-                const startRadius = isMobile ? 24 : 76;
-                const span = maxR - startRadius;
-                const baseR = startRadius + i * (span / BRANDS.length);
-                const r = startRadius + (baseR - startRadius) * eased;
-                const x = Math.cos(angle) * r;
-                const y = Math.sin(angle) * r;
+
+                const startR = isMobile ? 48 : 76;
+                const spanX = maxRx - startR;
+                const spanY = maxRy - startR;
+                const baseRx = startR + i * (spanX / BRANDS.length);
+                const baseRy = startR + i * (spanY / BRANDS.length);
+                const rx = startR + (baseRx - startR) * eased;
+                const ry = startR + (baseRy - startR) * eased;
+                const x = Math.cos(angle) * rx;
+                const y = Math.sin(angle) * ry;
 
                 el.style.transform = `translate(calc(-50% + ${x}px), calc(-50% + ${y}px))`;
                 el.style.opacity = Math.min(1, eased * 2.5);
-                if (isMobile) el.style.fontSize = '0.52rem';
+                if (isMobile) el.style.fontSize = '0.5rem';
             });
         };
 
