@@ -389,17 +389,31 @@ function resolveSpec(modelId) {
     return (window.CUSTOM_SPEC_PROFILES || {})[model.specProfile] || null;
 }
 
+function getCurrencyConfig() {
+    const currency = localStorage.getItem('faceoff_currency') || 'NGN';
+    const rates = {
+        'NGN':    { symbol: '₦',   rate: 1     },
+        'GHS':    { symbol: 'GH₵', rate: 0.012 },
+        'XOF-TG': { symbol: 'CFA', rate: 0.52  },
+        'XOF-BJ': { symbol: 'CFA', rate: 0.52  },
+    };
+    return rates[currency] || rates['NGN'];
+}
+
 function shortPrice(priceStr) {
     if (!priceStr) return '';
     const num = parseInt(priceStr.replace(/[^0-9]/g, ''), 10);
     if (isNaN(num)) return priceStr;
-    if (num >= 1000000) return '+₦' + (num / 1000000).toFixed(1).replace('.0', '') + 'M';
-    if (num >= 1000)    return '+₦' + Math.round(num / 1000) + 'K';
-    return '+₦' + num.toLocaleString();
+    const { symbol, rate } = getCurrencyConfig();
+    const converted = Math.round(num * rate);
+    if (converted >= 1000000) return '+' + symbol + (converted / 1000000).toFixed(1).replace('.0', '') + 'M';
+    if (converted >= 1000)    return '+' + symbol + Math.round(converted / 1000) + 'K';
+    return '+' + symbol + converted.toLocaleString();
 }
 
 function fmtNaira(num) {
-    return '₦' + num.toLocaleString('en-NG');
+    const { symbol, rate } = getCurrencyConfig();
+    return symbol + Math.round(num * rate).toLocaleString();
 }
 
 function calcAddonsTotal() {
@@ -962,3 +976,7 @@ function init() {
 }
 
 document.addEventListener('DOMContentLoaded', init);
+
+window.addEventListener('storage', e => {
+    if (e.key === 'faceoff_currency') buildStepContent(config.currentStep);
+});
