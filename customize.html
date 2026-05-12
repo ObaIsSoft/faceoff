@@ -76,38 +76,33 @@
                     <h2 class="cz-panel-title">Configure</h2>
                 </div>
 
-                <div class="cz-section">
-                    <h3 class="cz-section-title">Body Paint</h3>
-                    <div class="cz-paint-presets" id="cz-paint-presets"></div>
-                    <div class="cz-paint-types" id="cz-paint-types"></div>
-                </div>
+                <nav class="cz-steps" id="cz-steps">
+                    <button class="cz-step active" data-step="0">
+                        <span class="cz-step-num">1</span>
+                        <span class="cz-step-label">Exterior</span>
+                    </button>
+                    <button class="cz-step" data-step="1">
+                        <span class="cz-step-num">2</span>
+                        <span class="cz-step-label">Interior</span>
+                    </button>
+                    <button class="cz-step" data-step="2">
+                        <span class="cz-step-num">3</span>
+                        <span class="cz-step-label">Add-ons</span>
+                    </button>
+                    <button class="cz-step" data-step="3">
+                        <span class="cz-step-num">4</span>
+                        <span class="cz-step-label">Summary</span>
+                    </button>
+                </nav>
 
-                <div class="cz-section">
-                    <h3 class="cz-section-title">Rim Finish</h3>
-                    <div class="cz-rims-grid" id="cz-rims-grid"></div>
-                </div>
-
-                <div class="cz-section">
-                    <h3 class="cz-section-title">Window Tint</h3>
-                    <div class="cz-tint-row">
-                        <input type="range" id="cz-tint-slider" min="0" max="90" value="20" class="cz-slider">
-                        <span id="cz-tint-val" class="cz-slider-val">20%</span>
-                    </div>
-                </div>
-
-                <div class="cz-section">
-                    <h3 class="cz-section-title">Brake Calipers</h3>
-                    <div class="cz-calipers-grid" id="cz-calipers-grid"></div>
-                </div>
-
-                <div class="cz-section">
-                    <h3 class="cz-section-title">Interior Trim</h3>
-                    <div class="cz-interior-grid" id="cz-interior-grid"></div>
-                </div>
+                <div class="cz-step-content" id="cz-step-content"></div>
 
                 <div class="cz-panel-footer">
-                    <button id="cz-reset" class="cz-btn cz-btn--ghost">Reset</button>
-                    <a id="cz-done" href="showroom.html" class="cz-btn cz-btn--primary">Done &mdash; View in Showroom</a>
+                    <button id="cz-reset" class="cz-btn cz-btn--ghost cz-reset-btn">Reset</button>
+                    <div class="cz-footer-nav">
+                        <button id="cz-prev" class="cz-btn cz-btn--ghost cz-prev-btn">&#8592;</button>
+                        <button id="cz-next" class="cz-btn cz-btn--primary">Next &#8594;</button>
+                    </div>
                 </div>
             </aside>
         </div>

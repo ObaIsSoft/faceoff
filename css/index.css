@@ -4977,12 +4977,13 @@ body.page-compare .music-player-pill {
     border-left: 1px solid rgba(0, 0, 0, 0.07);
     display: flex;
     flex-direction: column;
-    overflow-y: auto;
+    overflow: hidden;
 }
 
 .cz-panel-header {
-    padding: 1.4rem 1.4rem 0.75rem;
+    padding: 1.2rem 1.4rem 0.75rem;
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+    flex-shrink: 0;
 }
 
 .cz-panel-eyebrow {
@@ -5081,8 +5082,10 @@ body.page-compare .music-player-pill {
     text-align: left;
     transition: all 0.15s;
 }
-.cz-rim-option:hover { border-color: #555; }
-.cz-rim-option.active { border-color: #111; background: #111; color: #fff; }
+.cz-rim-option:hover { border-color: #c8920c; }
+.cz-rim-option.active { border-color: #c8920c; background: #fdf6e8; color: #1a1a1a; }
+
+.cz-rim-name { flex: 1; }
 
 .cz-rim-swatch {
     width: 18px;
@@ -5091,7 +5094,7 @@ body.page-compare .music-player-pill {
     flex-shrink: 0;
     border: 1px solid rgba(0, 0, 0, 0.1);
 }
-.cz-rim-option.active .cz-rim-swatch { border-color: rgba(255, 255, 255, 0.25); }
+.cz-rim-option.active .cz-rim-swatch { border-color: rgba(200, 146, 12, 0.3); }
 
 /* Tint slider */
 .cz-tint-row {
@@ -5154,8 +5157,8 @@ body.page-compare .music-player-pill {
     color: #333;
     transition: all 0.15s;
 }
-.cz-caliper-option:hover { border-color: #555; }
-.cz-caliper-option.active { border-color: #111; background: #111; color: #fff; }
+.cz-caliper-option:hover { border-color: #c8920c; }
+.cz-caliper-option.active { border-color: #c8920c; background: #fdf6e8; color: #1a1a1a; }
 
 .cz-caliper-swatch {
     width: 12px;
@@ -5173,9 +5176,10 @@ body.page-compare .music-player-pill {
 
 .cz-interior-option {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    padding: 0.55rem 0.8rem;
+    flex-direction: row;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.6rem 0.8rem;
     border: 1px solid rgba(0, 0, 0, 0.1);
     border-radius: 6px;
     background: none;
@@ -5183,36 +5187,47 @@ body.page-compare .music-player-pill {
     text-align: left;
     transition: all 0.15s;
 }
-.cz-interior-option:hover { border-color: #555; }
-.cz-interior-option.active { border-color: #111; background: #111; }
+.cz-interior-option:hover { border-color: #c8920c; }
+.cz-interior-option.active { border-color: #c8920c; background: #fdf6e8; }
+
+.cz-interior-info {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+}
 
 .cz-interior-title {
     font-size: 0.76rem;
     font-weight: 600;
     color: #222;
 }
-.cz-interior-option.active .cz-interior-title { color: #fff; }
+.cz-interior-option.active .cz-interior-title { color: #111; }
 
 .cz-interior-desc {
     font-size: 0.65rem;
     color: #999;
-    margin-top: 2px;
 }
-.cz-interior-option.active .cz-interior-desc { color: rgba(255, 255, 255, 0.55); }
+.cz-interior-option.active .cz-interior-desc { color: #777; }
 
 /* Panel footer */
 .cz-panel-footer {
-    margin-top: auto;
-    padding: 1.1rem 1.4rem;
+    padding: 0.9rem 1.2rem;
     display: flex;
-    gap: 7px;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.5rem;
     border-top: 1px solid rgba(0, 0, 0, 0.07);
     flex-shrink: 0;
 }
 
+.cz-footer-nav {
+    display: flex;
+    gap: 0.4rem;
+}
+
 .cz-btn {
-    flex: 1;
-    padding: 0.65rem 0.9rem;
+    padding: 0.6rem 0.9rem;
     border-radius: 6px;
     font-size: 0.76rem;
     font-weight: 600;
@@ -5221,7 +5236,10 @@ body.page-compare .music-player-pill {
     transition: all 0.15s;
     text-decoration: none;
     display: inline-block;
+    white-space: nowrap;
 }
+
+.cz-reset-btn { color: #aaa; font-size: 0.7rem; }
 
 .cz-btn--ghost {
     border: 1px solid rgba(0, 0, 0, 0.14);
@@ -5236,6 +5254,266 @@ body.page-compare .music-player-pill {
     color: #fff;
 }
 .cz-btn--primary:hover { background: #333; border-color: #333; }
+
+/* ── Step tabs ───────────────────────────────────────────────── */
+.cz-steps {
+    display: flex;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.07);
+    flex-shrink: 0;
+}
+
+.cz-step {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.7rem 0.3rem;
+    background: none;
+    border: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    gap: 0.25rem;
+    transition: border-color 0.2s;
+    margin-bottom: -1px;
+}
+
+.cz-step-num {
+    font-size: 0.62rem;
+    font-weight: 700;
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: #f0ede8;
+    color: #bbb;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s, color 0.2s;
+}
+
+.cz-step-label {
+    font-size: 0.6rem;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #bbb;
+    transition: color 0.2s;
+}
+
+.cz-step.active .cz-step-num { background: #c8920c; color: #fff; }
+.cz-step.active .cz-step-label { color: #333; }
+.cz-step.active { border-bottom-color: #c8920c; }
+.cz-step.completed .cz-step-num { background: #ead99a; color: #8a6020; }
+.cz-step.completed .cz-step-label { color: #888; }
+
+/* ── Step content ────────────────────────────────────────────── */
+.cz-step-content {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+/* ── Paint grid (new swatch buttons) ─────────────────────────── */
+.cz-paint-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 0.6rem;
+}
+
+.cz-swatch-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0.2rem;
+    border-radius: 6px;
+    transition: background 0.15s;
+}
+.cz-swatch-btn:hover { background: #f5f0e8; }
+
+.cz-swatch-circle {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.18);
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+.cz-swatch-btn.active .cz-swatch-circle {
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #c8920c;
+    transform: scale(1.1);
+}
+
+.cz-swatch-price {
+    font-size: 0.52rem;
+    color: #c8920c;
+    letter-spacing: 0.03em;
+}
+
+.cz-paint-sel-info {
+    font-size: 0.7rem;
+    color: #666;
+    letter-spacing: 0.04em;
+    margin-bottom: 0.5rem;
+    min-height: 1em;
+}
+
+/* ── Option price label ──────────────────────────────────────── */
+.cz-option-price {
+    font-size: 0.62rem;
+    color: #bbb;
+    white-space: nowrap;
+    flex-shrink: 0;
+    letter-spacing: 0.02em;
+}
+.cz-option-price--active { color: #c8920c; }
+
+/* ── Add-on cards ────────────────────────────────────────────── */
+.cz-addons-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.cz-addon-card {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.7rem;
+    padding: 0.75rem 0.85rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    background: none;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.15s, background 0.15s;
+    width: 100%;
+}
+.cz-addon-card:hover { border-color: #c8920c; background: #fdf8f0; }
+.cz-addon-card.selected { border-color: #c8920c; background: #fdf6e8; }
+
+.cz-addon-check {
+    width: 17px;
+    height: 17px;
+    border-radius: 4px;
+    border: 2px solid #ccc;
+    flex-shrink: 0;
+    margin-top: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.65rem;
+    color: transparent;
+    transition: all 0.15s;
+}
+.cz-addon-card.selected .cz-addon-check { background: #c8920c; border-color: #c8920c; color: #fff; }
+
+.cz-addon-info { flex: 1; }
+
+.cz-addon-label {
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: #1a1a1a;
+    letter-spacing: 0.02em;
+    display: block;
+    margin-bottom: 2px;
+}
+
+.cz-addon-desc {
+    font-size: 0.64rem;
+    color: #888;
+    letter-spacing: 0.01em;
+    display: block;
+}
+
+.cz-addon-price {
+    font-size: 0.72rem;
+    font-weight: 600;
+    color: #c8920c;
+    white-space: nowrap;
+    flex-shrink: 0;
+    align-self: center;
+}
+
+/* ── Summary step ────────────────────────────────────────────── */
+.cz-summary { }
+
+.cz-summary-group {
+    margin-bottom: 1rem;
+}
+
+.cz-summary-section-label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: #bbb;
+    margin-bottom: 0.4rem;
+}
+
+.cz-summary-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0.32rem 0;
+    border-bottom: 1px solid #f0ede8;
+    gap: 0.5rem;
+}
+
+.cz-summary-row-label {
+    font-size: 0.74rem;
+    color: #555;
+    flex-shrink: 0;
+}
+
+.cz-summary-row-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 1px;
+}
+
+.cz-summary-row-value {
+    font-size: 0.74rem;
+    font-weight: 600;
+    color: #111;
+}
+
+.cz-summary-row-price {
+    font-size: 0.65rem;
+    color: #888;
+}
+
+.cz-summary-total {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    padding: 0.65rem 0 0.4rem;
+    border-top: 2px solid #111;
+    margin-top: 0.25rem;
+}
+
+.cz-summary-total-label {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.07em;
+    text-transform: uppercase;
+    color: #111;
+}
+
+.cz-summary-total-amount {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #111;
+}
+
+.cz-enquiry-full {
+    width: 100%;
+    margin-top: 1.2rem;
+    padding: 0.75rem;
+}
 
 /* ── Showroom: Customise CTA */
 .cta-btn--outline {
