@@ -80,35 +80,102 @@ function classifyMat(meshName, mat) {
     return 'body';
 }
 
+// ── Loader wave animation ─────────────────────────────────────────────────────
+let _fillTarget  = 0;   // 0-100, set by progress
+let _fillCurrent = 0;   // smoothly lerps toward target
+let _loaderRafId = null;
+
+function _tickWave(now) {
+    const wavePath = document.getElementById('cz-wave-path');
+    const pctEl    = document.getElementById('cz-loader-pct');
+    if (!wavePath) return;
+
+    // Lerp fill level toward target (viscous lag)
+    _fillCurrent += (_fillTarget - _fillCurrent) * 0.04;
+
+    const W = 540, H = 88;
+    const surfaceY = H * (1 - _fillCurrent / 100);
+    const t = now * 0.001;
+
+    // Two overlapping slow sine waves = viscous surface
+    let d = `M 0 ${H} L 0 ${surfaceY + 2.4 * Math.sin(t * 0.7)} `;
+    for (let x = 5; x <= W; x += 5) {
+        const y = surfaceY
+            + 2.4 * Math.sin(x * 0.022 - t * 0.9)
+            + 1.4 * Math.sin(x * 0.041 + t * 0.55);
+        d += `L ${x} ${y} `;
+    }
+    d += `L ${W} ${H} Z`;
+    wavePath.setAttribute('d', d);
+
+    if (pctEl) pctEl.textContent = Math.round(_fillCurrent) + '%';
+
+    _loaderRafId = requestAnimationFrame(_tickWave);
+}
+
+function startLoaderWave() {
+    if (_loaderRafId) return;
+    _loaderRafId = requestAnimationFrame(_tickWave);
+}
+
+function stopLoaderWave() {
+    if (_loaderRafId) { cancelAnimationFrame(_loaderRafId); _loaderRafId = null; }
+}
+
+function setLoaderProgress(pct) {
+    _fillTarget = pct;
+}
+
+function revealCanvas() {
+    stopLoaderWave();
+    const loader = document.getElementById('cz-loader');
+    const canvas = document.getElementById('cz-canvas');
+    if (loader) loader.classList.add('is-hidden');
+    if (canvas) canvas.style.opacity = '1';
+}
+
 // ── GLTF loader ───────────────────────────────────────────────────────────────
 function loadModel(modelId) {
-    const modelDef   = (window.MODELS || {})[modelId];
+    const modelDef    = (window.MODELS || {})[modelId];
     const model3dPath = modelDef?.model3d;
 
     if (model3dPath) {
+        setLoaderProgress(0);
         const loader = new GLTFLoader();
         loader.load(
             model3dPath,
             (gltf) => {
+                setLoaderProgress(100);
                 carGroup = gltf.scene;
                 fitAndCenter(carGroup);
                 classifyGLTF(carGroup);
                 carGroup.rotation.y = Math.PI / 5;
                 scene.add(carGroup);
                 applyAll();
+                revealCanvas();
                 revealPhase = true;
                 revealStart = performance.now();
             },
-            null,
+            (xhr) => {
+                if (xhr.total > 0) {
+                    const pct = Math.round((xhr.loaded / xhr.total) * 95);
+                    setLoaderProgress(pct, `Loading model — ${pct}%`);
+                } else {
+                    setLoaderProgress(40);
+                }
+            },
             (err) => {
                 console.warn('GLTF load failed, using placeholder:', err);
                 buildPlaceholder();
+                revealCanvas();
                 revealPhase = true;
                 revealStart = performance.now();
             }
         );
     } else {
+        // No 3D model — build placeholder and reveal immediately
         buildPlaceholder();
+        revealCanvas();
         revealPhase = true;
         revealStart = performance.now();
     }
@@ -521,6 +588,7 @@ function init() {
     initScene();
     buildUI();
 
+    startLoaderWave();
     const modelId = unit?.modelId || '';
     loadModel(modelId);
 

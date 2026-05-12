@@ -4915,12 +4915,58 @@ body.page-compare .music-player-pill {
     min-height: 0;
 }
 
+/* ── 3D loader overlay ───────────────────────────────────────── */
+.cz-loader {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 1.2rem;
+    background: #fafafa;
+    z-index: 10;
+    transition: opacity 0.7s ease;
+}
+.cz-loader.is-hidden {
+    opacity: 0;
+    pointer-events: none;
+}
+.cz-loader-svg {
+    width: min(72vw, 400px);
+    height: auto;
+    overflow: visible;
+}
+.cz-svg-bg {
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 52px;
+    font-weight: 700;
+    fill: #dcdcdc;
+    letter-spacing: 6px;
+}
+.cz-svg-fill {
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 52px;
+    font-weight: 700;
+    fill: url(#czGoldGrad);
+    letter-spacing: 6px;
+}
+.cz-loader-pct {
+    font-family: 'Cinzel', Georgia, serif;
+    font-size: 0.65rem;
+    letter-spacing: 0.28em;
+    color: #c8920c;
+    opacity: 0.7;
+}
+
 #cz-canvas {
     position: absolute;
     inset: 0;
     display: block;
     width: 100%;
     height: 100%;
+    opacity: 0;
+    transition: opacity 0.6s ease;
 }
 
 /* ── Config Panel */
