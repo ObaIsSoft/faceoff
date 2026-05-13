@@ -2919,6 +2919,7 @@ body.showroom-light header.nav-top .nav-links a {
     align-items: center;
     justify-content: center;
     gap: 0.5rem;
+    position: relative;
 }
 
 /* Spec panels flanking the car */
@@ -3104,12 +3105,58 @@ body.showroom-light header.nav-top .nav-links a {
     max-height: 52vh;
     width: 100%;
     position: relative;
+    z-index: 11;
 }
 .showroom-car img {
     max-height: 52vh;
     width: 100%;
     object-fit: contain;
 }
+
+/* Ghost stat backdrop — bleeds behind car */
+.sr-ghost-backdrop {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 10;
+    width: 100%;
+    text-align: center;
+    pointer-events: none;
+    white-space: nowrap;
+    mix-blend-mode: difference;
+}
+.sr-ghost-label {
+    font-family: var(--font-nav);
+    font-size: 1.2rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.3);
+    display: block;
+    text-align: left;
+    padding-left: 20vw;
+    line-height: 1;
+    margin-bottom: -1rem;
+    opacity: 0;
+    transition: opacity 0.7s ease;
+}
+.sr-ghost-num {
+    font-family: var(--font-display);
+    font-size: 110vh;
+    color: rgba(255,255,255,0.08);
+    line-height: 0.9;
+    letter-spacing: -0.02em;
+    display: block;
+    text-align: center;
+    opacity: 0;
+    transition: opacity 0.4s ease;
+}
+.sr-ghost-int { font-size: 1em; }
+.sr-ghost-dec { font-size: 1em; vertical-align: 0; letter-spacing: 0; }
+.sr-ghost-suffix { font-size: 0.45em; vertical-align: 0.12em; letter-spacing: 0; }
+
+/* Hide mobile stat chips on desktop */
+.sr-stat-chip { display: none; }
 
 /* CTA row — fixed at bottom centre, same level as notes + music player */
 .showroom-cta {

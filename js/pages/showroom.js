@@ -410,35 +410,33 @@ var ShowroomPage = {
             }
 
             // Ghost backdrop injected into .showroom-center (bleeds behind car)
-            if (isMobile) {
-                document.querySelector('.sr-ghost-backdrop')?.remove();
-                let ghostVal = '', ghostLbl = '';
-                if (dEarly.zeroToHundred) {
-                    ghostVal = dEarly.zeroToHundred;   // e.g. "4.5s"
-                    ghostLbl = '0 — 100';
-                } else if (unit.power) {
-                    ghostVal = unit.power;              // e.g. "585 hp"
-                    ghostLbl = 'Power';
-                } else if (unit.topSpeed) {
-                    ghostVal = unit.topSpeed;
-                    ghostLbl = 'Top Speed';
-                }
-                if (ghostVal) {
-                    const numMatch    = ghostVal.match(/^([\d]+)(\.\d+)?(.*)/);
-                    const isDecimalV  = numMatch && parseFloat(numMatch[1] + (numMatch[2] || '')) < 30;
-                    const suffix      = numMatch ? (numMatch[3] || '').trim() : '';
-                    const initDec     = (isDecimalV && numMatch[2]) ? '.0' : '';
-                    const ghostEl     = document.createElement('div');
-                    ghostEl.id        = 'sr-ghost-backdrop';
-                    ghostEl.className = 'sr-ghost-backdrop';
-                    ghostEl.innerHTML = `
-                        <span class="sr-ghost-label">${ghostLbl}</span>
-                        <span class="sr-ghost-num">
-                            <span class="sr-ghost-int">0</span><span class="sr-ghost-dec">${initDec}</span><span class="sr-ghost-suffix">${suffix}</span>
-                        </span>`;
-                    const center = document.querySelector('.showroom-center');
-                    if (center) center.appendChild(ghostEl);
-                }
+            document.querySelector('.sr-ghost-backdrop')?.remove();
+            let ghostVal = '', ghostLbl = '';
+            if (dEarly.zeroToHundred) {
+                ghostVal = dEarly.zeroToHundred;   // e.g. "4.5s"
+                ghostLbl = '0 — 100';
+            } else if (unit.power) {
+                ghostVal = unit.power;              // e.g. "585 hp"
+                ghostLbl = 'Power';
+            } else if (unit.topSpeed) {
+                ghostVal = unit.topSpeed;
+                ghostLbl = 'Top Speed';
+            }
+            if (ghostVal) {
+                const numMatch    = ghostVal.match(/^([\d]+)(\.\d+)?(.*)/);
+                const isDecimalV  = numMatch && parseFloat(numMatch[1] + (numMatch[2] || '')) < 30;
+                const suffix      = numMatch ? (numMatch[3] || '').trim() : '';
+                const initDec     = (isDecimalV && numMatch[2]) ? '.0' : '';
+                const ghostEl     = document.createElement('div');
+                ghostEl.id        = 'sr-ghost-backdrop';
+                ghostEl.className = 'sr-ghost-backdrop';
+                ghostEl.innerHTML = `
+                    <span class="sr-ghost-label">${ghostLbl}</span>
+                    <span class="sr-ghost-num">
+                        <span class="sr-ghost-int">0</span><span class="sr-ghost-dec">${initDec}</span><span class="sr-ghost-suffix">${suffix}</span>
+                    </span>`;
+                const center = document.querySelector('.showroom-center');
+                if (center) center.appendChild(ghostEl);
             }
         }
 
@@ -541,8 +539,8 @@ var ShowroomPage = {
             backEl.href = backHref;
             backEl.setAttribute('data-router-link', '');
             backEl.textContent = `← ${backLabel}`;
-            const center = document.querySelector('.showroom-center');
-            if (center) center.prepend(backEl);
+            const layout = document.querySelector('.showroom-layout');
+            if (layout) layout.prepend(backEl);
         }
 
         // Save button
@@ -551,10 +549,8 @@ var ShowroomPage = {
         // Mobile bottom sheet
         if (window.innerWidth <= 768) this._buildSheet(unit);
 
-        // Ghost counter animation (mobile only)
-        if (window.innerWidth <= 768) {
-            setTimeout(() => this._animateGhostCounter(unit), 500);
-        }
+        // Ghost counter animation
+        setTimeout(() => this._animateGhostCounter(unit), 500);
     },
 
     // ─── Gallery ───────────────────────────────────────────────────────────────
