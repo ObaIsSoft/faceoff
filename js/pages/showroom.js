@@ -221,7 +221,7 @@ class DrumWheel {
         });
     }
 
-    // ── _bindWheel: keyboard/mouse-wheel ─────────────────────────────────────
+    // ── _bindWheel: fluid scrolling for trackpad and mouse ───────────────────
     _bindWheel() {
         this._viewport.addEventListener('wheel', e => {
             e.preventDefault();
@@ -229,15 +229,17 @@ class DrumWheel {
                 this._scrollToOffset(this._getCurrentOffset());
                 this._state = 'standby';
             }
-            var all = [...this._drumEl.querySelectorAll('.drum-item')];
-            var cur = this._getItemInView();
-            var dir = e.deltaY > 0 ? 1 : -1;
-            var next = all.indexOf(cur) + dir;
-            while (next >= 0 && next < all.length && all[next].classList.contains('drum-item--disabled')) next += dir;
-            if (next < 0 || next >= all.length) return;
-            this._centerView(all[next], true);
-            if (!all[next].classList.contains('drum-item--disabled'))
-                this._onChange && this._onChange(all[next].dataset.value);
+            
+            // Move fluidly with delta
+            this._drumEl.style.transition = 'none';
+            // Decrease offset by delta (scrolling down -> deltaY > 0 -> content moves up)
+            this._scrollToOffset(this._drumOffset - e.deltaY);
+            
+            // Snap to nearest item after scrolling stops
+            clearTimeout(this._wheelTimer);
+            this._wheelTimer = setTimeout(() => {
+                this._stopRevolving();
+            }, 100);
         }, { passive: false });
     }
 
@@ -276,9 +278,16 @@ class DrumWheel {
 
         function onMove(ev) {
             var p  = getXY(ev);
+            var isTouch = /touch/.test(ev.type);
             var t  = Date.now();
             var dx = p.x - coords.x;
             var dy = p.y - coords.y;
+            
+            // Boost sensitivity on PC (mouse drag) so users don't have to drag as hard
+            if (!isTouch) {
+                dy = dy * 2.5;
+            }
+            
             var dt = t   - coords.t;
             coords = { x: p.x, y: p.y, t: t, dx: dx, dy: dy, dt: dt };
             that._scrollToOffset(that._drumOffset + dy);
