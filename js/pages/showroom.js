@@ -1161,7 +1161,7 @@ var ShowroomPage = {
         let startY = 0, startTranslate = 0, currentTranslate = 0, lastTouchEnd = 0;
 
         const getTranslate = () => {
-            if (sheet.classList.contains('sr-sheet--collapsed')) return window.innerHeight * 0.88 - 80;
+            if (sheet.classList.contains('sr-sheet--collapsed')) return window.innerHeight * 0.88 - 32;
             if (sheet.classList.contains('sr-sheet--half'))      return window.innerHeight * 0.38;
             return window.innerHeight * 0.12;
         };

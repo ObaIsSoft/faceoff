@@ -4346,7 +4346,7 @@ body.showroom-light header.nav-top .nav-links a {
     /* Floating performance chips */
     .sr-stat-chip {
         position: absolute;
-        top: 40%;
+        top: 54%;
         transform: translateY(-50%);
         z-index: 2;
         display: flex;
@@ -4373,7 +4373,17 @@ body.showroom-light header.nav-top .nav-links a {
         font-weight: 700;
         color: rgba(255,255,255,0.65);
     }
-    .showroom-brand-logo     { width: 22px; height: 22px; margin-bottom: 0.3rem; opacity: 0.5; }
+    .showroom-brand-logo     {
+        position: absolute;
+        top: 22dvh;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 28px;
+        height: 28px;
+        opacity: 0.45;
+        z-index: 12;
+        margin: 0;
+    }
     .showroom-title          { font-size: clamp(1.3rem, 5vw, 1.8rem) !important; margin-top: 0.1rem; }
     .showroom-price          { font-size: 0.82rem !important; opacity: 0.65; margin-bottom: 0; }
     .showroom-meta-row       { gap: 0.4rem; margin-top: 0.1rem; }
@@ -4458,9 +4468,10 @@ body.showroom-light header.nav-top .nav-links a {
         display: flex;
         flex-direction: column;
         height: 88dvh;
-        transform: translateY(calc(100% - 80px));
+        transform: translateY(calc(100% - 32px));
         transition: transform 0.38s cubic-bezier(0.32, 0, 0.67, 0);
         will-change: transform;
+        overflow: hidden;
     }
     .sr-sheet--half          { transform: translateY(38dvh); }
     .sr-sheet--full          { transform: translateY(12dvh); }
