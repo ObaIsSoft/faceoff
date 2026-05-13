@@ -4248,7 +4248,7 @@ body.showroom-light header.nav-top .nav-links a {
         position: fixed;
         inset: 0;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: center;
     }
     .showroom-layout {
@@ -4256,111 +4256,253 @@ body.showroom-light header.nav-top .nav-links a {
         width: 100%;
         height: 100dvh;
         display: flex;
-        align-items: center;
+        align-items: flex-start;
         justify-content: center;
         padding: 0;
         gap: 0;
     }
-    /* Hide static spec panels — replaced by floating modals */
+    /* Hide static spec panels — content lives in the bottom sheet */
     .spec-panel              { display: none !important; }
-    /* Centre: car image + name + price + CTAs */
+    /* Upper zone: car + identity + CTAs, vertically centered */
     .showroom-center {
         display: flex;
         flex-direction: column;
         align-items: center;
         text-align: center;
-        gap: 0.4rem;
+        gap: 0.35rem;
         z-index: 1;
+        overflow-y: visible;
+        max-height: none;
+        width: 100%;
+        height: calc(100dvh - 80px);
+        justify-content: center;
+        padding: 3.2rem 1.25rem 0;
+        transition: height 0.38s cubic-bezier(0.32, 0, 0.67, 0);
     }
-    .showroom-car            { width: 82vw; max-width: 320px; }
-    .showroom-title          { font-size: clamp(1.4rem, 5.5vw, 2rem) !important; }
-    .showroom-price          { font-size: 0.85rem !important; opacity: 0.6; margin-bottom: 0.2rem; }
+    /* Push car up as sheet opens */
+    body.sr-sheet-half .showroom-center  { height: 56dvh; padding-top: 2.5rem; }
+    body.sr-sheet-full .showroom-center  { height: 24dvh; padding-top: 2rem; }
+    .showroom-car            { width: 92vw; max-width: 380px; max-height: 46vw; }
+    .showroom-car img        { max-height: 46vw; }
+    .showroom-brand-logo     { width: 22px; height: 22px; margin-bottom: 0.3rem; opacity: 0.5; }
+    .showroom-title          { font-size: clamp(1.3rem, 5vw, 1.8rem) !important; margin-top: 0.1rem; }
+    .showroom-price          { font-size: 0.82rem !important; opacity: 0.65; margin-bottom: 0; }
+    .showroom-meta-row       { gap: 0.4rem; margin-top: 0.1rem; }
+    .sr-badge                { font-size: 0.48rem; padding: 0.22rem 0.5rem; }
+    /* CTAs — stacked full-width */
     .showroom-cta {
         position: static;
         transform: none;
-        flex-direction: row;
-        gap: 0.4rem;
+        flex-direction: column;
+        gap: 0.45rem;
         width: 100%;
-        max-width: 320px;
-        margin-top: 0.2rem;
+        max-width: 340px;
+        margin-top: 0.5rem;
         align-items: stretch;
     }
-    .cta-btn { flex: 1; text-align: center; padding: 0.55rem 0.4rem; font-size: 0.5rem !important; letter-spacing: 0.06em; white-space: nowrap; }
-    .showroom-cta .sr-save { flex: 0 0 38px !important; width: 38px !important; max-width: none !important; padding: 0 !important; margin: 0 !important; display: flex !important; align-items: center; justify-content: center; }
-    /* Phase 4 elements — mobile overrides */
-    .showroom-center         { overflow-y: visible; max-height: none; }
-    /* Compact badge in meta row */
-    .showroom-meta-row       { gap: 0.4rem; margin-top: 0.15rem; }
-    .sr-badge                { font-size: 0.38rem; padding: 0.2rem 0.4rem; }
-    /* Multi-drum — mobile: back to normal flow */
-    .sr-unit-selector        { width: 100%; max-width: 320px; }
-    .drum-col-label          { font-size: 0.26rem; letter-spacing: 0.16em; padding: 0.22rem 0 0.16rem; }
-    .drum-item               { font-size: 0.5rem; }
-    /* Hide gallery strip on mobile — swipe handles it */
+    .cta-btn {
+        flex: none;
+        width: 100%;
+        text-align: center;
+        padding: 0.78rem 1rem;
+        font-size: 0.6rem !important;
+        letter-spacing: 0.1em;
+        white-space: nowrap;
+    }
+    .showroom-cta .sr-save {
+        position: absolute;
+        top: 0.55rem;
+        right: 1.25rem;
+        width: 38px !important;
+        height: 38px !important;
+        flex: none !important;
+        padding: 0 !important;
+        margin: 0 !important;
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.12);
+        border-radius: 6px;
+    }
+    /* Gallery dots */
     .showroom-gallery        { display: none !important; }
-    /* Hide LACVIS + notes — shown in cycling modals */
+    .sr-gallery-dots {
+        display: flex;
+        gap: 5px;
+        justify-content: center;
+        margin-top: 0.3rem;
+    }
+    .sr-gallery-dot {
+        width: 5px;
+        height: 5px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.22);
+        transition: background 0.2s ease, transform 0.2s ease;
+    }
+    .sr-gallery-dot.active   { background: #fff; transform: scale(1.3); }
+    /* Hide in upper zone — live in the sheet */
     .sr-lacvis               { display: none !important; }
     .sr-notes                { display: none !important; }
-    /* Floating spec modals */
-    .sr-modal {
+    .sr-unit-selector        { display: none !important; }
+    .sr-variant-selector     { display: none !important; }
+
+    /* ── BOTTOM SHEET ────────────────────────────────────────── */
+    .sr-sheet {
         position: fixed;
-        left: 1rem;
-        right: 1rem;
-        background: rgba(8, 8, 8, 0.84);
-        backdrop-filter: blur(18px);
-        -webkit-backdrop-filter: blur(18px);
-        border: 1px solid rgba(255,255,255,0.07);
-        border-radius: 14px;
-        padding: 0.85rem 1rem 0.9rem;
-        opacity: 0;
-        transform: translateY(6px);
-        transition: opacity 0.35s ease, transform 0.35s ease;
-        pointer-events: none;
-        z-index: 20;
-    }
-    .sr-modal--visible {
-        opacity: 1;
-        transform: translateY(0);
-        pointer-events: auto;
-    }
-    .sr-modal--top           { top: auto; bottom: 10.5rem; }
-    .sr-modal--bot           { bottom: 5rem; }
-    .sr-modal-label {
-        font-family: var(--font-nav, sans-serif);
-        font-size: 0.4rem;
-        letter-spacing: 0.28em;
-        text-transform: uppercase;
-        opacity: 0.45;
-        margin-bottom: 0.55rem;
-        color: #fff;
-    }
-    .sr-modal-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 0.4rem 0.75rem;
-    }
-    .sr-modal-row {
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(9, 9, 9, 0.97);
+        backdrop-filter: blur(24px);
+        -webkit-backdrop-filter: blur(24px);
+        border-top: 1px solid rgba(255,255,255,0.08);
+        border-radius: 18px 18px 0 0;
+        z-index: 25;
         display: flex;
         flex-direction: column;
-        gap: 0.08rem;
+        height: 88dvh;
+        transform: translateY(calc(100% - 80px));
+        transition: transform 0.38s cubic-bezier(0.32, 0, 0.67, 0);
+        will-change: transform;
     }
-    .sr-modal-key {
-        font-size: 0.44rem;
-        opacity: 0.38;
+    .sr-sheet--half          { transform: translateY(38dvh); }
+    .sr-sheet--full          { transform: translateY(12dvh); }
+    .sr-sheet--dragging      { transition: none !important; }
+    .sr-sheet-handle {
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0.6rem 0 0.35rem;
+        cursor: grab;
+        touch-action: none;
+        user-select: none;
+        -webkit-user-select: none;
+    }
+    .sr-sheet-handle::before {
+        content: '';
+        width: 36px;
+        height: 4px;
+        border-radius: 2px;
+        background: rgba(255,255,255,0.18);
+    }
+    .sr-sheet-tabs {
+        flex-shrink: 0;
+        display: flex;
+        border-bottom: 1px solid rgba(255,255,255,0.07);
+        padding: 0 1.25rem;
+    }
+    .sr-sheet-tab {
+        font-family: var(--font-nav);
+        font-size: 0.48rem;
+        letter-spacing: 0.18em;
         text-transform: uppercase;
+        color: rgba(255,255,255,0.35);
+        background: none;
+        border: none;
+        border-bottom: 2px solid transparent;
+        padding: 0.5rem 0.85rem 0.45rem;
+        cursor: pointer;
+        transition: color 0.2s ease, border-color 0.2s ease;
+        margin-bottom: -1px;
+        white-space: nowrap;
+    }
+    .sr-sheet-tab.active     { color: #fff; border-bottom-color: #fff; }
+    .sr-sheet-content {
+        flex: 1;
+        min-height: 0;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior: contain;
+        scrollbar-width: none;
+        padding: 1rem 1.25rem 2.5rem;
+    }
+    /* Constrain content to the VISIBLE portion so overflow-y:auto actually scrolls */
+    body.sr-sheet-half .sr-sheet-content { max-height: calc(50dvh - 3rem); }
+    body.sr-sheet-full .sr-sheet-content { max-height: calc(76dvh - 3rem); }
+    .sr-sheet-content::-webkit-scrollbar { display: none; }
+    .sr-sheet-panel          { display: none; }
+    .sr-sheet-panel.active   { display: block; }
+    .sr-sheet-section-label {
+        font-family: var(--font-nav);
+        font-size: 0.38rem;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        opacity: 0.28;
+        margin: 1rem 0 0.5rem;
+        color: #fff;
+    }
+    .sr-sheet-section-label:first-child { margin-top: 0; }
+    .sr-sheet-specs-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.6rem 1.2rem;
+        margin-bottom: 0.5rem;
+    }
+    .sr-sheet-spec-row {
+        display: flex;
+        flex-direction: column;
+        gap: 0.05rem;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        padding-bottom: 0.4rem;
+    }
+    .sr-sheet-spec-row--full { grid-column: 1 / -1; }
+    .sr-sheet-spec-label {
+        font-family: var(--font-nav);
+        font-size: 0.38rem;
         letter-spacing: 0.1em;
+        text-transform: uppercase;
+        opacity: 0.32;
         color: #fff;
     }
-    .sr-modal-val {
-        font-size: 0.62rem;
-        color: #fff;
-        font-weight: 500;
+    .sr-sheet-spec-val {
+        font-family: var(--font-nav);
+        font-size: 0.6rem;
+        font-weight: 600;
+        color: rgba(255,255,255,0.88);
+        line-height: 1.35;
     }
-    .sr-modal-funfact {
-        font-size: 0.64rem;
-        color: rgba(255,255,255,0.72);
-        line-height: 1.55;
+    .sr-sheet-funfact {
+        font-family: var(--font-nav);
+        font-size: 0.56rem;
         font-style: italic;
+        color: rgba(255,255,255,0.4);
+        line-height: 1.7;
+        margin: 0.6rem 0 0;
+    }
+    .sr-sheet-empty-docs {
+        font-family: var(--font-nav);
+        font-size: 0.52rem;
+        color: rgba(255,255,255,0.28);
+        text-align: center;
+        padding: 2rem 1rem;
+        letter-spacing: 0.08em;
+    }
+    .sr-sheet .sr-unit-selector,
+    .sr-sheet .sr-variant-selector {
+        display: block !important;
+        width: 100%;
+        max-width: none;
+        margin: 0 0 1rem;
+    }
+    .sr-sheet .drum-col-label { font-size: 0.42rem; }
+    .sr-sheet .drum-item      { font-size: 0.54rem; }
+    .sr-sheet .sr-lacvis,
+    .sr-sheet .sr-notes {
+        display: block !important;
+        width: 100%;
+        max-width: none;
+        margin-bottom: 1rem;
+    }
+    .sr-sheet .sr-back {
+        display: inline-block;
+        margin-bottom: 0.75rem;
+        font-size: 0.48rem;
+        letter-spacing: 0.1em;
+        opacity: 0.5;
+        color: #fff;
+        text-decoration: none;
     }
     /* Hide atmospheric effects on mobile for performance */
     .flashlight-beam,
@@ -4750,20 +4892,40 @@ body.page-compare .music-player-pill {
 
 /* Showroom Mobile Positioning Fix */
 @media (max-width: 768px) {
+    /* Both pills sit 20px above the 80px sheet peek */
+    body.showroom-mode .fd-trigger {
+        bottom: 100px;
+        height: 36px;
+        padding: 0 1rem;
+        align-items: center;
+    }
     body.showroom-mode .music-player-pill {
-        position: relative;
-        inset: auto;
-        bottom: auto;
+        position: fixed;
+        bottom: 100px;
+        left: 1.25rem;
         top: auto;
-        left: auto;
-        margin: 0.8rem auto 0;
+        right: auto;
+        margin: 0;
         max-width: 189px;
-        transform: scale(0.85);
-        transform-origin: center;
-        z-index: 10;
+        height: 36px;
+        padding: 0 6px;
+        align-items: center;
+        transform: none;
+        transform-origin: bottom left;
+        z-index: 2000;
         opacity: 1 !important;
         pointer-events: auto !important;
         visibility: visible !important;
+    }
+    /* Hide both pills when bottom sheet is open */
+    body.sr-sheet-half .music-player-pill,
+    body.sr-sheet-full .music-player-pill,
+    body.sr-sheet-half .fd-trigger,
+    body.sr-sheet-full .fd-trigger {
+        opacity: 0 !important;
+        pointer-events: none !important;
+        transform: translateY(10px) !important;
+        transition: opacity 0.25s ease, transform 0.25s ease !important;
     }
     .music-player-pill {
         bottom: 1rem;

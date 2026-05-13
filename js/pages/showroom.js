@@ -220,7 +220,6 @@ window.DrumWheel = DrumWheel;
 
 if (!window.ShowroomPage) {
 var ShowroomPage = {
-    _modalInterval: null,
     _currentUnit: null,
 
     init() {
@@ -377,8 +376,8 @@ var ShowroomPage = {
         // Save button
         this._renderSaveBtn(unit.id);
 
-        // Mobile cycling modals
-        if (window.innerWidth <= 768) this._initMobileCycling(unit);
+        // Mobile bottom sheet
+        if (window.innerWidth <= 768) this._buildSheet(unit);
     },
 
     // ─── Gallery ───────────────────────────────────────────────────────────────
@@ -395,18 +394,34 @@ var ShowroomPage = {
                 <img src="${src}" alt="Photo ${i + 1}">
             </button>`).join('');
 
+        const setActive = (idx) => {
+            const thumbs = [...galleryEl.querySelectorAll('.gallery-thumb')];
+            thumbs.forEach((b, i) => b.classList.toggle('active', i === idx));
+            const display = document.getElementById('car-display');
+            if (display && thumbs[idx]) display.querySelector('img').src = thumbs[idx].dataset.src;
+            // Update dots
+            const dots = document.querySelectorAll('.sr-gallery-dot');
+            dots.forEach((d, i) => d.classList.toggle('active', i === idx));
+        };
+
         galleryEl.addEventListener('click', e => {
             const btn = e.target.closest('.gallery-thumb');
             if (!btn) return;
-            galleryEl.querySelectorAll('.gallery-thumb').forEach(b => b.classList.remove('active'));
-            btn.classList.add('active');
-            const display = document.getElementById('car-display');
-            if (display) display.querySelector('img').src = btn.dataset.src;
+            const thumbs = [...galleryEl.querySelectorAll('.gallery-thumb')];
+            setActive(thumbs.indexOf(btn));
         });
 
-        // Mobile swipe
+        // Mobile: dot indicators + swipe
         const display = document.getElementById('car-display');
         if (display && window.innerWidth <= 768) {
+            // Inject dots below car image
+            const dotsEl = document.createElement('div');
+            dotsEl.className = 'sr-gallery-dots';
+            dotsEl.innerHTML = capped.map((_, i) =>
+                `<span class="sr-gallery-dot${i === 0 ? ' active' : ''}"></span>`
+            ).join('');
+            display.insertAdjacentElement('afterend', dotsEl);
+
             let touchX = 0;
             display.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
             display.addEventListener('touchend', e => {
@@ -416,7 +431,7 @@ var ShowroomPage = {
                 const active = galleryEl.querySelector('.gallery-thumb.active');
                 const idx = thumbs.indexOf(active);
                 const next = dx < 0 ? Math.min(idx + 1, thumbs.length - 1) : Math.max(idx - 1, 0);
-                thumbs[next]?.click();
+                setActive(next);
             }, { passive: true });
         }
     },
@@ -860,88 +875,233 @@ var ShowroomPage = {
         update();
     },
 
-    // ─── Mobile cycling modals ────────────────────────────────────────────────
-    _initMobileCycling(unit) {
-        document.querySelectorAll('.sr-modal').forEach(m => m.remove());
-        if (this._modalInterval) { clearInterval(this._modalInterval); this._modalInterval = null; }
+    // ─── Mobile bottom sheet ──────────────────────────────────────────────────
+    _buildSheet(unit) {
+        document.querySelector('.sr-sheet')?.remove();
+        document.querySelector('.sr-gallery-dots')?.remove();
 
         const d = unit.details || {};
         const mileageLabel = unit.mileage === 0 ? '0 km · New' : `${unit.mileage.toLocaleString()} km`;
         const condLabel = unit.condition === 'new' ? 'New' : `Pre-owned · ${unit.grade || ''}`;
-        const row = (k, v) => v
-            ? `<div class="sr-modal-row"><span class="sr-modal-key">${k}</span><span class="sr-modal-val">${v}</span></div>`
+
+        const specRow = (key, val, full) => val
+            ? `<div class="sr-sheet-spec-row${full ? ' sr-sheet-spec-row--full' : ''}">
+                <span class="sr-sheet-spec-label">${key}</span>
+                <span class="sr-sheet-spec-val">${val}</span>
+               </div>`
             : '';
 
-        let certStatus = '';
-        if (unit.certificate) {
-            const expired = new Date(unit.certificate.expiryDate) < new Date();
-            certStatus = expired ? '⚠ Expired' : '✓ Valid';
-        } else if (unit.condition === 'used') {
-            certStatus = 'None on file';
+        const specsHTML = `
+            <div class="sr-sheet-section-label">Identity</div>
+            <div class="sr-sheet-specs-grid">
+                ${specRow('Manufacturer', d.manufacturer)}
+                ${specRow('Year', unit.year)}
+                ${specRow('Colour', unit.color)}
+                ${specRow('Condition', condLabel)}
+                ${specRow('Mileage', mileageLabel)}
+                ${specRow('Edition', d.limited)}
+                ${specRow('Production', d.production)}
+            </div>
+            <div class="sr-sheet-section-label">Performance</div>
+            <div class="sr-sheet-specs-grid">
+                ${specRow('Power', unit.power)}
+                ${specRow('Torque', unit.torque)}
+                ${specRow('0 – 100 km/h', d.zeroToHundred)}
+                ${specRow('Top Speed', unit.topSpeed)}
+                ${specRow('Engine', d.engineFull, true)}
+            </div>
+            <div class="sr-sheet-section-label">Interior</div>
+            <div class="sr-sheet-specs-grid">
+                ${specRow('Seating', d.seating)}
+                ${specRow('Leather', d.leather)}
+                ${specRow('Audio', d.stereo)}
+                ${specRow('Heated Seats', d.heatedSeats)}
+                ${specRow('Cargo', d.cargo)}
+                ${specRow('Headlights', d.headlights)}
+                ${specRow('AI Systems', d.ai, true)}
+            </div>
+            ${d.funFact ? `<p class="sr-sheet-funfact">${d.funFact}</p>` : ''}`;
+
+        // Build sheet DOM
+        const sheet = document.createElement('div');
+        sheet.className = 'sr-sheet sr-sheet--collapsed';
+        sheet.innerHTML = `
+            <div class="sr-sheet-handle"></div>
+            <div class="sr-sheet-tabs">
+                <button class="sr-sheet-tab active" data-tab="overview">Overview</button>
+                <button class="sr-sheet-tab" data-tab="specs">Specs</button>
+                <button class="sr-sheet-tab" data-tab="docs">Docs</button>
+            </div>
+            <div class="sr-sheet-content">
+                <div class="sr-sheet-panel active" data-panel="overview"></div>
+                <div class="sr-sheet-panel" data-panel="specs">${specsHTML}</div>
+                <div class="sr-sheet-panel" data-panel="docs"></div>
+            </div>`;
+
+        document.body.appendChild(sheet);
+
+        // ── Populate Overview panel ─────────────────────────────────────────────
+        const overviewPanel = sheet.querySelector('[data-panel="overview"]');
+
+        // Key-stats grid — always visible, no layout dependencies
+        const highlights = [
+            unit.power        ? ['Power',        unit.power]        : null,
+            d.zeroToHundred   ? ['0 – 100 km/h', d.zeroToHundred]   : null,
+            unit.topSpeed     ? ['Top Speed',    unit.topSpeed]      : null,
+            d.engineFull      ? ['Engine',       d.engineFull]       : null,
+            unit.color        ? ['Colour',       unit.color]         : null,
+            ['Condition',       condLabel],
+            ['Mileage',         mileageLabel],
+        ].filter(Boolean);
+
+        overviewPanel.innerHTML = `
+            <div class="sr-sheet-specs-grid" style="margin-top:0.25rem">
+                ${highlights.map(([k, v]) => `
+                    <div class="sr-sheet-spec-row">
+                        <span class="sr-sheet-spec-label">${k}</span>
+                        <span class="sr-sheet-spec-val">${v}</span>
+                    </div>`).join('')}
+            </div>
+            ${d.funFact ? `<p class="sr-sheet-funfact">${d.funFact}</p>` : ''}`;
+
+        // Variant drum below highlights (optional — hidden if only one variant)
+        const origEl = document.getElementById('unit-selector');
+        if (origEl && unit.modelId) {
+            const clone = document.createElement('div');
+            clone.className = 'sr-unit-selector';
+            overviewPanel.appendChild(clone);
+            this._renderDrumSelectorInto(clone, unit.modelId, unit.id);
         }
 
-        const slides = [
-            {
-                top: { label: 'Identity', html: `<div class="sr-modal-grid">
-                    ${row('Manufacturer', d.manufacturer)}${row('Year', unit.year)}
-                    ${row('Colour', unit.color)}${row('Condition', condLabel)}
-                    ${row('Mileage', mileageLabel)}</div>` },
-                bot: { label: 'Performance', html: `<div class="sr-modal-grid">
-                    ${row('Power', unit.power)}${row('Torque', unit.torque)}
-                    ${row('0 – 100', d.zeroToHundred)}${row('Top Speed', unit.topSpeed)}
-                    ${row('Engine', d.engineFull)}</div>` }
-            },
-            {
-                top: { label: 'Interior', html: `<div class="sr-modal-grid">
-                    ${row('Seating', d.seating)}${row('Leather', d.leather)}
-                    ${row('Audio', d.stereo)}${row('Heated Seats', d.heatedSeats)}
-                    ${row('Cargo', d.cargo)}</div>` },
-                bot: { label: 'Technology', html: `<div class="sr-modal-grid">
-                    ${row('Headlights', d.headlights)}${row('AI Systems', d.ai)}
-                    </div>${d.funFact ? `<p class="sr-modal-funfact">${d.funFact}</p>` : ''}` }
-            }
-        ];
+        // ── Populate Docs panel with LACVIS + notes ─────────────────────────────
+        const docsPanel = sheet.querySelector('[data-panel="docs"]');
+        const lacvisWrap = document.createElement('div');
+        lacvisWrap.className = 'sr-lacvis';
+        lacvisWrap.id = 'sr-sheet-lacvis';
+        docsPanel.appendChild(lacvisWrap);
+        this._renderLACVISInto(lacvisWrap, unit);
+        lacvisWrap.style.display = '';
 
-        const hasExtra = certStatus || unit.notes;
-        if (hasExtra) {
-            const notesExcerpt = unit.notes
-                ? unit.notes.slice(0, 120) + (unit.notes.length > 120 ? '…' : '')
-                : '';
-            const certSlide = certStatus
-                ? { label: 'Certificate', html: `<div class="sr-modal-grid">
-                    ${row('LACVIS', certStatus)}
-                    ${unit.certificate ? row('Cert No.', unit.certificate.certNumber) : ''}
-                    ${unit.certificate ? row('Expires', new Date(unit.certificate.expiryDate).toLocaleDateString('en-GB', { month: 'short', year: 'numeric' })) : ''}
-                    </div>` }
-                : slides[0].top;
-            const notesSlide = notesExcerpt
-                ? { label: 'Seller Notes', html: `<p class="sr-modal-funfact">${notesExcerpt}</p>` }
-                : slides[1].bot;
-            slides.push({ top: certSlide, bot: notesSlide });
+        const notesWrap = document.createElement('div');
+        notesWrap.className = 'sr-notes';
+        notesWrap.id = 'sr-sheet-notes';
+        docsPanel.appendChild(notesWrap);
+        this._renderNotesInto(notesWrap, unit);
+        notesWrap.style.display = '';
+
+        // Show empty state in Docs if nothing available
+        const hasDoc = lacvisWrap.innerHTML.trim() || notesWrap.innerHTML.trim();
+        if (!hasDoc) {
+            docsPanel.insertAdjacentHTML('beforeend',
+                '<p class="sr-sheet-empty-docs">No documents on file for this vehicle.</p>');
         }
 
-        const topModal = document.createElement('div');
-        topModal.className = 'sr-modal sr-modal--top';
-        const botModal = document.createElement('div');
-        botModal.className = 'sr-modal sr-modal--bot';
-        document.body.appendChild(topModal);
-        document.body.appendChild(botModal);
+        // ── Tab switching ───────────────────────────────────────────────────────
+        sheet.querySelectorAll('.sr-sheet-tab').forEach(btn => {
+            btn.addEventListener('click', () => {
+                sheet.querySelectorAll('.sr-sheet-tab').forEach(t => t.classList.remove('active'));
+                sheet.querySelectorAll('.sr-sheet-panel').forEach(p => p.classList.remove('active'));
+                btn.classList.add('active');
+                sheet.querySelector(`[data-panel="${btn.dataset.tab}"]`).classList.add('active');
+                // Expand to half if still collapsed
+                if (sheet.classList.contains('sr-sheet--collapsed')) {
+                    sheet.classList.remove('sr-sheet--collapsed');
+                    sheet.classList.add('sr-sheet--half');
+                    document.body.classList.remove('sr-sheet-half', 'sr-sheet-full');
+                    document.body.classList.add('sr-sheet-half');
+                }
+            });
+        });
 
-        let idx = 0;
-        const show = () => {
-            const s = slides[idx];
-            topModal.innerHTML = `<div class="sr-modal-label">${s.top.label}</div>${s.top.html}`;
-            botModal.innerHTML = `<div class="sr-modal-label">${s.bot.label}</div>${s.bot.html}`;
-            topModal.classList.add('sr-modal--visible');
-            botModal.classList.add('sr-modal--visible');
+        // ── Drag logic ──────────────────────────────────────────────────────────
+        const handle = sheet.querySelector('.sr-sheet-handle');
+        const SNAP = { collapsed: 'sr-sheet--collapsed', half: 'sr-sheet--half', full: 'sr-sheet--full' };
+        let startY = 0, startTranslate = 0, currentTranslate = 0, lastTouchEnd = 0;
+
+        const getTranslate = () => {
+            if (sheet.classList.contains('sr-sheet--collapsed')) return window.innerHeight * 0.88 - 80;
+            if (sheet.classList.contains('sr-sheet--half'))      return window.innerHeight * 0.38;
+            return window.innerHeight * 0.12;
         };
 
-        show();
-        this._modalInterval = setInterval(() => {
-            topModal.classList.remove('sr-modal--visible');
-            botModal.classList.remove('sr-modal--visible');
-            setTimeout(() => { idx = (idx + 1) % slides.length; show(); }, 400);
-        }, 4500);
+        const snapTo = state => {
+            sheet.classList.remove('sr-sheet--dragging');
+            Object.values(SNAP).forEach(c => sheet.classList.remove(c));
+            sheet.classList.add(SNAP[state]);
+            sheet.style.transform = '';
+            document.body.classList.remove('sr-sheet-half', 'sr-sheet-full');
+            if (state !== 'collapsed') document.body.classList.add(`sr-sheet-${state}`);
+        };
+
+        handle.addEventListener('touchstart', e => {
+            startY = e.touches[0].clientY;
+            startTranslate = getTranslate();
+            sheet.classList.add('sr-sheet--dragging');
+        }, { passive: true });
+
+        handle.addEventListener('touchmove', e => {
+            const dy = e.touches[0].clientY - startY;
+            currentTranslate = Math.max(0, startTranslate + dy);
+            sheet.style.transform = `translateY(${currentTranslate}px)`;
+        }, { passive: true });
+
+        handle.addEventListener('touchend', e => {
+            lastTouchEnd = Date.now();
+            const dy = e.changedTouches[0].clientY - startY;
+            if (dy < -60) {
+                snapTo(sheet.classList.contains('sr-sheet--collapsed') ? 'half' : 'full');
+            } else if (dy > 60) {
+                snapTo(sheet.classList.contains('sr-sheet--full') ? 'half' : 'collapsed');
+            } else if (Math.abs(dy) < 10) {
+                // Tap: toggle open/closed
+                if (sheet.classList.contains('sr-sheet--collapsed')) snapTo('half');
+                else if (sheet.classList.contains('sr-sheet--half'))  snapTo('collapsed');
+            } else {
+                sheet.classList.remove('sr-sheet--dragging');
+                sheet.style.transform = '';
+            }
+        }, { passive: true });
+
+        // Mouse-only fallback; skip synthetic click that follows touchend
+        handle.addEventListener('click', () => {
+            if (Date.now() - lastTouchEnd < 500) return;
+            if (sheet.classList.contains('sr-sheet--collapsed')) snapTo('half');
+            else if (sheet.classList.contains('sr-sheet--half'))  snapTo('collapsed');
+        });
+    },
+
+    // ─── Render drum selector into a given container ──────────────────────────
+    _renderDrumSelectorInto(container, modelId, activeUnitId) {
+        if (!modelId || typeof INVENTORY === 'undefined') return;
+        // Reuse _renderDrumSelector logic but target custom container
+        const origId = 'unit-selector';
+        const orig = document.getElementById(origId);
+        // Temporarily swap target
+        if (orig) orig.id = '__unit-selector-hidden';
+        container.id = origId;
+        this._renderDrumSelector(modelId, activeUnitId);
+        container.id = 'sr-sheet-drum';
+        if (orig) orig.id = origId;
+    },
+
+    // ─── LACVIS render into arbitrary element ─────────────────────────────────
+    _renderLACVISInto(el, unit) {
+        const origId = document.getElementById('lacvis-block');
+        if (origId) origId.id = '__lacvis-hidden';
+        el.id = 'lacvis-block';
+        this._renderLACVIS(unit);
+        el.id = 'sr-sheet-lacvis';
+        if (origId) origId.id = 'lacvis-block';
+    },
+
+    // ─── Notes render into arbitrary element ─────────────────────────────────
+    _renderNotesInto(el, unit) {
+        const origId = document.getElementById('seller-notes');
+        if (origId) origId.id = '__notes-hidden';
+        el.id = 'seller-notes';
+        this._renderNotes(unit);
+        el.id = 'sr-sheet-notes';
+        if (origId) origId.id = 'seller-notes';
     },
 
     // ─── Helpers ──────────────────────────────────────────────────────────────
@@ -956,7 +1116,8 @@ var ShowroomPage = {
 
     _reset() {
         clearTimeout(this._drumNavTimer);
-        document.querySelectorAll('.sr-back, .sr-save, .sr-modal, .spec-panel--mobile').forEach(el => el.remove());
+        document.body.classList.remove('sr-sheet-half', 'sr-sheet-full');
+        document.querySelectorAll('.sr-back, .sr-save, .sr-sheet, .sr-gallery-dots, .spec-panel--mobile').forEach(el => el.remove());
         ['car-gallery', 'variant-selector', 'unit-selector', 'lacvis-block', 'seller-notes'].forEach(id => {
             const el = document.getElementById(id);
             if (el) { el.innerHTML = ''; el.style.display = 'none'; }
@@ -966,8 +1127,7 @@ var ShowroomPage = {
     },
 
     destroy() {
-        if (this._modalInterval) { clearInterval(this._modalInterval); this._modalInterval = null; }
-        document.querySelectorAll('.sr-modal').forEach(m => m.remove());
+        document.querySelectorAll('.sr-sheet, .sr-gallery-dots').forEach(el => el.remove());
         const player = document.querySelector('.music-player-pill');
         if (player && player.parentElement !== document.body) document.body.appendChild(player);
     }
