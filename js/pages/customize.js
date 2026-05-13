@@ -892,6 +892,14 @@ function resetConfig() {
     config.addons     = [];
     config.currentStep = 0;
     _initExtrasFromSpec(config.spec);
+
+    // Clear persisted config so it doesn't follow back to showroom
+    if (config.unitId) {
+        localStorage.removeItem(`faceoff_config_${config.unitId}`);
+    }
+    localStorage.removeItem('faceoff_last_config_summary');
+    localStorage.removeItem('faceoff_last_config_unitId');
+
     buildStepContent(0);
     applyAll();
 }
@@ -986,6 +994,11 @@ function init() {
     buildStepContent(0);
 
     startLoaderWave();
+    
+    // Show global pills
+    if (window.MusicPlayer) window.MusicPlayer.show();
+    if (window.FaceoffDrawer) window.FaceoffDrawer.show();
+
     loadModel(config.modelId);
 
     window.addEventListener('resize', onResize);
