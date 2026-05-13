@@ -5311,6 +5311,26 @@ body.page-compare .music-player-pill {
     border-bottom: 1px solid rgba(0, 0, 0, 0.06);
     flex-shrink: 0;
 }
+.cz-panel-header-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+}
+.cz-panel-back-btn {
+    background: none;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    font-family: var(--font-nav);
+    font-size: 0.65rem;
+    letter-spacing: 0.06em;
+    color: #777;
+    cursor: pointer;
+    padding: 0.3rem 0.65rem;
+    border-radius: 4px;
+    transition: color 0.15s, border-color 0.15s;
+    white-space: nowrap;
+    margin-top: 0.15rem;
+}
+.cz-panel-back-btn:hover { color: #111; border-color: #555; }
 
 .cz-panel-eyebrow {
     font-size: 0.62rem;

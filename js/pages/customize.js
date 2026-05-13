@@ -951,6 +951,10 @@ function init() {
         window.location.href = config.unitId ? `showroom.html?unit=${config.unitId}` : 'showroom.html';
     });
 
+    document.getElementById('cz-panel-back')?.addEventListener('click', () => {
+        window.location.href = config.unitId ? `showroom.html?unit=${config.unitId}` : 'showroom.html';
+    });
+
     document.getElementById('cz-reset')?.addEventListener('click', resetConfig);
 
     document.getElementById('cz-steps')?.querySelectorAll('.cz-step').forEach(btn => {
