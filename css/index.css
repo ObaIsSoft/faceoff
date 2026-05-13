@@ -4293,7 +4293,7 @@ body.showroom-light header.nav-top .nav-links a {
     }
     .showroom-identity { margin-top: auto; }
     /* Car + identity float above the ghost text layer */
-    .showroom-car        { z-index: 2; margin-top: 25dvh; }
+    .showroom-car        { z-index: 11; margin-top: 25dvh; }
     .showroom-identity   { z-index: 2; position: relative; }
     .showroom-meta-row   { z-index: 2; position: relative; }
     .showroom-cta        { z-index: 2; position: relative; }
@@ -4308,32 +4308,37 @@ body.showroom-light header.nav-top .nav-links a {
         top: 28%;
         left: 50%;
         transform: translateX(-50%);
-        z-index: 1;
+        z-index: 10;
         width: 100%;
         text-align: center;
         pointer-events: none;
         white-space: nowrap;
+        mix-blend-mode: difference;
     }
     .sr-ghost-label {
         font-family: var(--font-nav);
         font-size: 5vw;
         letter-spacing: 0.22em;
         text-transform: uppercase;
-        color: rgba(255,255,255,0.07);
+        color: rgba(255,255,255,0.3);
         display: block;
         text-align: left;
         padding-left: 6vw;
         line-height: 1;
         margin-bottom: 0.5em;
+        opacity: 0;
+        transition: opacity 0.7s ease;
     }
     .sr-ghost-num {
         font-family: var(--font-display);
         font-size: 92vw;
-        color: #fff;
+        color: rgba(255,255,255,0.08);
         line-height: 0.9;
         letter-spacing: -0.02em;
         display: block;
         text-align: center;
+        opacity: 0;
+        transition: opacity 0.4s ease;
     }
     .sr-ghost-int { font-size: 1em; }
     .sr-ghost-dec { font-size: 1em; vertical-align: 0; letter-spacing: 0; }

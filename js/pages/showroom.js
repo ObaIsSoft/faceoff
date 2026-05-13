@@ -310,8 +310,8 @@ var ShowroomPage = {
                     ghostEl.id        = 'sr-ghost-backdrop';
                     ghostEl.className = 'sr-ghost-backdrop';
                     ghostEl.innerHTML = `
-                        <span class="sr-ghost-label" style="opacity:0">${ghostLbl}</span>
-                        <span class="sr-ghost-num" style="opacity:0">
+                        <span class="sr-ghost-label">${ghostLbl}</span>
+                        <span class="sr-ghost-num">
                             <span class="sr-ghost-int">0</span><span class="sr-ghost-dec">${initDec}</span><span class="sr-ghost-suffix">${suffix}</span>
                         </span>`;
                     const center = document.querySelector('.showroom-center');
@@ -933,30 +933,75 @@ var ShowroomPage = {
     // ─── Ghost counter animation ──────────────────────────────────────────────
     _animateGhostCounter(unit) {
         const d    = unit.details || {};
-        const el   = document.getElementById('sr-ghost-num');
         const back = document.getElementById('sr-ghost-backdrop');
-        if (!el || !back) return;
+        if (!back) return;
+
+        const labelEl = back.querySelector('.sr-ghost-label');
+        const numEl   = back.querySelector('.sr-ghost-num');
+        const intEl   = back.querySelector('.sr-ghost-int');
+        const decEl   = back.querySelector('.sr-ghost-dec');
+        if (!numEl || !intEl) return;
+
+        // Determine which stat we're showing and extract target number
         const raw = d.zeroToHundred || unit.power || unit.topSpeed || '';
         const m   = raw.match(/([\d.]+)/);
         if (!m) return;
         const target  = parseFloat(m[1]);
-        const decimal = target < 30;
-        const dur     = 1400;
-        const t0      = performance.now();
-        back.style.opacity = '1';
-        const tick = now => {
-            const p = Math.min((now - t0) / dur, 1);
-            const e = 1 - Math.pow(1 - p, 3);
-            el.textContent = decimal ? (target * e).toFixed(1) : Math.round(target * e);
-            if (p < 1) { requestAnimationFrame(tick); return; }
-            setTimeout(() => {
-                const cl = document.getElementById('sr-chip-left');
-                const cr = document.getElementById('sr-chip-right');
-                if (cl) cl.classList.add('visible');
-                if (cr) cr.classList.add('visible');
-            }, 150);
-        };
-        requestAnimationFrame(tick);
+        const isTime  = !!d.zeroToHundred;
+        const decimal = target < 30 && raw.includes('.');
+
+        // Duration: 0-100 time uses actual value in ms (e.g. 4.5 → 4500ms),
+        // power/speed uses a fixed 2s
+        const dur = isTime ? Math.min(target * 1000, 8000) : 2000;
+
+        // easeOutQuint: fast burst at start, decelerates hard at the end
+        const ease = t => 1 - Math.pow(1 - t, 5);
+
+        // Step 1: Fade in the label (CSS transition: 700ms)
+        if (labelEl) labelEl.style.opacity = '1';
+
+        // Step 2: After 450ms, fade in number and start counter
+        setTimeout(() => {
+            numEl.style.opacity = '1';
+
+            const t0 = performance.now();
+            const alphaStart = 0.08;
+            const alphaEnd   = 1.0;
+            const tick = now => {
+                const p = Math.min((now - t0) / dur, 1);
+                const e = ease(p);
+                const current = target * e;
+
+                // Interpolate color: gray → white as counter progresses
+                const alpha = alphaStart + (alphaEnd - alphaStart) * e;
+                numEl.style.color = `rgba(255,255,255,${alpha.toFixed(3)})`;
+
+                // Update span contents (preserves structure)
+                if (decimal) {
+                    const val = current.toFixed(1);
+                    const [whole, frac] = val.split('.');
+                    intEl.textContent = whole;
+                    if (decEl) decEl.textContent = '.' + frac;
+                } else {
+                    intEl.textContent = Math.round(current);
+                    if (decEl) decEl.textContent = '';
+                }
+
+                if (p < 1) {
+                    requestAnimationFrame(tick);
+                    return;
+                }
+
+                // Counter landed — show chips after 200ms
+                setTimeout(() => {
+                    const cl = document.getElementById('sr-chip-left');
+                    const cr = document.getElementById('sr-chip-right');
+                    if (cl) cl.classList.add('visible');
+                    if (cr) cr.classList.add('visible');
+                }, 200);
+            };
+            requestAnimationFrame(tick);
+        }, 450);
     },
 
     // ─── Mobile bottom sheet ──────────────────────────────────────────────────
