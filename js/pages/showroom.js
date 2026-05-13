@@ -942,7 +942,10 @@ var ShowroomPage = {
             <div class="sp-row sp-row--block"><span class="sp-label">AI Systems</span><span class="sp-val">${d.ai || ''}</span></div>
             <div class="sp-divider"></div>
             <div class="sp-section-label">Fun Fact</div>
-            <p class="sp-funfact">${d.funFact || ''}</p>`;
+            <p class="sp-funfact">${d.funFact || ''}</p>
+            <div class="sp-read-more-wrapper">
+                <a href="article.html?unit=${unit.id}" class="sr-read-more sr-read-more--desktop" aria-label="Learn more about this vehicle">Learn more...</a>
+            </div>`;
     },
 
     // ─── LACVIS block ─────────────────────────────────────────────────────────
@@ -1040,6 +1043,14 @@ var ShowroomPage = {
             if (typeof FaceoffDrawer !== 'undefined') { FaceoffDrawer.toggle(unitId); update(); }
         });
         cta.appendChild(saveBtn);
+        
+        // Render mobile "Learn more" next to save button
+        const learnBtn = document.createElement('a');
+        learnBtn.href = `article.html?unit=${unitId}`;
+        learnBtn.className = 'sr-read-more sr-read-more--mobile';
+        learnBtn.textContent = 'Learn more...';
+        cta.appendChild(learnBtn);
+
         update();
     },
 

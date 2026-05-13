@@ -60,7 +60,7 @@ var Router = {
         // 1. Show/Hide Persistent Nav
         const nav = document.getElementById('persistent-nav');
         if (nav) {
-            nav.style.display = (path === 'index.html') ? 'none' : 'flex';
+            nav.style.display = (path === 'index.html' || path === 'article.html') ? 'none' : 'flex';
         }
 
         // 2. Cleanup old page
@@ -145,6 +145,8 @@ var Router = {
             window.currentPage = window.ContactPage;
         } else if (path === 'about.html') {
             window.currentPage = window.AboutPage;
+        } else if (path === 'article.html') {
+            window.currentPage = window.ArticlePage;
         } else if (path === 'index.html') {
             window.currentPage = {
                 init: () => {
