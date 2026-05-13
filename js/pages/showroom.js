@@ -277,8 +277,47 @@ var ShowroomPage = {
             const configSummaryEarly = localStorage.getItem('faceoff_last_config_summary');
             const configUnitIdEarly  = localStorage.getItem('faceoff_last_config_unitId');
             const isConfiguredEarly  = !!(configSummaryEarly && configUnitIdEarly === unit.id);
-            display.innerHTML = `<img src="${unit.img}" alt="${unit.name}" style="width:100%;object-fit:contain;">` + (isConfiguredEarly ? `<div id="config-badge" class="sr-config-badge"><div class="sr-config-header"><span class="sr-config-dot"></span><span class="sr-config-label">Configured</span></div><span class="sr-config-summary">${configSummaryEarly}</span><a href="customize.html?unit=${unit.id}" class="sr-config-edit">Edit</a></div>` : '<div id="config-badge" class="sr-config-badge" style="display:none"></div>');
+            const isMobile = window.innerWidth <= 768;
+            const dEarly   = unit.details || {};
+            const leftChipHtml  = (isMobile && unit.power)    ? `<div class="sr-stat-chip sr-stat-chip--left" id="sr-chip-left"><span class="sr-chip-label">Power</span><span class="sr-chip-val">${unit.power}</span></div>` : '';
+            const rightChipHtml = (isMobile && unit.topSpeed) ? `<div class="sr-stat-chip sr-stat-chip--right" id="sr-chip-right"><span class="sr-chip-label">Top Speed</span><span class="sr-chip-val">${unit.topSpeed}</span></div>` : '';
+            display.innerHTML =
+                leftChipHtml + rightChipHtml +
+                `<img src="${unit.img}" alt="${unit.name}" style="width:100%;object-fit:contain;">` +
+                (isConfiguredEarly ? `<div id="config-badge" class="sr-config-badge"><div class="sr-config-header"><span class="sr-config-dot"></span><span class="sr-config-label">Configured</span></div><span class="sr-config-summary">${configSummaryEarly}</span><a href="customize.html?unit=${unit.id}" class="sr-config-edit">Edit</a></div>` : '<div id="config-badge" class="sr-config-badge" style="display:none"></div>');
             if (unit.facesRight === false) display.classList.add('flipped');
+
+            // Ghost backdrop injected into .showroom-center (bleeds behind car)
+            if (isMobile) {
+                document.querySelector('.sr-ghost-backdrop')?.remove();
+                let ghostVal = '', ghostLbl = '';
+                if (dEarly.zeroToHundred) {
+                    ghostVal = dEarly.zeroToHundred;   // e.g. "4.5s"
+                    ghostLbl = '0 — 100';
+                } else if (unit.power) {
+                    ghostVal = unit.power;              // e.g. "585 hp"
+                    ghostLbl = 'Power';
+                } else if (unit.topSpeed) {
+                    ghostVal = unit.topSpeed;
+                    ghostLbl = 'Top Speed';
+                }
+                if (ghostVal) {
+                    const numMatch    = ghostVal.match(/^([\d]+)(\.\d+)?(.*)/);
+                    const isDecimalV  = numMatch && parseFloat(numMatch[1] + (numMatch[2] || '')) < 30;
+                    const suffix      = numMatch ? (numMatch[3] || '').trim() : '';
+                    const initDec     = (isDecimalV && numMatch[2]) ? '.0' : '';
+                    const ghostEl     = document.createElement('div');
+                    ghostEl.id        = 'sr-ghost-backdrop';
+                    ghostEl.className = 'sr-ghost-backdrop';
+                    ghostEl.innerHTML = `
+                        <span class="sr-ghost-label" style="opacity:0">${ghostLbl}</span>
+                        <span class="sr-ghost-num" style="opacity:0">
+                            <span class="sr-ghost-int">0</span><span class="sr-ghost-dec">${initDec}</span><span class="sr-ghost-suffix">${suffix}</span>
+                        </span>`;
+                    const center = document.querySelector('.showroom-center');
+                    if (center) center.appendChild(ghostEl);
+                }
+            }
         }
 
         // Gallery
@@ -301,7 +340,18 @@ var ShowroomPage = {
         const nameEl  = document.getElementById('car-name');
         const condEl  = document.getElementById('car-condition');
         const priceEl = document.getElementById('car-price');
-        if (nameEl)  nameEl.textContent = unit.name;
+        if (nameEl) {
+            nameEl.textContent = unit.name;
+            let trimEl = document.getElementById('sr-trim-label');
+            if (!trimEl) {
+                trimEl = document.createElement('span');
+                trimEl.id = 'sr-trim-label';
+                trimEl.className = 'sr-trim-label';
+                nameEl.insertAdjacentElement('afterend', trimEl);
+            }
+            trimEl.textContent = unit.trim || '';
+            trimEl.style.display = unit.trim ? '' : 'none';
+        }
         if (priceEl) priceEl.textContent = this.formatPrice(unit.price);
         if (condEl) {
             if (unit.condition === 'used') {
@@ -378,6 +428,11 @@ var ShowroomPage = {
 
         // Mobile bottom sheet
         if (window.innerWidth <= 768) this._buildSheet(unit);
+
+        // Ghost counter animation (mobile only)
+        if (window.innerWidth <= 768) {
+            setTimeout(() => this._animateGhostCounter(unit), 500);
+        }
     },
 
     // ─── Gallery ───────────────────────────────────────────────────────────────
@@ -875,6 +930,35 @@ var ShowroomPage = {
         update();
     },
 
+    // ─── Ghost counter animation ──────────────────────────────────────────────
+    _animateGhostCounter(unit) {
+        const d    = unit.details || {};
+        const el   = document.getElementById('sr-ghost-num');
+        const back = document.getElementById('sr-ghost-backdrop');
+        if (!el || !back) return;
+        const raw = d.zeroToHundred || unit.power || unit.topSpeed || '';
+        const m   = raw.match(/([\d.]+)/);
+        if (!m) return;
+        const target  = parseFloat(m[1]);
+        const decimal = target < 30;
+        const dur     = 1400;
+        const t0      = performance.now();
+        back.style.opacity = '1';
+        const tick = now => {
+            const p = Math.min((now - t0) / dur, 1);
+            const e = 1 - Math.pow(1 - p, 3);
+            el.textContent = decimal ? (target * e).toFixed(1) : Math.round(target * e);
+            if (p < 1) { requestAnimationFrame(tick); return; }
+            setTimeout(() => {
+                const cl = document.getElementById('sr-chip-left');
+                const cr = document.getElementById('sr-chip-right');
+                if (cl) cl.classList.add('visible');
+                if (cr) cr.classList.add('visible');
+            }, 150);
+        };
+        requestAnimationFrame(tick);
+    },
+
     // ─── Mobile bottom sheet ──────────────────────────────────────────────────
     _buildSheet(unit) {
         document.querySelector('.sr-sheet')?.remove();
@@ -943,26 +1027,39 @@ var ShowroomPage = {
         // ── Populate Overview panel ─────────────────────────────────────────────
         const overviewPanel = sheet.querySelector('[data-panel="overview"]');
 
-        // Key-stats grid — always visible, no layout dependencies
-        const highlights = [
-            unit.power        ? ['Power',        unit.power]        : null,
-            d.zeroToHundred   ? ['0 – 100 km/h', d.zeroToHundred]   : null,
-            unit.topSpeed     ? ['Top Speed',    unit.topSpeed]      : null,
-            d.engineFull      ? ['Engine',       d.engineFull]       : null,
-            unit.color        ? ['Colour',       unit.color]         : null,
-            ['Condition',       condLabel],
-            ['Mileage',         mileageLabel],
+        const heroStats = [
+            unit.power      ? { label: 'Power',   val: unit.power }      : null,
+            d.zeroToHundred ? { label: '0 – 100', val: d.zeroToHundred } : null,
+            unit.topSpeed   ? { label: 'Top Spd', val: unit.topSpeed }   : null,
+        ].filter(Boolean);
+
+        const secondaryStats = [
+            d.engineFull ? ['Engine',    d.engineFull] : null,
+            unit.color   ? ['Colour',    unit.color]   : null,
+            ['Condition',  condLabel],
+            ['Mileage',    mileageLabel],
         ].filter(Boolean);
 
         overviewPanel.innerHTML = `
-            <div class="sr-sheet-specs-grid" style="margin-top:0.25rem">
-                ${highlights.map(([k, v]) => `
+            ${heroStats.length ? `
+            <div class="sr-sheet-hero-stats">
+                ${heroStats.map(s => `
+                    <div class="sr-sheet-hero-stat">
+                        <span class="sr-sheet-hero-label">${s.label}</span>
+                        <span class="sr-sheet-hero-val">${s.val}</span>
+                    </div>`).join('')}
+            </div>` : ''}
+            <div class="sr-sheet-specs-grid" style="margin-top:${heroStats.length ? '0.75rem' : '0.25rem'}">
+                ${secondaryStats.map(([k, v]) => `
                     <div class="sr-sheet-spec-row">
                         <span class="sr-sheet-spec-label">${k}</span>
                         <span class="sr-sheet-spec-val">${v}</span>
                     </div>`).join('')}
             </div>
-            ${d.funFact ? `<p class="sr-sheet-funfact">${d.funFact}</p>` : ''}`;
+            ${d.funFact ? `
+            <div class="sr-sheet-funfact-pull">
+                <p>${d.funFact}</p>
+            </div>` : ''}`;
 
         // Variant drum below highlights (optional — hidden if only one variant)
         const origEl = document.getElementById('unit-selector');
@@ -1117,7 +1214,7 @@ var ShowroomPage = {
     _reset() {
         clearTimeout(this._drumNavTimer);
         document.body.classList.remove('sr-sheet-half', 'sr-sheet-full');
-        document.querySelectorAll('.sr-back, .sr-save, .sr-sheet, .sr-gallery-dots, .spec-panel--mobile').forEach(el => el.remove());
+        document.querySelectorAll('.sr-back, .sr-save, .sr-sheet, .sr-gallery-dots, .spec-panel--mobile, .sr-ghost-backdrop').forEach(el => el.remove());
         ['car-gallery', 'variant-selector', 'unit-selector', 'lacvis-block', 'seller-notes'].forEach(id => {
             const el = document.getElementById(id);
             if (el) { el.innerHTML = ''; el.style.display = 'none'; }

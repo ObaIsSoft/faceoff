@@ -3074,6 +3074,7 @@ body.showroom-light header.nav-top .nav-links a {
 .showroom-car {
     max-height: 52vh;
     width: 100%;
+    position: relative;
 }
 .showroom-car img {
     max-height: 52vh;
@@ -3115,6 +3116,16 @@ body.showroom-light header.nav-top .nav-links a {
 
 /* ── Identity block ── */
 .showroom-identity { text-align: center; line-height: 1; }
+
+.sr-trim-label {
+    display: block;
+    font-family: var(--font-nav);
+    font-size: 0.5rem;
+    letter-spacing: 0.28em;
+    text-transform: uppercase;
+    color: rgba(212, 175, 55, 0.7);
+    margin-top: 0.15rem;
+}
 
 .showroom-brand-logo {
     display: block;
@@ -4263,27 +4274,100 @@ body.showroom-light header.nav-top .nav-links a {
     }
     /* Hide static spec panels — content lives in the bottom sheet */
     .spec-panel              { display: none !important; }
-    /* Upper zone: car + identity + CTAs, vertically centered */
+    /* Upper zone: car anchors top, identity + CTAs sink to bottom */
     .showroom-center {
         display: flex;
         flex-direction: column;
         align-items: center;
         text-align: center;
         gap: 0.35rem;
-        z-index: 1;
-        overflow-y: visible;
+        overflow: hidden;
         max-height: none;
         width: 100%;
         height: calc(100dvh - 80px);
-        justify-content: center;
-        padding: 3.2rem 1.25rem 0;
+        justify-content: flex-start;
+        padding: 3.2rem 1.25rem 4.5rem;
         transition: height 0.38s cubic-bezier(0.32, 0, 0.67, 0);
+        position: relative;
+        isolation: isolate;
     }
+    .showroom-identity { margin-top: auto; }
+    /* Car + identity float above the ghost text layer */
+    .showroom-car        { z-index: 2; margin-top: 25dvh; }
+    .showroom-identity   { z-index: 2; position: relative; }
+    .showroom-meta-row   { z-index: 2; position: relative; }
+    .showroom-cta        { z-index: 2; position: relative; }
     /* Push car up as sheet opens */
     body.sr-sheet-half .showroom-center  { height: 56dvh; padding-top: 2.5rem; }
     body.sr-sheet-full .showroom-center  { height: 24dvh; padding-top: 2rem; }
     .showroom-car            { width: 92vw; max-width: 380px; max-height: 46vw; }
     .showroom-car img        { max-height: 46vw; }
+    /* Ghost stat backdrop — sits in .showroom-center, bleeds behind car */
+    .sr-ghost-backdrop {
+        position: absolute;
+        top: 28%;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1;
+        width: 100%;
+        text-align: center;
+        pointer-events: none;
+        white-space: nowrap;
+    }
+    .sr-ghost-label {
+        font-family: var(--font-nav);
+        font-size: 5vw;
+        letter-spacing: 0.22em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.07);
+        display: block;
+        text-align: left;
+        padding-left: 6vw;
+        line-height: 1;
+        margin-bottom: 0.5em;
+    }
+    .sr-ghost-num {
+        font-family: var(--font-display);
+        font-size: 92vw;
+        color: #fff;
+        line-height: 0.9;
+        letter-spacing: -0.02em;
+        display: block;
+        text-align: center;
+    }
+    .sr-ghost-int { font-size: 1em; }
+    .sr-ghost-dec { font-size: 1em; vertical-align: 0; letter-spacing: 0; }
+    .sr-ghost-suffix { font-size: 0.45em; vertical-align: 0.12em; letter-spacing: 0; }
+    /* Floating performance chips */
+    .sr-stat-chip {
+        position: absolute;
+        top: 40%;
+        transform: translateY(-50%);
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.1rem;
+        opacity: 0;
+        transition: opacity 0.6s ease;
+        pointer-events: none;
+    }
+    .sr-stat-chip--left  { left: 0.4rem; }
+    .sr-stat-chip--right { right: 0.4rem; }
+    .sr-stat-chip.visible { opacity: 1; }
+    .sr-chip-label {
+        font-family: var(--font-nav);
+        font-size: 0.3rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.28);
+    }
+    .sr-chip-val {
+        font-family: var(--font-nav);
+        font-size: 0.54rem;
+        font-weight: 700;
+        color: rgba(255,255,255,0.65);
+    }
     .showroom-brand-logo     { width: 22px; height: 22px; margin-bottom: 0.3rem; opacity: 0.5; }
     .showroom-title          { font-size: clamp(1.3rem, 5vw, 1.8rem) !important; margin-top: 0.1rem; }
     .showroom-price          { font-size: 0.82rem !important; opacity: 0.65; margin-bottom: 0; }
@@ -4310,20 +4394,27 @@ body.showroom-light header.nav-top .nav-links a {
         white-space: nowrap;
     }
     .showroom-cta .sr-save {
-        position: absolute;
-        top: 0.55rem;
-        right: 1.25rem;
-        width: 38px !important;
-        height: 38px !important;
+        position: fixed;
+        top: 3.6rem;
+        right: 1rem;
+        z-index: 30;
+        width: 40px !important;
+        height: 40px !important;
         flex: none !important;
         padding: 0 !important;
         margin: 0 !important;
         display: flex !important;
         align-items: center;
         justify-content: center;
-        background: rgba(255,255,255,0.06);
-        border: 1px solid rgba(255,255,255,0.12);
-        border-radius: 6px;
+        background: rgba(10,10,10,0.7);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255,255,255,0.14);
+        border-radius: 8px;
+    }
+    body.sr-sheet-full .showroom-cta .sr-save {
+        opacity: 0 !important;
+        pointer-events: none !important;
     }
     /* Gallery dots */
     .showroom-gallery        { display: none !important; }
@@ -4470,6 +4561,49 @@ body.showroom-light header.nav-top .nav-links a {
         color: rgba(255,255,255,0.4);
         line-height: 1.7;
         margin: 0.6rem 0 0;
+    }
+    /* Overview hero stat blocks */
+    .sr-sheet-hero-stats {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 0.35rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid rgba(255,255,255,0.07);
+    }
+    .sr-sheet-hero-stat {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+        gap: 0.18rem;
+    }
+    .sr-sheet-hero-label {
+        font-family: var(--font-nav);
+        font-size: 0.33rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: rgba(255,255,255,0.28);
+    }
+    .sr-sheet-hero-val {
+        font-family: var(--font-nav);
+        font-size: 0.88rem;
+        font-weight: 700;
+        color: #fff;
+        line-height: 1.1;
+    }
+    /* Fun fact as pull-quote */
+    .sr-sheet-funfact-pull {
+        margin-top: 1rem;
+        padding-left: 0.65rem;
+        border-left: 2px solid rgba(212, 175, 55, 0.45);
+    }
+    .sr-sheet-funfact-pull p {
+        font-family: var(--font-nav);
+        font-size: 0.52rem;
+        font-style: italic;
+        color: rgba(255,255,255,0.45);
+        line-height: 1.7;
+        margin: 0;
     }
     .sr-sheet-empty-docs {
         font-family: var(--font-nav);
@@ -4926,6 +5060,14 @@ body.page-compare .music-player-pill {
         pointer-events: none !important;
         transform: translateY(10px) !important;
         transition: opacity 0.25s ease, transform 0.25s ease !important;
+    }
+    /* Fade ghost + chips when sheet opens */
+    body.sr-sheet-half .sr-ghost-backdrop,
+    body.sr-sheet-full .sr-ghost-backdrop,
+    body.sr-sheet-half .sr-stat-chip,
+    body.sr-sheet-full .sr-stat-chip {
+        opacity: 0 !important;
+        transition: opacity 0.25s ease !important;
     }
     .music-player-pill {
         bottom: 1rem;
