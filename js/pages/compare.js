@@ -30,22 +30,27 @@ function _hslToRgb(h, s, l) {
     return [hue2rgb(p,q,h+1/3), hue2rgb(p,q,h), hue2rgb(p,q,h-1/3)].map(v => Math.round(v * 255));
 }
 
-const PAINT_SWATCHES = [
-    { id: 'stock',  label: 'Stock',         css: null,      mode: 'reset' },
-    { id: 'white',  label: 'Pearl White',   css: '#f2f0eb', mode: 'white' },
-    { id: 'black',  label: 'Gloss Black',   css: '#111111', mode: 'black' },
-    { id: 'red',    label: 'Racing Red',    css: '#c41a1a', mode: 'hue', hue: 5   },
-    { id: 'purple', label: 'Royal Purple',  css: '#5e2394', mode: 'hue', hue: 272 },
-    { id: 'blue',   label: 'Midnight Blue', css: '#1a2860', mode: 'hue', hue: 222 },
-    { id: 'green',  label: 'Forest Green',  css: '#1a5c2a', mode: 'hue', hue: 138 },
-    { id: 'gold',   label: 'Champagne',     css: '#b8962e', mode: 'hue', hue: 44  },
-];
+function _hexToHsl(hex) {
+    hex = hex.replace('#', '');
+    if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    return _rgbToHsl(r, g, b);
+}
 
 const DEFAULT_PAINT_PROFILE = { bodyLightnessRange: [8, 90], usesAlphaMask: false, saturationBoost: 60 };
 
 if (!window.ComparePage) {
 var ComparePage = {
     stacks: { left: null, right: null },
+
+    resolveSpec(modelId) {
+        if ((window.MODEL_SPECS || {})[modelId]) return window.MODEL_SPECS[modelId];
+        const model = (window.MODELS || {})[modelId];
+        if (!model || !model.specProfile) return null;
+        return (window.CUSTOM_SPEC_PROFILES || {})[model.specProfile] || null;
+    },
 
     init() {
         document.body.classList.add('compare-page');
@@ -464,37 +469,83 @@ class CarStack {
             this._origData    = ctx.getImageData(0, 0, W, H);
             this._paintCanvas = canvas;
             this._paintCtx    = ctx;
+            this._addSwatches(fgItem, car);
         };
 
         if (img.complete && img.naturalWidth > 0) doSetup();
         else img.addEventListener('load', doSetup, { once: true });
-
-        this._addSwatches(fgItem);
     }
 
-    _addSwatches(fgItem) {
+    _addSwatches(fgItem, fgCar) {
         fgItem.querySelector('.paint-swatches')?.remove();
+        
+        const spec = ComparePage.resolveSpec(fgCar.modelId);
+        let paintOptions = [];
+        
+        if (spec && spec.exterior && spec.exterior.paint && spec.exterior.paint.options) {
+            paintOptions = spec.exterior.paint.options;
+        }
+
+        if (paintOptions.length === 0) return;
+
         const row = document.createElement('div');
         row.className = 'paint-swatches';
+        
+        let savedOpt = null;
+        try {
+            const existing = JSON.parse(localStorage.getItem(`faceoff_config_${fgCar.id}`) || '{}');
+            if (existing.paint) savedOpt = existing.paint.id;
+        } catch (e) {}
 
-        PAINT_SWATCHES.forEach(sw => {
+        const savePaintState = (opt) => {
+            try {
+                const key = `faceoff_config_${fgCar.id}`;
+                const existing = JSON.parse(localStorage.getItem(key) || '{}');
+                if (opt === null) {
+                    delete existing.paint;
+                } else {
+                    existing.paint = opt;
+                }
+                localStorage.setItem(key, JSON.stringify(existing));
+            } catch (e) {}
+        };
+
+        // Add reset swatch first
+        const resetBtn = document.createElement('button');
+        resetBtn.className = 'paint-swatch paint-swatch--reset';
+        if (!savedOpt) resetBtn.classList.add('active');
+        resetBtn.title = 'Stock';
+        resetBtn.setAttribute('aria-label', 'Stock');
+        resetBtn.textContent = '↺';
+        resetBtn.addEventListener('click', e => {
+            e.stopPropagation();
+            row.querySelectorAll('.paint-swatch').forEach(b => b.classList.remove('active'));
+            resetBtn.classList.add('active');
+            this._applyPaint({ mode: 'reset' });
+            savePaintState(null);
+        });
+        row.appendChild(resetBtn);
+
+        paintOptions.forEach(opt => {
             const btn = document.createElement('button');
-            btn.className = 'paint-swatch' + (sw.mode === 'reset' ? ' active' : '');
-            btn.title = sw.label;
-            btn.setAttribute('aria-label', sw.label);
-            if (sw.mode === 'reset') {
-                btn.classList.add('paint-swatch--reset');
-                btn.textContent = '↺';
-            } else {
-                btn.style.background = sw.css;
-            }
+            btn.className = 'paint-swatch';
+            if (savedOpt === opt.id) btn.classList.add('active');
+            btn.title = opt.label;
+            btn.setAttribute('aria-label', opt.label);
+            btn.style.background = opt.hex;
+            
             btn.addEventListener('click', e => {
                 e.stopPropagation();
                 row.querySelectorAll('.paint-swatch').forEach(b => b.classList.remove('active'));
                 btn.classList.add('active');
-                this._applyPaint(sw);
+                this._applyPaint({ mode: 'hex', hex: opt.hex });
+                savePaintState(opt);
             });
             row.appendChild(btn);
+            
+            if (savedOpt === opt.id) {
+                this._applyPaint({ mode: 'hex', hex: opt.hex });
+            }
         });
 
         const label = fgItem.querySelector('.depth-label');
@@ -531,17 +582,20 @@ class CarStack {
 
             let newH = h, newS = s, newL = l;
 
-            if (swatch.mode === 'hue') {
-                newH = swatch.hue;
-                // grey/silver body (low sat) — push saturation up so the hue is visible
-                if (s < 20) newS = Math.max(s, satBoost * 0.6);
-                if (useAlpha && s < 8) newS = satBoost;
-            } else if (swatch.mode === 'white') {
-                newS = s * 0.12;
-                newL = l + (95 - l) * 0.78;
-            } else if (swatch.mode === 'black') {
-                newS = s * 0.25;
-                newL = l * 0.22;
+            if (swatch.mode === 'hex') {
+                const [sh, ss, sl] = _hexToHsl(swatch.hex);
+                
+                if (sl > 85 && ss < 15) { // 'white'
+                    newS = s * 0.12;
+                    newL = l + (95 - l) * 0.78;
+                } else if (sl < 15) { // 'black'
+                    newS = s * 0.25;
+                    newL = l * 0.22;
+                } else { // 'hue'
+                    newH = sh;
+                    if (s < 20) newS = Math.max(s, satBoost * 0.6);
+                    if (useAlpha && s < 8) newS = satBoost;
+                }
             }
 
             const [nr, ng, nb] = _hslToRgb(newH, newS, newL);

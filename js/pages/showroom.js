@@ -1,3 +1,110 @@
+// ─── Paint Colour Preview (Showroom Hero) ─────────────────────────────────────
+function _rgbToHsl(r, g, b) {
+    r /= 255; g /= 255; b /= 255;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h = 0, s = 0, l = (max + min) / 2;
+    if (max !== min) {
+        const d = max - min;
+        s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
+        switch (max) {
+            case r: h = ((g - b) / d + (g < b ? 6 : 0)) / 6; break;
+            case g: h = ((b - r) / d + 2) / 6; break;
+            case b: h = ((r - g) / d + 4) / 6; break;
+        }
+    }
+    return [h * 360, s * 100, l * 100];
+}
+function _hslToRgb(h, s, l) {
+    h /= 360; s /= 100; l /= 100;
+    if (s === 0) { const v = Math.round(l * 255); return [v, v, v]; }
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s;
+    const p = 2 * l - q;
+    const hue2rgb = (p, q, t) => {
+        if (t < 0) t += 1; if (t > 1) t -= 1;
+        if (t < 1/6) return p + (q - p) * 6 * t;
+        if (t < 1/2) return q;
+        if (t < 2/3) return p + (q - p) * (2/3 - t) * 6;
+        return p;
+    };
+    return [hue2rgb(p,q,h+1/3), hue2rgb(p,q,h), hue2rgb(p,q,h-1/3)].map(v => Math.round(v * 255));
+}
+function _hexToHsl(hex) {
+    hex = hex.replace('#', '');
+    if (hex.length === 3) hex = hex.split('').map(c => c + c).join('');
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    return _rgbToHsl(r, g, b);
+}
+
+function applyHeroPaint(imgEl, unit) {
+    try {
+        const existing = JSON.parse(localStorage.getItem(`faceoff_config_${unit.id}`) || '{}');
+        if (!existing.paint) return; // No custom paint saved
+        
+        const opt = existing.paint;
+        const model = (window.MODELS || {})[unit.modelId];
+        const profile = model?.paintProfile || { bodyLightnessRange: [8, 90], usesAlphaMask: false, saturationBoost: 60 };
+        
+        const W = imgEl.naturalWidth || 400;
+        const H = imgEl.naturalHeight || 300;
+        const canvas = document.createElement('canvas');
+        canvas.className = imgEl.className;
+        canvas.style.cssText = imgEl.style.cssText;
+        canvas.width = W;
+        canvas.height = H;
+        
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        ctx.drawImage(imgEl, 0, 0, W, H);
+        const origData = ctx.getImageData(0, 0, W, H);
+        const copy = new ImageData(new Uint8ClampedArray(origData.data), W, H);
+        const d = copy.data;
+        const orig = origData.data;
+        
+        const [loL, hiL] = profile.bodyLightnessRange;
+        const useAlpha = profile.usesAlphaMask;
+        const satBoost = profile.saturationBoost;
+        
+        const [sh, ss, sl] = _hexToHsl(opt.hex);
+        
+        for (let i = 0; i < d.length; i += 4) {
+            const a = orig[i + 3];
+            if (a < 50) continue; 
+            
+            const r = orig[i], g = orig[i+1], b = orig[i+2];
+            const [h, s, l] = _rgbToHsl(r, g, b);
+            
+            if (l > 87 && s < 12) continue; 
+            if (l < loL || l > hiL) continue; 
+            if (!useAlpha && s < 3) continue; 
+            
+            let newH = h, newS = s, newL = l;
+            
+            if (sl > 85 && ss < 15) { // white
+                newS = s * 0.12;
+                newL = l + (95 - l) * 0.78;
+            } else if (sl < 15) { // black
+                newS = s * 0.25;
+                newL = l * 0.22;
+            } else { // hue
+                newH = sh;
+                if (s < 20) newS = Math.max(s, satBoost * 0.6);
+                if (useAlpha && s < 8) newS = satBoost;
+            }
+            
+            const [nr, ng, nb] = _hslToRgb(newH, newS, newL);
+            d[i] = nr; d[i+1] = ng; d[i+2] = nb;
+        }
+        
+        ctx.putImageData(copy, 0, 0);
+        // Replace image with canvas in DOM
+        if (imgEl.parentNode) {
+            imgEl.parentNode.replaceChild(canvas, imgEl);
+        }
+    } catch(e) {
+        console.error('Failed to apply paint to hero', e);
+    }
+}
 
 if (!window.DrumWheel) {
 // Direct port of jquery.drum.js + jquery.watch-drag.js to vanilla JS.
@@ -286,6 +393,12 @@ var ShowroomPage = {
                 `<img src="${unit.img}" alt="${unit.name}" style="width:100%;object-fit:contain;">` +
                 (isConfiguredEarly ? `<div id="config-badge" class="sr-config-badge"><div class="sr-config-header"><span class="sr-config-dot"></span><span class="sr-config-label">Configured</span></div><span class="sr-config-summary">${configSummaryEarly}</span><a href="customize.html?unit=${unit.id}" class="sr-config-edit">Edit</a></div>` : '<div id="config-badge" class="sr-config-badge" style="display:none"></div>');
             if (unit.facesRight === false) display.classList.add('flipped');
+
+            const heroImg = display.querySelector('img');
+            if (heroImg) {
+                if (heroImg.complete && heroImg.naturalWidth > 0) applyHeroPaint(heroImg, unit);
+                else heroImg.addEventListener('load', () => applyHeroPaint(heroImg, unit), { once: true });
+            }
 
             // Ghost backdrop injected into .showroom-center (bleeds behind car)
             if (isMobile) {
