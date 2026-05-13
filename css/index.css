@@ -4315,14 +4315,14 @@ body.showroom-light header.nav-top .nav-links a {
         width: 100%;
         height: calc(100dvh - 80px);
         justify-content: flex-start;
-        padding: 3.2rem 1.25rem 4.5rem;
+        padding: 3.2rem 1.25rem clamp(5rem, 12dvh, 8rem);
         transition: height 0.38s cubic-bezier(0.32, 0, 0.67, 0);
         position: relative;
         isolation: isolate;
     }
     .showroom-identity { margin-top: auto; }
     /* Car + identity float above the ghost text layer */
-    .showroom-car        { z-index: 11; margin-top: 25dvh; }
+    .showroom-car        { z-index: 11; margin-top: clamp(10dvh, 18dvh, 22dvh); }
     .showroom-identity   { z-index: 2; position: relative; }
     .showroom-meta-row   { z-index: 2; position: relative; }
     .showroom-cta        { z-index: 2; position: relative; }
@@ -4334,7 +4334,7 @@ body.showroom-light header.nav-top .nav-links a {
     /* Ghost stat backdrop — sits in .showroom-center, bleeds behind car */
     .sr-ghost-backdrop {
         position: absolute;
-        top: 28%;
+        top: 22%;
         left: 50%;
         transform: translateX(-50%);
         z-index: 10;
@@ -4360,7 +4360,7 @@ body.showroom-light header.nav-top .nav-links a {
     }
     .sr-ghost-num {
         font-family: var(--font-display);
-        font-size: 92vw;
+        font-size: clamp(60vw, 75vw, 85vw);
         color: rgba(255,255,255,0.08);
         line-height: 0.9;
         letter-spacing: -0.02em;
@@ -4375,7 +4375,7 @@ body.showroom-light header.nav-top .nav-links a {
     /* Floating performance chips */
     .sr-stat-chip {
         position: absolute;
-        top: 54%;
+        top: 48%;
         transform: translateY(-50%);
         z-index: 2;
         display: flex;
@@ -4469,7 +4469,7 @@ body.showroom-light header.nav-top .nav-links a {
         display: flex !important;
         position: fixed;
         top: 3.6rem;
-        right: 4.2rem;
+        right: calc(1.8rem + 40px);
         z-index: 30;
         height: 40px;
         align-items: center;
