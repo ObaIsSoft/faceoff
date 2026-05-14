@@ -1,41 +1,124 @@
 if (!window.ArticlePage) {
 
 const EDITORIAL_POOL = [
-    'assets/editorial/anthony-adu-2fJnO-DDE-w-unsplash.jpg',
-    'assets/editorial/autotrader-uk-gjoO-I7-H_I-unsplash.jpg',
-    'assets/editorial/bruno-guerrero-f22widk6gow-unsplash.jpg',
-    'assets/editorial/carter-bilawchuk-kfSWl1EoadE-unsplash.jpg',
-    'assets/editorial/cash-macanaya-P7jbC3FRgco-unsplash.jpg',
-    'assets/editorial/caspar-rae-M09yaKs0z1I-unsplash.jpg',
-    'assets/editorial/gleb-paniotov-vZfTIDV2qOY-unsplash.jpg',
-    'assets/editorial/grahame-jenkins-p7tai9P7H-s-unsplash.jpg',
-    'assets/editorial/ionut-vlad-Opu5OoMb1pU-unsplash.jpg',
-    'assets/editorial/karthik-vadlamani-EsVrwFuIZNI-unsplash.jpg',
-    'assets/editorial/kevin-bhagat-3cLpiv8h5so-unsplash.jpg',
-    'assets/editorial/mdreza-jalali-1MNKzd0C2dM-unsplash.jpg',
-    'assets/editorial/mehan-talukder-sX94ITfZXnY-unsplash.jpg',
-    'assets/editorial/objecttype-raw-6R8L09tbjOo-unsplash.jpg',
-    'assets/editorial/oli-woodman-2e07u8GXe3I-unsplash.jpg',
-    'assets/editorial/peter-thomas-4lLOihvXrTk-unsplash.jpg',
+    // editorial — full-car & scene photography (WebP)
+    'assets/editorial/webp/anthony-adu-2fJnO-DDE-w-unsplash.webp',
+    'assets/editorial/webp/autotrader-uk-gjoO-I7-H_I-unsplash.webp',
+    'assets/editorial/webp/bruno-guerrero-f22widk6gow-unsplash.webp',
+    'assets/editorial/webp/carter-bilawchuk-kfSWl1EoadE-unsplash.webp',
+    'assets/editorial/webp/cash-macanaya-P7jbC3FRgco-unsplash.webp',
+    'assets/editorial/webp/caspar-rae-M09yaKs0z1I-unsplash.webp',
+    'assets/editorial/webp/gleb-paniotov-vZfTIDV2qOY-unsplash.webp',
+    'assets/editorial/webp/grahame-jenkins-p7tai9P7H-s-unsplash.webp',
+    'assets/editorial/webp/ionut-vlad-Opu5OoMb1pU-unsplash.webp',
+    'assets/editorial/webp/karthik-vadlamani-EsVrwFuIZNI-unsplash.webp',
+    'assets/editorial/webp/kevin-bhagat-3cLpiv8h5so-unsplash.webp',
+    'assets/editorial/webp/mdreza-jalali-1MNKzd0C2dM-unsplash.webp',
+    'assets/editorial/webp/mehan-talukder-sX94ITfZXnY-unsplash.webp',
+    'assets/editorial/webp/objecttype-raw-6R8L09tbjOo-unsplash.webp',
+    'assets/editorial/webp/oli-woodman-2e07u8GXe3I-unsplash.webp',
+    'assets/editorial/webp/peter-thomas-4lLOihvXrTk-unsplash.webp',
     'assets/editorial/premium_photo-1683134242640-fe6baaf4d5fc.avif',
-    'assets/editorial/rishab-lamichhane-iflRMZelx0M-unsplash.jpg',
-    'assets/editorial/roger-starnes-sr-6gpPxhLAKJI-unsplash.jpg',
-    'assets/editorial/roger-starnes-sr-UsMWE1VSW_0-unsplash.jpg',
-    'assets/editorial/roman-LD8F38MI5So-unsplash.jpg',
-    'assets/editorial/roman-uRbbJM3WL0g-unsplash.jpg',
-    'assets/editorial/seungmin-yoon-87kzHSRwzj8-unsplash.jpg',
-    'assets/editorial/seungmin-yoon-ZLJNkBcMa84-unsplash.jpg',
-    'assets/editorial/vitali-adutskevich-f-Ob1ubCiIE-unsplash.jpg',
-    'assets/editorial/vitaly-mazur-pvDQwb8Mnm8-unsplash.jpg',
-    'assets/editorial/wes-hicks-mDASgFtuMRQ-unsplash.jpg',
-    'assets/editorial/wesley-tingey-07DJcv5PXyY-unsplash.jpg',
-    'assets/editorial/wolf-schram-19t6J2RVqQE-unsplash.jpg',
+    'assets/editorial/webp/rishab-lamichhane-iflRMZelx0M-unsplash.webp',
+    'assets/editorial/webp/roger-starnes-sr-6gpPxhLAKJI-unsplash.webp',
+    'assets/editorial/webp/roger-starnes-sr-UsMWE1VSW_0-unsplash.webp',
+    'assets/editorial/webp/roman-LD8F38MI5So-unsplash.webp',
+    'assets/editorial/webp/roman-uRbbJM3WL0g-unsplash.webp',
+    'assets/editorial/webp/seungmin-yoon-87kzHSRwzj8-unsplash.webp',
+    'assets/editorial/webp/seungmin-yoon-ZLJNkBcMa84-unsplash.webp',
+    'assets/editorial/webp/vitali-adutskevich-f-Ob1ubCiIE-unsplash.webp',
+    'assets/editorial/webp/vitaly-mazur-pvDQwb8Mnm8-unsplash.webp',
+    'assets/editorial/webp/wes-hicks-mDASgFtuMRQ-unsplash.webp',
+    'assets/editorial/webp/wesley-tingey-07DJcv5PXyY-unsplash.webp',
+    'assets/editorial/webp/wolf-schram-19t6J2RVqQE-unsplash.webp',
+    // parts — engines, exhaust, tyres, interiors, details (WebP; avif kept as-is)
+    'assets/parts/webp/alex-pudov-o2m-IvJ7T50-unsplash.webp',
+    'assets/parts/webp/apostolos-vamvouras-jnmGVg7GwTU-unsplash.webp',
+    'assets/parts/webp/arteum-ro-SkKTh9ZyTxU-unsplash.webp',
+    'assets/parts/webp/autotrader-uk-cxM8lR9TPBk-unsplash.webp',
+    'assets/parts/webp/ben-griffiths-bjJ1ckzCcjI-unsplash.webp',
+    'assets/parts/webp/benjamin-zhao-5DremXTTKE0-unsplash.webp',
+    'assets/parts/boot.avif',
+    'assets/parts/webp/bram-van-oost-4xM5cytsdMo-unsplash.webp',
+    'assets/parts/webp/brock-wegner-pWGUMQSWBwI-unsplash.webp',
+    'assets/parts/webp/cemrecan-yurtman-sk6fOQYIO1o-unsplash.webp',
+    'assets/parts/webp/chad-kirchoff-xe-e69j6-Ds-unsplash.webp',
+    'assets/parts/chasis.avif',
+    'assets/parts/webp/chinmay-jade-XNN9C8MG4KM-unsplash.webp',
+    'assets/parts/webp/daniela-p-YU9rbNLQxSY-unsplash.webp',
+    'assets/parts/webp/dinuka-de-silva-jd_vMUyBGNc-unsplash.webp',
+    'assets/parts/webp/dominik-garbera-2DrK_hrVsrk-unsplash.webp',
+    'assets/parts/webp/erik-mclean-ioEjMWHn2nY-unsplash.webp',
+    'assets/parts/exhaust.avif',
+    'assets/parts/webp/frank-albrecht-eKHRJMdCi9A-unsplash.webp',
+    'assets/parts/webp/gab-9P5Fbk6g6tA-unsplash.webp',
+    'assets/parts/webp/gab-YSeNTqKhASc-unsplash.webp',
+    'assets/parts/webp/igor-constantino-aXxu0nVMGmk-unsplash.webp',
+    'assets/parts/webp/imaad-whd-T0LChgLV0Vc-unsplash.webp',
+    'assets/parts/interior.avif',
+    'assets/parts/webp/iridial-X4jAWbmsRCk-unsplash.webp',
+    'assets/parts/webp/j-z-aKwjqJjpUBQ-unsplash.webp',
+    'assets/parts/webp/jakob-rosen-FsBbavP9YA4-unsplash.webp',
+    'assets/parts/webp/joshua-aragon-8vf8d5CVicw-unsplash.webp',
+    'assets/parts/webp/joshua-aragon-SlgLD4_drDA-unsplash.webp',
+    'assets/parts/webp/kahl-orr-ZdLFPE0AZBU-unsplash.webp',
+    'assets/parts/webp/logan-weaver-lgnwvr-7VtjKFKkEAg-unsplash.webp',
+    'assets/parts/webp/luca-hooijer-u3RhNe3QJeM-unsplash.webp',
+    'assets/parts/webp/marc-grande-Zc8e11NhM1Q-unsplash.webp',
+    'assets/parts/webp/markus-spiske-TKCcWZFdi-w-unsplash.webp',
+    'assets/parts/webp/markus-spiske-fc3IaGfDATI-unsplash.webp',
+    'assets/parts/webp/markus-spiske-tlHsaRcpLPw-unsplash.webp',
+    'assets/parts/webp/mason-jones-9e_ssIz4jB4-unsplash.webp',
+    'assets/parts/webp/mateusz-suski-nnZ6ORmjmew-unsplash.webp',
+    'assets/parts/webp/maxim-hopman-FdAXItuGDnY-unsplash.webp',
+    'assets/parts/webp/nick-ter-haar-gLxo-qpWiT0-unsplash.webp',
+    'assets/parts/webp/nilayam-patel-29dTRsw-ZGU-unsplash.webp',
+    'assets/parts/webp/obi-5nWB9sq6kiQ-unsplash.webp',
+    'assets/parts/webp/obi-FmOdtM4KXhk-unsplash.webp',
+    'assets/parts/webp/oliur-ovrOPhu8vSw-unsplash.webp',
+    'assets/parts/webp/omer-haktan-bulut-JcN9DEzYsDg-unsplash.webp',
+    'assets/parts/webp/omer-haktan-bulut-RFtokfwmCaA-unsplash.webp',
+    'assets/parts/webp/philippe-Pqv3vISYlqU-unsplash.webp',
+    'assets/parts/webp/portafolio-fotografico-automotriz-nNupvXbyif4-unsplash.webp',
+    'assets/parts/webp/rahul-bhogal-ci5yx3gR-Vg-unsplash.webp',
+    'assets/parts/webp/rhys-rainbow-mccormack-C9j3p_JHllQ-unsplash.webp',
+    'assets/parts/webp/rktw-extend-2EHRBs1gefY-unsplash.webp',
+    'assets/parts/webp/ryno-marais-l81o3kZe40c-unsplash.webp',
+    'assets/parts/webp/serjan-midili-0ZZuVE0wJUE-unsplash.webp',
+    'assets/parts/webp/serjan-midili-LgjAGsMTqAA-unsplash.webp',
+    'assets/parts/webp/tim-mossholder-OwBRQ0bykX8-unsplash.webp',
+    'assets/parts/webp/tim-mossholder-VurHDpO4VYI-unsplash.webp',
+    'assets/parts/webp/umpholphat-dangam-fWB5QT4o18k-unsplash.webp',
+    'assets/parts/webp/vadym-kudriavtsev-Xb6w0ywUvZk-unsplash.webp',
+    'assets/parts/webp/viktor-theo-F_jI33ON9Fw-unsplash.webp',
+    'assets/parts/webp/viktor-theo-wWN4AiGPscM-unsplash.webp',
+    'assets/parts/webp/wesley-tingey-pyFcKnxyAW4-unsplash.webp',
+    'assets/parts/webp/zack-szadurski-dRcoznrOhFQ-unsplash.webp',
+    'assets/parts/webp/zoshua-colah-CKdTLYPfnX8-unsplash.webp',
+    'assets/parts/webp/zoshua-colah-o1f1yOCUgH4-unsplash.webp',
 ];
 
 function editorialHash(str) {
     let h = 0;
     for (let i = 0; i < str.length; i++) h = (Math.imul(31, h) + str.charCodeAt(i)) | 0;
     return Math.abs(h);
+}
+
+function pickVideo(unit) {
+    const energy   = (unit.energy   || '').toUpperCase();
+    const category = (unit.category || '').toUpperCase();
+    const type     = (unit.type     || '').toUpperCase();
+    const year     = parseInt(unit.year, 10) || 9999;
+
+    if (energy === 'ELECTRIC')                             return 'assets/videos/ev.mp4';
+    if (year < 2015)                                       return 'assets/videos/vintage-classics.mp4';
+    if (category === 'SPORT' && type === 'SEDAN')          return 'assets/videos/supercars.mp4';
+    if (category === 'SPORT' && type === 'SALOON')         return 'assets/videos/supercars.mp4';
+    if (category === 'SPORT')                              return 'assets/videos/supercars.mp4';
+    if (type === 'SEDAN' || type === 'SALOON')             return 'assets/videos/executive-sedans.mp4';
+    if (category === 'ECONOMY' || category === 'FAMILY')   return 'assets/videos/family-cars.mp4';
+    if (type === 'SUV' || type === 'TRUCK')                return 'assets/videos/suv.mp4';
+    return 'assets/videos/istockphoto-1505840199-640_adpp_is.mp4';
 }
 
 function pickEditorial(unitId, count, offset) {
@@ -61,6 +144,13 @@ window.ArticlePage = {
         if (!unit) { titleEl.textContent = 'Vehicle not found'; return; }
 
         const d = unit.details || {};
+
+        // ── Video assignment ──────────────────────────────────────────────
+        const videoSrc = pickVideo(unit);
+        const videoEl  = document.getElementById('article-video');
+        if (videoEl) { videoEl.src = videoSrc; videoEl.load(); }
+        const xrayVid  = document.getElementById('article-xray-video');
+        if (xrayVid)  { xrayVid.src = videoSrc; xrayVid.load(); xrayVid.play().catch(() => {}); }
 
         // ── Eyebrow + title ───────────────────────────────────────────────
         const eyebrow = document.getElementById('article-eyebrow');
@@ -212,7 +302,8 @@ window.ArticlePage = {
                 ScrollTrigger.update();
                 this._scrollVel = Math.abs(e.velocity || 0);
             });
-            gsap.ticker.add(t => this.lenis.raf(t * 1000));
+            this._lenisRaf = t => { if (this.lenis) this.lenis.raf(t * 1000); };
+            gsap.ticker.add(this._lenisRaf);
             gsap.ticker.lagSmoothing(0);
         } else {
             const raf = t => { this.lenis.raf(t); requestAnimationFrame(raf); };
@@ -425,7 +516,7 @@ window.ArticlePage = {
         });
     },
 
-    // ── X-ray — rect cached via IntersectionObserver ──────────────────────
+    // ── X-ray — rect recomputed on every move (viewport-relative coords change on scroll)
     _initXray() {
         const reveal    = document.getElementById('xray-spotlight');
         const container = document.querySelector('.art-xray-container');
@@ -436,20 +527,10 @@ window.ArticlePage = {
             return;
         }
 
-        let rect = null;
         let lastClip = '';
 
-        // Update rect when section scrolls into view — avoids calling getBCR on every move
-        const io = new IntersectionObserver(([entry]) => {
-            if (entry.isIntersecting) rect = container.getBoundingClientRect();
-        }, { threshold: 0 });
-        io.observe(container);
-
-        const onResize = () => { rect = null; }; // invalidate; recalculate on next intersection
-        window.addEventListener('resize', onResize, { passive: true });
-
         const onMove = e => {
-            if (!rect) return;
+            const rect   = container.getBoundingClientRect();
             const inside = e.clientX >= rect.left && e.clientX <= rect.right
                         && e.clientY >= rect.top  && e.clientY <= rect.bottom;
             const clip = inside
@@ -459,12 +540,7 @@ window.ArticlePage = {
         };
 
         window.addEventListener('mousemove', onMove);
-
-        this._cleanups.push(() => {
-            window.removeEventListener('mousemove', onMove);
-            window.removeEventListener('resize', onResize);
-            io.disconnect();
-        });
+        this._cleanups.push(() => window.removeEventListener('mousemove', onMove));
     },
 
     // ── Fluid typography — only runs when scrolling, stops when idle ──────
@@ -503,6 +579,10 @@ window.ArticlePage = {
     },
 
     destroy() {
+        if (this._lenisRaf && typeof gsap !== 'undefined') {
+            gsap.ticker.remove(this._lenisRaf);
+            this._lenisRaf = null;
+        }
         if (this.lenis) { this.lenis.destroy(); this.lenis = null; }
         if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.getAll().forEach(t => t.kill());
         this._cleanups.forEach(fn => fn());

@@ -32,6 +32,7 @@ body {
     width: 100vw;
     overflow: hidden;
     position: fixed;
+    isolation: isolate;
 }
 
 /* Base Body Font for long-form */
