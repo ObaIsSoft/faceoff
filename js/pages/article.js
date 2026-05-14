@@ -667,22 +667,23 @@ window.ArticlePage = {
             requestAnimationFrame(() => this._initPaletteCarousel(paletteSection));
         }
 
-        // ── Interior & Options ────────────────────────────────────────────
+        // ── Interior & Options ─────────────────────────────────────────────
         const optionsSection = document.getElementById('art-options');
         const optionsBody    = document.getElementById('art-options-body');
-        let optHtml = '';
+        const optionsTabs    = document.getElementById('art-opt-tabs');
+        const panels         = [];
 
         if (customData.interior?.packages?.length) {
-            optHtml += `<div class="art-options-block">
-                <span class="art-options-sublabel">Packages</span>
-                <div class="art-packages-grid">${
-                    customData.interior.packages.map(pkg => `
-                        <div class="art-pkg-card">
-                            <span class="art-pkg-name">${pkg.name}</span>
-                            ${pkg.desc ? `<p class="art-pkg-desc">${pkg.desc}</p>` : ''}
+            panels.push({
+                id: 'packages', label: 'Packages',
+                html: `<div class="art-opt-packages">${
+                    customData.interior.packages.map((pkg, i) => `
+                        <div class="art-opt-pkg" style="--i:${i}">
+                            <span class="art-opt-pkg-name">${pkg.name}</span>
+                            ${pkg.desc ? `<p class="art-opt-pkg-desc">${pkg.desc}</p>` : ''}
                         </div>`).join('')
-                }</div>
-            </div>`;
+                }</div>`
+            });
         }
 
         const intColors = [
@@ -690,40 +691,70 @@ window.ArticlePage = {
             ...(customData.interior?.colors?.special  || []),
         ];
         if (intColors.length) {
-            optHtml += `<div class="art-options-block">
-                <span class="art-options-sublabel">Interior Colours</span>
-                <div class="art-int-colors">${
-                    intColors.map(c => `<span class="art-int-color">${c}</span>`).join('')
-                }</div>
-            </div>`;
+            const self = this;
+            panels.push({
+                id: 'colours', label: 'Colours',
+                html: `<div class="art-opt-colours-grid">${
+                    intColors.map(c => {
+                        const bg = self._intColorHex(c);
+                        const ac = self._intColorAccent(c);
+                        return `<div class="art-opt-colour-card${ac ? ' has-accent' : ''}" style="--bg:${bg}${ac ? ';--ac:' + ac : ''}">
+                            <div class="art-opt-colour-bg"></div>
+                            <span class="art-opt-colour-name">${c}</span>
+                        </div>`;
+                    }).join('')
+                }</div>`
+            });
         }
 
         if (customData.rims?.length) {
-            optHtml += `<div class="art-options-block">
-                <span class="art-options-sublabel">Wheel Options</span>
-                <div class="art-rims-list">${
-                    customData.rims.map(r => {
-                        if (typeof r === 'string') return `<span class="art-rim-item">${r}</span>`;
-                        const label = [r.size, r.style].filter(Boolean).join(' · ');
-                        const note  = r.note ? `<span class="art-rim-note">${r.note}</span>` : '';
-                        return `<span class="art-rim-item">${label}${note}</span>`;
+            panels.push({
+                id: 'wheels', label: 'Wheels',
+                html: `<div class="art-opt-wheels">${
+                    customData.rims.map((r, i) => {
+                        const size  = typeof r === 'string' ? r  : (r.size  || '');
+                        const style = typeof r === 'string' ? '' : (r.style || '');
+                        const note  = typeof r === 'string' ? '' : (r.note  || '');
+                        return `<div class="art-opt-wheel" style="--i:${i}">
+                            <span class="art-opt-wheel-size">${size}</span>
+                            <span class="art-opt-wheel-style">${style}</span>
+                            ${note ? `<span class="art-opt-wheel-note">${note}</span>` : ''}
+                        </div>`;
                     }).join('')
-                }</div>
-            </div>`;
+                }</div>`
+            });
         }
 
         if (customData.interior?.trim?.length) {
-            optHtml += `<div class="art-options-block">
-                <span class="art-options-sublabel">Trim Finishes</span>
-                <div class="art-rims-list">${
-                    customData.interior.trim.map(t => `<span class="art-rim-item">${t}</span>`).join('')
-                }</div>
-            </div>`;
+            const self = this;
+            panels.push({
+                id: 'trim', label: 'Trim',
+                html: `<div class="art-opt-trim-grid">${
+                    customData.interior.trim.map((t, i) => {
+                        const mat = self._trimMaterial(t);
+                        return `<div class="art-opt-trim-card${mat.dark ? ' is-light-bg' : ''}" style="--i:${i};background:${mat.bg}">
+                            <span class="art-opt-trim-name">${t}</span>
+                        </div>`;
+                    }).join('')
+                }</div>`
+            });
         }
 
-        if (optHtml && optionsSection && optionsBody) {
-            optionsBody.innerHTML = optHtml;
+        if (panels.length && optionsSection && optionsBody) {
+            if (optionsTabs) {
+                const indicator = optionsTabs.querySelector('.art-opt-indicator');
+                optionsTabs.insertAdjacentHTML('afterbegin',
+                    panels.map((p, i) =>
+                        `<button class="art-opt-tab${i === 0 ? ' is-active' : ''}" data-panel="${p.id}">${p.label}</button>`
+                    ).join('')
+                );
+                if (indicator) optionsTabs.appendChild(indicator);
+            }
+            optionsBody.innerHTML = panels.map((p, i) =>
+                `<div class="art-opt-panel${i === 0 ? ' is-active' : ''}" data-panel="${p.id}">${p.html}</div>`
+            ).join('');
             optionsSection.style.display = '';
+            requestAnimationFrame(() => this._initOptionsCarousel(optionsSection));
         }
     },
 
@@ -758,6 +789,143 @@ window.ArticlePage = {
 
         const ro = new ResizeObserver(update);
         ro.observe(wrap);
+        this._cleanups.push(() => ro.disconnect());
+    },
+
+    _trimMaterial(name) {
+        const n = name.toLowerCase();
+
+        if (/carbon/.test(n)) return { dark: false, bg:
+            `repeating-linear-gradient(45deg,rgba(255,255,255,.032) 0,rgba(255,255,255,.032) 1px,transparent 1px,transparent 7px),` +
+            `repeating-linear-gradient(-45deg,rgba(255,255,255,.032) 0,rgba(255,255,255,.032) 1px,transparent 1px,transparent 7px),` +
+            `#161819`
+        };
+
+        if (/piano\s*black|lacquer/.test(n)) return { dark: false, bg:
+            `linear-gradient(135deg,rgba(255,255,255,.12) 0%,rgba(255,255,255,.04) 30%,transparent 60%),` +
+            `#060608`
+        };
+
+        if (/chrome|silver/.test(n)) return { dark: true, bg:
+            `linear-gradient(135deg,#c8d0da 0%,#eef0f4 35%,#9098a8 60%,#c0c8d2 100%)`
+        };
+
+        if (/alumin/.test(n)) return { dark: false, bg:
+            `repeating-linear-gradient(90deg,rgba(255,255,255,.06) 0,rgba(255,255,255,.06) 1px,transparent 1px,transparent 5px),` +
+            `linear-gradient(135deg,#485060 0%,#6a7480 45%,#485060 100%)`
+        };
+
+        if (/high[\s-]*gloss.*walnut|burr\s*walnut/.test(n)) return { dark: false, bg:
+            `repeating-linear-gradient(91deg,rgba(0,0,0,.14) 0,rgba(0,0,0,.14) 1px,transparent 1px,transparent 16px),` +
+            `linear-gradient(175deg,rgba(255,255,255,.08) 0%,transparent 40%),` +
+            `linear-gradient(180deg,#7a4a22 0%,#5a3014 55%,#6e3e1a 100%)`
+        };
+
+        if (/natural.*walnut|walnut/.test(n)) return { dark: false, bg:
+            `repeating-linear-gradient(87deg,rgba(0,0,0,.1) 0,rgba(0,0,0,.1) 1px,transparent 1px,transparent 20px),` +
+            `linear-gradient(180deg,#6a3e1a 0%,#4e2c10 55%,#5e3818 100%)`
+        };
+
+        if (/ash\s*wood|black\s*ash/.test(n)) return { dark: false, bg:
+            `repeating-linear-gradient(89deg,rgba(255,255,255,.04) 0,rgba(255,255,255,.04) 1px,transparent 1px,transparent 18px),` +
+            `linear-gradient(180deg,#2e2a20 0%,#1c1814 55%,#262218 100%)`
+        };
+
+        if (/open[\s-]*pore|takahona|wood/.test(n)) return { dark: false, bg:
+            `repeating-linear-gradient(88deg,rgba(0,0,0,.1) 0,rgba(0,0,0,.1) 1px,transparent 1px,transparent 22px),` +
+            `linear-gradient(180deg,#6a4020 0%,#4e2c0e 55%,#5c3618 100%)`
+        };
+
+        if (/diamond[\s-]*stitch|nappa|leather/.test(n)) return { dark: false, bg:
+            `repeating-linear-gradient(45deg,rgba(255,255,255,.025) 0,rgba(255,255,255,.025) 1px,transparent 1px,transparent 10px),` +
+            `repeating-linear-gradient(-45deg,rgba(255,255,255,.025) 0,rgba(255,255,255,.025) 1px,transparent 1px,transparent 10px),` +
+            `linear-gradient(135deg,rgba(255,255,255,.06) 0%,transparent 50%),` +
+            `#2a1808`
+        };
+
+        return { dark: false, bg: `#141414` };
+    },
+
+    _intColorHex(name) {
+        const n = name.toLowerCase().replace(/[,\/]/g, ' ');
+        if (/platinum\s*white|ivory|cream/.test(n))        return '#ccc8b4';
+        if (/macchiato|beige|sand|champagne/.test(n))      return '#a87840';
+        if (/tartufo/.test(n))                             return '#2c1308';
+        if (/espresso/.test(n))                            return '#1c0c02';
+        if (/nut\s*brown/.test(n))                         return '#5e3218';
+        if (/saddle\s*brown/.test(n))                      return '#6e3010';
+        if (/brown/.test(n))                               return '#40200c';
+        if (/classic\s*red|bengal\s*red/.test(n))          return '#5c0e0e';
+        if (/red/.test(n))                                 return '#400808';
+        if (/yacht\s*blue|blue/.test(n))                   return '#0e2035';
+        if (/titanium\s*grey|grey|gray/.test(n))           return '#383e48';
+        if (/lime\s*green|green/.test(n))                  return '#162508';
+        return '#111111';
+    },
+
+    _intColorAccent(name) {
+        const n = name.toLowerCase();
+        if (/w\/bronze|bronze\s*stitch/.test(n))            return '#b87333';
+        if (/w\/gold|gold\s*stitch/.test(n))                return '#c8980c';
+        if (/w\/red[\s-]stitch|red\s*stitch/.test(n))       return '#c01010';
+        if (/w\/lime|lime[\s-]green\s*(stitch|a-band)/.test(n)) return '#58a010';
+        if (/w\/white\s*stitch/.test(n))                    return '#c8c8c0';
+        if (/w\/yacht|yacht[\s-]blue\s*(stitch|a-band)/.test(n)) return '#1e5090';
+        if (/w\/bengal|bengal[\s-]red\s*(stitch|a-band)/.test(n)) return '#a01818';
+        return null;
+    },
+
+    _initOptionsCarousel(section) {
+        const tabs      = Array.from(section.querySelectorAll('.art-opt-tab'));
+        const panels    = Array.from(section.querySelectorAll('.art-opt-panel'));
+        const indicator = section.querySelector('.art-opt-indicator');
+        const body      = section.querySelector('.art-options-body');
+        if (!tabs.length || !panels.length) return;
+
+        let current = 0;
+        let touchX  = 0;
+
+        const updateIndicator = () => {
+            if (!indicator || !tabs[current]) return;
+            const t = tabs[current];
+            indicator.style.left  = t.offsetLeft + 'px';
+            indicator.style.width = t.offsetWidth + 'px';
+        };
+
+        const replayAnims = (panel) => {
+            panel.querySelectorAll('.art-opt-pkg, .art-opt-wheel, .art-opt-trim-card').forEach(el => {
+                el.style.animation = 'none';
+                void el.offsetWidth;
+                el.style.animation = '';
+            });
+        };
+
+        const goTo = (idx) => {
+            if (idx < 0 || idx >= panels.length || idx === current) return;
+            panels[current].classList.remove('is-active');
+            tabs[current].classList.remove('is-active');
+            current = idx;
+            panels[current].classList.add('is-active');
+            tabs[current].classList.add('is-active');
+            tabs[current].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            updateIndicator();
+            replayAnims(panels[current]);
+        };
+
+        tabs.forEach((tab, i) => tab.addEventListener('click', () => goTo(i)));
+
+        if (body) {
+            body.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+            body.addEventListener('touchend',   e => {
+                const dx = e.changedTouches[0].clientX - touchX;
+                if (Math.abs(dx) > 44) dx < 0 ? goTo(current + 1) : goTo(current - 1);
+            }, { passive: true });
+        }
+
+        updateIndicator();
+        replayAnims(panels[0]);
+        const ro = new ResizeObserver(updateIndicator);
+        ro.observe(section);
         this._cleanups.push(() => ro.disconnect());
     },
 
