@@ -34,9 +34,11 @@ var Router = {
         // Bypass SPA for customize page — Three.js ES modules can't re-execute inside innerHTML swap
         const targetPath = url.split('?')[0].split('/').pop();
         if (targetPath === 'customize.html') {
+            if (window.PageTransition) await window.PageTransition.exit();
             window.location.href = url;
             return;
         }
+        if (window.PageTransition) await window.PageTransition.exit();
         history.pushState(null, '', url);
         await this.handleRoute(url);
     },
@@ -128,8 +130,11 @@ var Router = {
 
         // 6. Initialize new page logic - With small delay for DOM settlement
         setTimeout(() => this.loadPageScript(path), 50);
-        
-        // 7. Scroll to top
+
+        // 7. Reveal page via transition
+        if (window.PageTransition && !isInitial) window.PageTransition.enter();
+
+        // 8. Scroll to top
         window.scrollTo(0, 0);
     },
 

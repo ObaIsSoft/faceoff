@@ -506,6 +506,29 @@ var INVENTORY = [
             scanPath: "assets/inventory/jeep-grandwagoneer-2023-used-001/rwc.html",
             verifyUrl: "https://dvis.lg.gov.ng"
         }
+    },
+    {
+        id: "c63-w204-2011-used-001",
+        variantId: "c63-w204-2011-saloon",
+        status: "available", condition: "used", grade: "excellent",
+        mileage: 62400, price: "₦28,500,000",
+        color: "Palladium Silver Metallic",
+        imgs: [
+            "assets/editorial/roman-uRbbJM3WL0g-unsplash.jpg",
+            "assets/editorial/wolf-schram-19t6J2RVqQE-unsplash.jpg",
+            "assets/editorial/vitaly-mazur-pvDQwb8Mnm8-unsplash.jpg",
+            "assets/editorial/wes-hicks-mDASgFtuMRQ-unsplash.jpg"
+        ],
+        notes: "Two owners. Performance Pack Plus — 480bhp, floating discs, Quaife LSD retrofitted. Full AMG service history. Both keys.",
+        certificate: {
+            type: "LACVIS",
+            regNumber: "LAG-C63-11A",
+            certNumber: "RWC-2025-00911",
+            issuedDate: "2025-04-15",
+            expiryDate: "2026-04-14",
+            scanPath: "assets/inventory/c63-w204-2011-used-001/rwc.html",
+            verifyUrl: "https://dvis.lg.gov.ng"
+        }
     }
 
 ];

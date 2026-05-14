@@ -8,35 +8,173 @@
     <link rel="apple-touch-icon" href="favicon.png">
     <link rel="stylesheet" href="css/index.css">
 </head>
-<body class="scrollable-page article-page">
+<body class="article-page scrollable-page">
 
+    <!-- Scroll progress bar -->
+    <div class="art-progress" id="art-progress"><div class="art-progress-fill" id="art-progress-fill"></div></div>
 
-    <main class="article-container" id="main-content">
-        <article class="article-content">
-            <header class="article-header">
-                <span id="article-eyebrow" class="article-eyebrow"></span>
-                <h1 id="article-title" class="editorial-header"></h1>
-            </header>
-            
-            <div class="article-hero-image">
-                <img id="article-image" src="" alt="Vehicle Image" style="display: none;">
-            </div>
+    <main class="art-main" id="main-content">
+        <article>
 
-            <div class="body-text article-body" id="article-body">
-                <!-- Content will be injected here -->
-            </div>
-            
-            <div class="article-footer">
-                <a id="article-back" href="showroom.html" class="article-link-cta">← Back to Showroom</a>
-            </div>
+            <!-- ① IGNITION HERO ─────────────────────────────────────────── -->
+            <section class="art-hero">
+
+                <a id="article-back" href="showroom.html" class="art-back-link">
+                    <span class="art-back-arrow">←</span>
+                    <span class="art-back-label">Back to Showroom</span>
+                </a>
+
+                <div class="art-hero-media">
+                    <span class="art-hero-ghost" id="art-hero-ghost"></span>
+                    <div class="art-mask-container">
+                        <img id="article-image" class="art-parallax-img" src="" alt="Vehicle">
+                    </div>
+                </div>
+
+                <header class="art-hero-header">
+                    <div class="ln_"><span id="article-eyebrow" class="art-eyebrow ln"></span></div>
+                    <div class="ln_"><h1 id="article-title" class="art-title ln"></h1></div>
+                </header>
+
+            </section>
+
+            <!-- ② KINETIC NUMBERS ──────────────────────────────────────── -->
+            <section class="art-kinetic" id="art-kinetic">
+                <span class="art-kinetic-label">The Numbers</span>
+                <div class="art-kinetic-grid">
+                    <div class="art-kinetic-item" id="kin-0">
+                        <span class="art-kinetic-tag" id="kin-tag-0">0 – 100</span>
+                        <span class="art-kinetic-num" id="kin-num-0">—</span>
+                        <span class="art-kinetic-bar"></span>
+                    </div>
+                    <div class="art-kinetic-item" id="kin-1">
+                        <span class="art-kinetic-tag" id="kin-tag-1">Power</span>
+                        <span class="art-kinetic-num" id="kin-num-1">—</span>
+                        <span class="art-kinetic-bar"></span>
+                    </div>
+                    <div class="art-kinetic-item" id="kin-2">
+                        <span class="art-kinetic-tag" id="kin-tag-2">Top Speed</span>
+                        <span class="art-kinetic-num" id="kin-num-2">—</span>
+                        <span class="art-kinetic-bar"></span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ③ EDITORIAL BODY ─────────────────────────────────────────── -->
+            <section class="art-editorial">
+                <div class="art-editorial-grid">
+                    <div class="art-editorial-left">
+                        <span class="art-section-index">01</span>
+                    </div>
+                    <div class="art-editorial-right" id="article-body">
+                        <!-- Injected by JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- ③.5 SPEC DATA ART ────────────────────────────────────────── -->
+            <section class="art-specs-data" id="art-specs-data" style="display:none">
+                <div class="art-specs-header">
+                    <span class="art-specs-label">Specification</span>
+                    <span class="art-section-index art-section-index--specs">02</span>
+                </div>
+                <div class="art-specs-rows" id="art-specs-rows"></div>
+            </section>
+
+            <!-- ④ ENGINEERING PULL-QUOTE ─────────────────────────────────── -->
+            <section class="art-pullquote" id="art-pullquote" style="display:none">
+                <div class="art-pullquote-inner">
+                    <div class="art-pullquote-rule art-pullquote-rule--top"></div>
+                    <div class="ln_"><span class="art-pullquote-tag ln">Behind the Engineering</span></div>
+                    <blockquote class="art-pullquote-text" id="art-pullquote-text"></blockquote>
+                    <div class="art-pullquote-rule art-pullquote-rule--bot"></div>
+                </div>
+            </section>
+
+            <!-- ④.5 EDITORIAL SPREAD ─────────────────────────────────────── -->
+            <section class="art-spread" id="art-spread">
+                <div class="art-spread-primary">
+                    <img id="art-spread-img-0" class="art-spread-img" src="" alt="">
+                </div>
+                <div class="art-spread-duo">
+                    <img id="art-spread-img-1" class="art-spread-img" src="" alt="">
+                    <img id="art-spread-img-2" class="art-spread-img" src="" alt="">
+                </div>
+            </section>
+
+            <!-- ⑤ VIDEO SCRUB — TIME MACHINE ─────────────────────────────── -->
+            <section class="art-video-scrub">
+                <div class="art-sticky-container">
+                    <video id="article-video" class="art-scrub-video"
+                        src="assets/videos/supercars.mp4"
+                        muted playsinline preload="auto">
+                    </video>
+                    <div class="art-video-overlay">
+                        <h2 class="art-overlay-title">THE<br>MACHINE</h2>
+                        <div class="art-tachometer">
+                            <span class="tacho-val">0</span>
+                            <span class="tacho-unit">RPM</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ⑥ X-RAY FLASHLIGHT ───────────────────────────────────────── -->
+            <section class="art-xray">
+                <div class="art-xray-container">
+                    <div class="art-xray-bg"><img id="art-xray-bg-img" class="art-xray-bg-img" src="" alt=""></div>
+                    <div class="art-xray-reveal" id="xray-spotlight">
+                        <video class="art-xray-video"
+                            src="assets/videos/suv.mp4"
+                            muted playsinline autoplay loop>
+                        </video>
+                    </div>
+                    <div class="art-xray-label">
+                        <span class="art-xray-tag">03 — Chassis</span>
+                        <h2 class="art-xray-title">CHASSIS<br>INTEGRITY</h2>
+                    </div>
+                    <p class="art-xray-instruction">Move cursor to explore</p>
+                </div>
+            </section>
+
+            <!-- ⑦ HORIZONTAL TIMELINE ───────────────────────────────────── -->
+            <section class="art-horizontal-section" id="horizontal-trigger">
+                <div class="art-horizontal-sticky">
+                    <div class="art-h-section-label">04 — Gallery</div>
+                    <div class="art-horizontal-track" id="art-h-track">
+                        <!-- Items injected by JS from unit gallery -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- ⑧ OUTRO ─────────────────────────────────────────────────── -->
+            <section class="art-outro">
+                <div class="art-outro-marquee" id="art-outro-marquee">
+                    <div class="art-outro-marquee-inner" id="art-outro-marquee-inner"></div>
+                </div>
+                <div class="art-outro-inner">
+                    <div class="ln_"><span class="art-outro-label ln">End of line</span></div>
+                    <a id="art-outro-back" href="showroom.html" class="art-outro-cta">
+                        Return to Showroom <span class="art-outro-arrow">→</span>
+                    </a>
+                </div>
+            </section>
+
         </article>
     </main>
 
-    <!-- Shell Scripts -->
+    <!-- Libs -->
+    <script src="https://unpkg.com/lenis@1.1.14/dist/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+
+    <!-- Shell -->
     <script src="js/inventory.js"></script>
     <script src="js/cars-data.js"></script>
     <script src="js/drawer.js"></script>
     <script src="js/player.js"></script>
     <script src="js/pages/article.js"></script>
+    <script src="js/transition.js"></script>
+    <script src="js/cursor.js"></script>
 </body>
 </html>
