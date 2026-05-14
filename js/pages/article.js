@@ -157,6 +157,14 @@ window.ArticlePage = {
         if (eyebrow) eyebrow.textContent = [unit.brand, unit.model].filter(Boolean).join(' ');
         titleEl.textContent = unit.name || unitId;
 
+        // ── Brand logo ────────────────────────────────────────────────────
+        const logoEl = document.getElementById('article-brand-logo');
+        if (logoEl) {
+            const logo = unit.logo || (window.MODELS || {})[unit.modelId]?.logo;
+            if (logo) { logoEl.src = logo; logoEl.style.display = ''; }
+            else logoEl.style.display = 'none';
+        }
+
         // ── Hero ghost ────────────────────────────────────────────────────
         const ghostEl = document.getElementById('art-hero-ghost');
         if (ghostEl) {
@@ -656,6 +664,7 @@ window.ArticlePage = {
                     `<span class="art-palette-finish">${f}</span>`).join('');
             }
             paletteSection.style.display = '';
+            requestAnimationFrame(() => this._initPaletteCarousel(paletteSection));
         }
 
         // ── Interior & Options ────────────────────────────────────────────
@@ -693,7 +702,12 @@ window.ArticlePage = {
             optHtml += `<div class="art-options-block">
                 <span class="art-options-sublabel">Wheel Options</span>
                 <div class="art-rims-list">${
-                    customData.rims.map(r => `<span class="art-rim-item">${r}</span>`).join('')
+                    customData.rims.map(r => {
+                        if (typeof r === 'string') return `<span class="art-rim-item">${r}</span>`;
+                        const label = [r.size, r.style].filter(Boolean).join(' · ');
+                        const note  = r.note ? `<span class="art-rim-note">${r.note}</span>` : '';
+                        return `<span class="art-rim-item">${label}${note}</span>`;
+                    }).join('')
                 }</div>
             </div>`;
         }
@@ -711,6 +725,40 @@ window.ArticlePage = {
             optionsBody.innerHTML = optHtml;
             optionsSection.style.display = '';
         }
+    },
+
+    _initPaletteCarousel(section) {
+        const track = section.querySelector('.art-palette-swatches');
+        const wrap  = section.querySelector('.art-palette-track-wrap');
+        const prev  = section.querySelector('.art-palette-arrow--prev');
+        const next  = section.querySelector('.art-palette-arrow--next');
+        if (!track || !wrap || !prev || !next) return;
+
+        let offset = 0;
+
+        const getStep = () => {
+            const first = track.firstElementChild;
+            if (!first) return 240;
+            const gap = parseFloat(getComputedStyle(track).gap) || 44;
+            return (first.offsetWidth + gap) * 5;
+        };
+
+        const update = () => {
+            const maxOffset = Math.max(0, track.scrollWidth - wrap.offsetWidth);
+            offset = Math.max(0, Math.min(offset, maxOffset));
+            track.style.transform = `translateX(${-offset}px)`;
+            prev.disabled = offset <= 0;
+            next.disabled = offset >= maxOffset - 1;
+        };
+
+        prev.addEventListener('click', () => { offset -= getStep(); update(); });
+        next.addEventListener('click', () => { offset += getStep(); update(); });
+
+        update();
+
+        const ro = new ResizeObserver(update);
+        ro.observe(wrap);
+        this._cleanups.push(() => ro.disconnect());
     },
 
     destroy() {

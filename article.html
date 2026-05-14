@@ -32,8 +32,11 @@
                 </div>
 
                 <header class="art-hero-header">
-                    <div class="ln_"><span id="article-eyebrow" class="art-eyebrow ln"></span></div>
-                    <div class="ln_"><h1 id="article-title" class="art-title ln"></h1></div>
+                    <div class="art-hero-header-left">
+                        <div class="ln_"><span id="article-eyebrow" class="art-eyebrow ln"></span></div>
+                        <div class="ln_"><h1 id="article-title" class="art-title ln"></h1></div>
+                    </div>
+                    <img id="article-brand-logo" class="art-brand-logo" src="" alt="" style="display:none">
                 </header>
 
             </section>
@@ -85,7 +88,6 @@
             <section class="art-variants" id="art-variants" style="display:none">
                 <div class="art-variants-header">
                     <span class="art-variants-label">Editions</span>
-                    <span class="art-section-index art-section-index--variants">02</span>
                 </div>
                 <div class="art-variants-grid" id="art-variants-grid"></div>
             </section>
@@ -124,8 +126,14 @@
             <section class="art-palette" id="art-palette" style="display:none">
                 <div class="art-palette-header">
                     <span class="art-palette-label">Colour Palette</span>
+                    <div class="art-palette-nav">
+                        <button class="art-palette-arrow art-palette-arrow--prev" aria-label="Previous colours">&#8592;</button>
+                        <button class="art-palette-arrow art-palette-arrow--next" aria-label="Next colours">&#8594;</button>
+                    </div>
                 </div>
-                <div class="art-palette-swatches" id="art-palette-swatches"></div>
+                <div class="art-palette-track-wrap">
+                    <div class="art-palette-swatches" id="art-palette-swatches"></div>
+                </div>
                 <div class="art-palette-finishes" id="art-palette-finishes"></div>
             </section>
 
@@ -166,7 +174,6 @@
             <section class="art-options" id="art-options" style="display:none">
                 <div class="art-options-header">
                     <span class="art-options-label">Interior & Options</span>
-                    <span class="art-section-index art-section-index--options">03</span>
                 </div>
                 <div class="art-options-body" id="art-options-body"></div>
             </section>
