@@ -7248,7 +7248,7 @@ body.article-page {
 
 /* ══ HORIZONTAL GALLERY ══════════════════════════════════════════ */
 .art-horizontal-section {
-    height: 400vh;
+    /* height set dynamically by JS: 100vh + track travel distance */
     background: #fff;
 }
 .art-horizontal-sticky {

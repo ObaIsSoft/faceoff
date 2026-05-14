@@ -464,18 +464,35 @@ window.ArticlePage = {
 
         // ⑩ Horizontal gallery
         const hTrack = document.getElementById('art-h-track');
-        if (hTrack && hTrack.children.length > 1) {
+        const hSection = document.getElementById('horizontal-trigger');
+        if (hTrack && hTrack.children.length > 1 && hSection) {
+            const setHeight = () => {
+                const travel = Math.max(0, hTrack.scrollWidth - window.innerWidth);
+                hSection.style.height = (window.innerHeight + travel) + 'px';
+            };
+            setHeight();
+
             gsap.to(hTrack, {
                 x: () => -(hTrack.scrollWidth - window.innerWidth),
                 ease: 'none',
                 scrollTrigger: {
-                    trigger: '#horizontal-trigger', start: 'top top', end: 'bottom top',
-                    scrub: 1, invalidateOnRefresh: true,
+                    trigger: '#horizontal-trigger',
+                    start: 'top top',
+                    end: () => '+=' + Math.max(1, hTrack.scrollWidth - window.innerWidth),
+                    scrub: 1,
+                    invalidateOnRefresh: true,
+                    onRefresh: () => setHeight(),
                 },
             });
+
+            const ro = new ResizeObserver(() => {
+                setHeight();
+                ScrollTrigger.refresh();
+            });
+            ro.observe(hTrack);
+            this._cleanups.push(() => ro.disconnect());
         } else {
-            const hs = document.getElementById('horizontal-trigger');
-            if (hs) hs.style.display = 'none';
+            if (hSection) hSection.style.display = 'none';
         }
     },
 
