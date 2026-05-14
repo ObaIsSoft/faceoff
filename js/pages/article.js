@@ -289,6 +289,13 @@ window.ArticlePage = {
         this._initLens();
         this._initXray();
         this._initFluid();
+
+        // After one paint, recalculate all ScrollTrigger positions.
+        // Essential after SPA navigation: body goes from position:fixed → position:relative
+        // and the total scroll height isn't settled until after the first render cycle.
+        requestAnimationFrame(() => {
+            if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
+        });
     },
 
     _initScroll() {
@@ -338,14 +345,13 @@ window.ArticlePage = {
         gsap.registerPlugin(ScrollTrigger);
 
         // ① Entry
-        const tl = gsap.timeline({ delay: 0.1 });
-        tl.to('.art-mask-container', { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.8, ease: 'expo.inOut' });
-        tl.fromTo('.art-parallax-img', { scale: 1.14 }, { scale: 1, duration: 1.8, ease: 'expo.inOut' }, '<');
-        tl.fromTo('.art-hero-ghost', { opacity: 0 }, { opacity: 1, duration: 1.4, ease: 'power2.out' }, '-=1.2');
-        tl.fromTo('#article-eyebrow', { yPercent: 110 }, { yPercent: 0, duration: 0.9, ease: 'power4.out' }, '-=0.7');
-        tl.fromTo('#article-title',   { yPercent: 110 }, { yPercent: 0, duration: 1.2, ease: 'power4.out' }, '-=0.8');
-        // Remove will-change after entry completes
-        tl.call(() => {
+        this._entryTl = gsap.timeline({ delay: 0.1 });
+        this._entryTl.to('.art-mask-container', { clipPath: 'inset(0% 0% 0% 0%)', duration: 1.8, ease: 'expo.inOut' });
+        this._entryTl.fromTo('.art-parallax-img', { scale: 1.14 }, { scale: 1, duration: 1.8, ease: 'expo.inOut' }, '<');
+        this._entryTl.fromTo('.art-hero-ghost', { opacity: 0 }, { opacity: 1, duration: 1.4, ease: 'power2.out' }, '-=1.2');
+        this._entryTl.fromTo('#article-eyebrow', { yPercent: 110 }, { yPercent: 0, duration: 0.9, ease: 'power4.out' }, '-=0.7');
+        this._entryTl.fromTo('#article-title',   { yPercent: 110 }, { yPercent: 0, duration: 1.2, ease: 'power4.out' }, '-=0.8');
+        this._entryTl.call(() => {
             const mc = document.querySelector('.art-mask-container');
             if (mc) mc.style.willChange = 'auto';
         });
@@ -427,9 +433,15 @@ window.ArticlePage = {
                         trigger: '.art-video-scrub', start: 'top top', end: 'bottom top', scrub: 2,
                     },
                 });
+                // Recalculate after async video metadata arrives; layout may have settled
+                requestAnimationFrame(() => ScrollTrigger.refresh());
             };
-            if (video.readyState >= 1) setDuration();
-            else video.addEventListener('loadedmetadata', setDuration, { once: true });
+            if (video.readyState >= 1) {
+                setDuration();
+            } else {
+                video.addEventListener('loadedmetadata', setDuration, { once: true });
+                this._cleanups.push(() => video.removeEventListener('loadedmetadata', setDuration));
+            }
         }
 
         // ⑩ Horizontal gallery
@@ -455,6 +467,8 @@ window.ArticlePage = {
         const media  = document.querySelector('.art-hero-media');
         const cursor = document.getElementById('wheel-cursor');
         if (!imgEl || !media) return;
+        // No src means no image to magnify — skip entirely
+        if (!imgEl.src || imgEl.style.display === 'none') return;
         if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return;
 
         const ZOOM = 2.8, LSIZE = 180;
@@ -579,6 +593,7 @@ window.ArticlePage = {
     },
 
     destroy() {
+        if (this._entryTl) { this._entryTl.kill(); this._entryTl = null; }
         if (this._lenisRaf && typeof gsap !== 'undefined') {
             gsap.ticker.remove(this._lenisRaf);
             this._lenisRaf = null;
