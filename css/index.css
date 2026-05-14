@@ -6371,27 +6371,18 @@ body.article-page {
 }
 .art-editorial-grid {
     display: grid;
-    grid-template-columns: 1fr 2.5fr;
-    gap: 6vw;
+    grid-template-columns: 1fr;
+    gap: 0;
     align-items: start;
 }
 .art-editorial-left {
-    position: relative;
+    display: none;
 }
 .art-section-index {
-    font-family: var(--font-display);
-    font-size: clamp(6rem, 16vw, 22rem);
-    line-height: 1;
-    color: rgba(17,17,17,0.055);
-    display: block;
-    position: sticky;
-    top: 28vh;
-    user-select: none;
+    display: none;
 }
 .art-section-index--specs {
-    position: static;
-    font-size: clamp(5rem, 12vw, 16rem);
-    color: rgba(255,255,255,0.06);
+    display: none;
 }
 .art-editorial-right {
     padding-top: 0.5rem;
@@ -7218,12 +7209,12 @@ body.article-page {
     pointer-events: none;
 }
 .art-xray-tag {
+    display: none;
     font-family: var(--font-nav);
     font-size: 0.55rem;
     letter-spacing: 0.3em;
     text-transform: uppercase;
     color: rgba(255,255,255,0.35);
-    display: block;
     margin-bottom: 0.8rem;
 }
 .art-xray-title {
@@ -7261,13 +7252,7 @@ body.article-page {
     justify-content: center;
 }
 .art-h-section-label {
-    font-family: var(--font-nav);
-    font-size: 0.55rem;
-    letter-spacing: 0.3em;
-    text-transform: uppercase;
-    color: rgba(17,17,17,0.3);
-    padding: 0 6vw;
-    margin-bottom: 3.5vw;
+    display: none;
 }
 .art-horizontal-track {
     display: flex;
@@ -7375,14 +7360,11 @@ body.article-page {
     .art-kinetic-bar { display: none; }
 
     /* ── editorial ── */
-    .art-editorial-grid { grid-template-columns: 1fr; gap: 2rem; }
-    .art-editorial-left { display: none; }
     .art-editorial { padding: 12vw 5vw; }
 
     /* ── specs ── */
     .art-specs-data { padding: 10vw 5vw; }
     .art-specs-header { flex-direction: column; gap: 1rem; }
-    .art-section-index--specs { display: none; }
     .art-spec-row { padding: 3.5vw 0; flex-direction: column; gap: 0.4rem; align-items: flex-start; }
     .art-spec-val { text-align: left; font-size: clamp(1.4rem, 7vw, 3rem); }
 
@@ -7424,10 +7406,6 @@ body.article-page {
     .art-opt-colour-name { font-size: 0.36rem; }
     .art-opt-trim-grid { grid-template-columns: repeat(2, 1fr); }
     .art-opt-trim-name { font-size: 0.4rem; }
-
-    /* ── hide numbered section labels ── */
-    .art-xray-tag { display: none; }
-    .art-h-section-label { display: none; }
 
     /* ── gallery ── */
     .art-track-img { width: clamp(180px, 72vw, 300px); height: clamp(120px, 48vw, 200px); }

@@ -964,5 +964,10 @@ window.ArticlePage = {
     },
 };
 
-document.addEventListener('DOMContentLoaded', () => window.ArticlePage.init());
+// With defer, DOM + all prior scripts are ready — call init immediately
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', () => window.ArticlePage.init());
+} else {
+    window.ArticlePage.init();
+}
 }
