@@ -37,74 +37,6 @@ function _hexToHsl(hex) {
     return _rgbToHsl(r, g, b);
 }
 
-function applyHeroPaint(imgEl, unit) {
-    try {
-        const existing = JSON.parse(localStorage.getItem(`faceoff_config_${unit.id}`) || '{}');
-        if (!existing.paint) return; // No custom paint saved
-        
-        const opt = existing.paint;
-        const model = (window.MODELS || {})[unit.modelId];
-        const profile = model?.paintProfile || { bodyLightnessRange: [8, 90], usesAlphaMask: false, saturationBoost: 60 };
-        
-        const W = imgEl.naturalWidth || 400;
-        const H = imgEl.naturalHeight || 300;
-        const canvas = document.createElement('canvas');
-        canvas.className = imgEl.className;
-        canvas.style.cssText = imgEl.style.cssText;
-        canvas.width = W;
-        canvas.height = H;
-        
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        ctx.drawImage(imgEl, 0, 0, W, H);
-        const origData = ctx.getImageData(0, 0, W, H);
-        const copy = new ImageData(new Uint8ClampedArray(origData.data), W, H);
-        const d = copy.data;
-        const orig = origData.data;
-        
-        const [loL, hiL] = profile.bodyLightnessRange;
-        const useAlpha = profile.usesAlphaMask;
-        const satBoost = profile.saturationBoost;
-        
-        const [sh, ss, sl] = _hexToHsl(opt.hex);
-        
-        for (let i = 0; i < d.length; i += 4) {
-            const a = orig[i + 3];
-            if (a < 50) continue; 
-            
-            const r = orig[i], g = orig[i+1], b = orig[i+2];
-            const [h, s, l] = _rgbToHsl(r, g, b);
-            
-            if (l > 87 && s < 12) continue; 
-            if (l < loL || l > hiL) continue; 
-            if (!useAlpha && s < 3) continue; 
-            
-            let newH = h, newS = s, newL = l;
-            
-            if (sl > 85 && ss < 15) { // white
-                newS = s * 0.12;
-                newL = l + (95 - l) * 0.78;
-            } else if (sl < 15) { // black
-                newS = s * 0.25;
-                newL = l * 0.22;
-            } else { // hue
-                newH = sh;
-                if (s < 20) newS = Math.max(s, satBoost * 0.6);
-                if (useAlpha && s < 8) newS = satBoost;
-            }
-            
-            const [nr, ng, nb] = _hslToRgb(newH, newS, newL);
-            d[i] = nr; d[i+1] = ng; d[i+2] = nb;
-        }
-        
-        ctx.putImageData(copy, 0, 0);
-        // Replace image with canvas in DOM
-        if (imgEl.parentNode) {
-            imgEl.parentNode.replaceChild(canvas, imgEl);
-        }
-    } catch(e) {
-        console.error('Failed to apply paint to hero', e);
-    }
-}
 
 if (!window.DrumWheel) {
 // Direct port of jquery.drum.js + jquery.watch-drag.js to vanilla JS.
@@ -337,6 +269,11 @@ window.DrumWheel = DrumWheel;
 if (!window.ShowroomPage) {
 var ShowroomPage = {
     _currentUnit: null,
+    _srPaintCanvas: null,
+    _srPaintCtx: null,
+    _srPaintOrigData: null,
+    _srPaintProfile: null,
+    _srActivePaintHex: null,
 
     init() {
         const params = new URLSearchParams(window.location.search);
@@ -403,11 +340,8 @@ var ShowroomPage = {
                 (isConfiguredEarly ? `<div id="config-badge" class="sr-config-badge"><div class="sr-config-header"><span class="sr-config-dot"></span><span class="sr-config-label">Configured</span></div><span class="sr-config-summary">${configSummaryEarly}</span><a href="customize.html?unit=${unit.id}" class="sr-config-edit">Edit</a></div>` : '<div id="config-badge" class="sr-config-badge" style="display:none"></div>');
             if (unit.facesRight === false) display.classList.add('flipped');
 
-            const heroImg = display.querySelector('img');
-            if (heroImg) {
-                if (heroImg.complete && heroImg.naturalWidth > 0) applyHeroPaint(heroImg, unit);
-                else heroImg.addEventListener('load', () => applyHeroPaint(heroImg, unit), { once: true });
-            }
+            // defer until after display is in DOM
+            requestAnimationFrame(() => this._initHeroPaintCanvas(unit));
 
             // Ghost backdrop injected into .showroom-center (bleeds behind car)
             document.querySelector('.sr-ghost-backdrop')?.remove();
@@ -571,7 +505,17 @@ var ShowroomPage = {
             const thumbs = [...galleryEl.querySelectorAll('.gallery-thumb')];
             thumbs.forEach((b, i) => b.classList.toggle('active', i === idx));
             const display = document.getElementById('car-display');
-            if (display && thumbs[idx]) display.querySelector('img').src = thumbs[idx].dataset.src;
+            const src = thumbs[idx]?.dataset.src;
+            if (display && src) {
+                const heroImg = display.querySelector('img');
+                if (heroImg) {
+                    heroImg.src = src;
+                    // Rebuild canvas if paint was active
+                    if (this._srActivePaintHex !== null) {
+                        heroImg.addEventListener('load', () => this._initHeroPaintCanvas(this._currentUnit), { once: true });
+                    }
+                }
+            }
             // Update dots
             const dots = document.querySelectorAll('.sr-gallery-dot');
             dots.forEach((d, i) => d.classList.toggle('active', i === idx));
@@ -1030,6 +974,196 @@ var ShowroomPage = {
                 }">Show more</button>` : ''}`;
     },
 
+    // ─── Hero paint canvas ────────────────────────────────────────────────────
+    _initHeroPaintCanvas(unit) {
+        document.getElementById('sr-hero-canvas')?.remove();
+        this._srPaintCanvas   = null;
+        this._srPaintCtx      = null;
+        this._srPaintOrigData = null;
+
+        const display = document.getElementById('car-display');
+        if (!display) return;
+        const img = display.querySelector('img');
+        if (!img) return;
+
+        // Ensure img is visible (may have been hidden by a previous paint activation)
+        img.style.display = '';
+        this._srHeroImgEl = img;
+
+        const model = (window.MODELS || {})[unit.modelId];
+        this._srPaintProfile = model?.paintProfile || { bodyLightnessRange: [8, 90], usesAlphaMask: false, saturationBoost: 60 };
+
+        const doSetup = () => {
+            const W = img.naturalWidth  || 600;
+            const H = img.naturalHeight || 400;
+            const canvas = document.createElement('canvas');
+            canvas.id = 'sr-hero-canvas';
+            canvas.width  = W;
+            canvas.height = H;
+            // Same inline style as img so layout is identical; start hidden
+            canvas.style.cssText  = img.style.cssText;
+            canvas.style.display  = 'none';
+            canvas.style.pointerEvents = 'none';
+            img.insertAdjacentElement('afterend', canvas);
+
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            ctx.drawImage(img, 0, 0, W, H);
+            this._srPaintOrigData = ctx.getImageData(0, 0, W, H);
+            this._srPaintCanvas   = canvas;
+            this._srPaintCtx      = ctx;
+
+            // Re-apply active paint (gallery swap keeps current colour)
+            const hex = this._srActivePaintHex;
+            if (hex) {
+                this._activatePaint(hex);
+            } else {
+                // Restore saved paint on first load
+                try {
+                    const saved = JSON.parse(localStorage.getItem(`faceoff_config_${unit.id}`) || '{}');
+                    if (saved.paint?.hex) {
+                        this._srActivePaintHex = saved.paint.hex;
+                        this._activatePaint(saved.paint.hex);
+                    }
+                } catch(e) {}
+            }
+
+            this._renderPaintSwatches(unit);
+        };
+
+        if (img.complete && img.naturalWidth > 0) doSetup();
+        else img.addEventListener('load', doSetup, { once: true });
+    },
+
+    _activatePaint(hex) {
+        if (!this._srPaintCanvas || !this._srPaintOrigData) return;
+        if (!hex) {
+            // Show img, hide canvas
+            if (this._srHeroImgEl) this._srHeroImgEl.style.display = '';
+            this._srPaintCtx.putImageData(this._srPaintOrigData, 0, 0);
+            this._srPaintCanvas.style.display = 'none';
+            return;
+        }
+        const { width: W, height: H, data: orig } = this._srPaintOrigData;
+        const copy = new ImageData(new Uint8ClampedArray(orig), W, H);
+        const d    = copy.data;
+        const [loL, hiL] = this._srPaintProfile?.bodyLightnessRange || [8, 90];
+        const useAlpha   = this._srPaintProfile?.usesAlphaMask || false;
+        const satBoost   = this._srPaintProfile?.saturationBoost || 60;
+        const [sh, ss, sl] = _hexToHsl(hex);
+        for (let i = 0; i < d.length; i += 4) {
+            const a = orig[i + 3];
+            if (a < 50) continue;
+            const r = orig[i], g = orig[i+1], b = orig[i+2];
+            const [h, s, l] = _rgbToHsl(r, g, b);
+            if (l > 87 && s < 12) continue;
+            if (l < loL || l > hiL) continue;
+            if (!useAlpha && s < 3) continue;
+            let newH = h, newS = s, newL = l;
+            if (sl > 85 && ss < 15) {
+                newS = s * 0.12;
+                newL = l + (95 - l) * 0.78;
+            } else if (sl < 15) {
+                newS = s * 0.25;
+                newL = l * 0.22;
+            } else {
+                newH = sh;
+                if (s < 20) newS = Math.max(s, satBoost * 0.6);
+                if (useAlpha && s < 8) newS = satBoost;
+            }
+            const [nr, ng, nb] = _hslToRgb(newH, newS, newL);
+            d[i] = nr; d[i+1] = ng; d[i+2] = nb;
+        }
+        this._srPaintCtx.putImageData(copy, 0, 0);
+        // Show canvas, hide img so only one is visible at a time
+        this._srPaintCanvas.style.display = '';
+        if (this._srHeroImgEl) this._srHeroImgEl.style.display = 'none';
+    },
+
+    _renderPaintSwatches(unit) {
+        document.getElementById('sr-paint-row')?.remove();
+
+        const key = (unit.modelId || '') + ':' + (unit.year || '');
+        const customData = (window.CUSTOMIZATION || {})[key];
+        const paints = customData?.paints;
+        const rawNames = paints ? [...(paints.standard || []), ...(paints.special || [])] : [];
+
+        const lookup = typeof _paintNameToHex === 'function' ? _paintNameToHex : () => null;
+        const paintOptions = rawNames
+            .map(name => {
+                const hex = lookup(name);
+                if (!hex) return null;
+                return { id: name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''), label: name, hex };
+            })
+            .filter(Boolean);
+
+        if (paintOptions.length === 0) return;
+
+        let savedId = null;
+        try {
+            const saved = JSON.parse(localStorage.getItem(`faceoff_config_${unit.id}`) || '{}');
+            if (saved.paint) savedId = saved.paint.id;
+        } catch(e) {}
+
+        const savePaint = opt => {
+            try {
+                const k = `faceoff_config_${unit.id}`;
+                const cfg = JSON.parse(localStorage.getItem(k) || '{}');
+                if (opt === null) delete cfg.paint; else cfg.paint = opt;
+                localStorage.setItem(k, JSON.stringify(cfg));
+            } catch(e) {}
+        };
+
+        const wrap = document.createElement('div');
+        wrap.id = 'sr-paint-row';
+        wrap.className = 'sr-paint-row';
+
+        const lbl = document.createElement('span');
+        lbl.className = 'sr-paint-label';
+        lbl.textContent = 'Colour';
+        wrap.appendChild(lbl);
+
+        const row = document.createElement('div');
+        row.className = 'paint-swatches sr-paint-swatches';
+
+        const resetBtn = document.createElement('button');
+        resetBtn.className = 'paint-swatch paint-swatch--reset' + (!savedId ? ' active' : '');
+        resetBtn.title = 'Stock';
+        resetBtn.setAttribute('aria-label', 'Stock colour');
+        resetBtn.textContent = '↺';
+        resetBtn.addEventListener('click', () => {
+            row.querySelectorAll('.paint-swatch').forEach(b => b.classList.remove('active'));
+            resetBtn.classList.add('active');
+            this._srActivePaintHex = null;
+            this._activatePaint(null);
+            savePaint(null);
+        });
+        row.appendChild(resetBtn);
+
+        paintOptions.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.className = 'paint-swatch' + (savedId === opt.id ? ' active' : '');
+            btn.title = opt.label;
+            btn.setAttribute('aria-label', opt.label);
+            btn.style.background = opt.hex;
+            btn.addEventListener('click', () => {
+                row.querySelectorAll('.paint-swatch').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                this._srActivePaintHex = opt.hex;
+                this._activatePaint(opt.hex);
+                savePaint(opt);
+            });
+            row.appendChild(btn);
+        });
+
+        wrap.appendChild(row);
+
+        // Insert: after gallery if visible, else after car-display
+        const gallery = document.getElementById('car-gallery');
+        const display = document.getElementById('car-display');
+        const anchor = (gallery && gallery.style.display !== 'none') ? gallery : display;
+        anchor?.insertAdjacentElement('afterend', wrap);
+    },
+
     // ─── Save button ──────────────────────────────────────────────────────────
     _renderSaveBtn(unitId) {
         const cta = document.querySelector('.showroom-cta');
@@ -1389,12 +1523,20 @@ var ShowroomPage = {
         clearTimeout(this._drumNavTimer);
         document.body.classList.remove('sr-sheet-half', 'sr-sheet-full');
         document.querySelectorAll('.sr-back, .sr-save, .sr-sheet, .sr-gallery-dots, .spec-panel--mobile, .sr-ghost-backdrop').forEach(el => el.remove());
+        document.getElementById('sr-paint-row')?.remove();
+        document.getElementById('sr-hero-canvas')?.remove();
+        if (this._srHeroImgEl) this._srHeroImgEl.style.display = '';
+        this._srPaintCanvas    = null;
+        this._srPaintCtx       = null;
+        this._srPaintOrigData  = null;
+        this._srHeroImgEl      = null;
+        this._srActivePaintHex = null;
         ['car-gallery', 'variant-selector', 'unit-selector', 'lacvis-block', 'seller-notes'].forEach(id => {
             const el = document.getElementById(id);
             if (el) { el.innerHTML = ''; el.style.display = 'none'; }
         });
         const display = document.getElementById('car-display');
-        if (display) display.className = 'showroom-car';
+        if (display) { display.className = 'showroom-car'; display.style.position = ''; }
     },
 
     destroy() {

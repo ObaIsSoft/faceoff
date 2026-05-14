@@ -81,6 +81,15 @@
                 <div class="art-specs-rows" id="art-specs-rows"></div>
             </section>
 
+            <!-- ③.6 VARIANTS & EDITIONS ─────────────────────────────────── -->
+            <section class="art-variants" id="art-variants" style="display:none">
+                <div class="art-variants-header">
+                    <span class="art-variants-label">Editions</span>
+                    <span class="art-section-index art-section-index--variants">02</span>
+                </div>
+                <div class="art-variants-grid" id="art-variants-grid"></div>
+            </section>
+
             <!-- ④ ENGINEERING PULL-QUOTE ─────────────────────────────────── -->
             <section class="art-pullquote" id="art-pullquote" style="display:none">
                 <div class="art-pullquote-inner">
@@ -94,12 +103,30 @@
             <!-- ④.5 EDITORIAL SPREAD ─────────────────────────────────────── -->
             <section class="art-spread" id="art-spread">
                 <div class="art-spread-primary">
-                    <img id="art-spread-img-0" class="art-spread-img" src="" alt="">
+                    <figure class="art-spread-figure">
+                        <img id="art-spread-img-0" class="art-spread-img" src="" alt="">
+                        <figcaption class="art-spread-caption" id="art-spread-cap-0"></figcaption>
+                    </figure>
                 </div>
                 <div class="art-spread-duo">
-                    <img id="art-spread-img-1" class="art-spread-img" src="" alt="">
-                    <img id="art-spread-img-2" class="art-spread-img" src="" alt="">
+                    <figure class="art-spread-figure">
+                        <img id="art-spread-img-1" class="art-spread-img" src="" alt="">
+                        <figcaption class="art-spread-caption" id="art-spread-cap-1"></figcaption>
+                    </figure>
+                    <figure class="art-spread-figure">
+                        <img id="art-spread-img-2" class="art-spread-img" src="" alt="">
+                        <figcaption class="art-spread-caption" id="art-spread-cap-2"></figcaption>
+                    </figure>
                 </div>
+            </section>
+
+            <!-- ④.6 COLOUR PALETTE ───────────────────────────────────────── -->
+            <section class="art-palette" id="art-palette" style="display:none">
+                <div class="art-palette-header">
+                    <span class="art-palette-label">Colour Palette</span>
+                </div>
+                <div class="art-palette-swatches" id="art-palette-swatches"></div>
+                <div class="art-palette-finishes" id="art-palette-finishes"></div>
             </section>
 
             <!-- ⑤ VIDEO SCRUB — TIME MACHINE ─────────────────────────────── -->
@@ -135,6 +162,15 @@
                 </div>
             </section>
 
+            <!-- ⑥.5 INTERIOR & OPTIONS ──────────────────────────────────── -->
+            <section class="art-options" id="art-options" style="display:none">
+                <div class="art-options-header">
+                    <span class="art-options-label">Interior & Options</span>
+                    <span class="art-section-index art-section-index--options">03</span>
+                </div>
+                <div class="art-options-body" id="art-options-body"></div>
+            </section>
+
             <!-- ⑦ HORIZONTAL TIMELINE ───────────────────────────────────── -->
             <section class="art-horizontal-section" id="horizontal-trigger">
                 <div class="art-horizontal-sticky">
@@ -147,9 +183,6 @@
 
             <!-- ⑧ OUTRO ─────────────────────────────────────────────────── -->
             <section class="art-outro">
-                <div class="art-outro-marquee" id="art-outro-marquee">
-                    <div class="art-outro-marquee-inner" id="art-outro-marquee-inner"></div>
-                </div>
                 <div class="art-outro-inner">
                     <div class="ln_"><span class="art-outro-label ln">End of line</span></div>
                     <a id="art-outro-back" href="showroom.html" class="art-outro-cta">
@@ -169,6 +202,8 @@
     <!-- Shell -->
     <script src="js/inventory.js"></script>
     <script src="js/cars-data.js"></script>
+    <script src="js/customization-data.js"></script>
+    <script src="js/paint-colors.js"></script>
     <script src="js/drawer.js"></script>
     <script src="js/player.js"></script>
     <script src="js/pages/article.js"></script>

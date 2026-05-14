@@ -247,6 +247,17 @@ window.ArticlePage = {
             if (el) el.src = spreadPicks[i];
         });
 
+        // ── Spread captions ───────────────────────────────────────────────
+        const spreadCaps = [
+            [unit.year, unit.brand, unit.trim].filter(Boolean).join(' · '),
+            d.leather ? `Interior · ${d.leather}` : (d.seating ? `Seating · ${d.seating}` : `${unit.brand} · Cabin`),
+            d.engineFull ? `Powertrain · ${d.engineFull}` : (unit.power ? `Output · ${unit.power}` : `${unit.brand} · Detail`),
+        ];
+        spreadCaps.forEach((cap, i) => {
+            const el = document.getElementById(`art-spread-cap-${i}`);
+            if (el) el.textContent = cap;
+        });
+
         // ── X-ray background ──────────────────────────────────────────────
         const xrayBgImg = document.getElementById('art-xray-bg-img');
         if (xrayBgImg) xrayBgImg.src = pickEditorial(unitId, 1, 'xray')[0];
@@ -256,10 +267,11 @@ window.ArticlePage = {
         if (track) {
             let imgs = (unit.imgs || []).slice(0, 6);
             if (imgs.length < 6) imgs = imgs.concat(pickEditorial(unitId, 6 - imgs.length, 'gallery'));
+            const trackLabels = ['Exterior', 'Profile', 'Detail', 'Interior', 'Rear', 'Motion'];
             if (imgs.length >= 2) {
                 track.innerHTML = imgs.map((src, i) => `
                     <div class="art-track-item">
-                        <span class="art-track-year">${String(i + 1).padStart(2, '0')}</span>
+                        <span class="art-track-year">${trackLabels[i] || String(i + 1).padStart(2, '0')}</span>
                         <img src="${src}" class="art-track-img" alt="">
                     </div>`).join('');
             } else {
@@ -268,21 +280,13 @@ window.ArticlePage = {
             }
         }
 
-        // ── Outro marquee ─────────────────────────────────────────────────
-        const marqueeInner = document.getElementById('art-outro-marquee-inner');
-        if (marqueeInner) {
-            const label = [unit.name, d.engineFull, unit.power, unit.topSpeed]
-                .filter(Boolean).join(' · ') + ' · ';
-            const repeated = label.repeat(8);
-            marqueeInner.innerHTML = `<span>${repeated}</span><span>${repeated}</span>`;
-        }
-
         // ── Back links ────────────────────────────────────────────────────
         ['article-back', 'art-outro-back'].forEach(id => {
             const el = document.getElementById(id);
             if (el) el.href = `showroom.html?unit=${unitId}`;
         });
 
+        this._initCustomizationSections(unit);
         this._initScroll();
         this._initProgress();
         this._initAnimations();
@@ -595,6 +599,117 @@ window.ArticlePage = {
                 this.lenis && this.lenis.off('scroll', onScroll);
                 if (rafId) cancelAnimationFrame(rafId);
             });
+        }
+    },
+
+    _initCustomizationSections(unit) {
+        const modelId = unit.modelId;
+        const key = modelId + ':' + unit.year;
+        const customData = (window.CUSTOMIZATION || {})[key];
+
+        // ── Variants & Editions ───────────────────────────────────────────
+        const allVariants = typeof getVariantsForModel === 'function'
+            ? getVariantsForModel(modelId) : [];
+        const variantsSection = document.getElementById('art-variants');
+        const variantsGrid    = document.getElementById('art-variants-grid');
+        if (allVariants.length > 1 && variantsSection && variantsGrid) {
+            const specialLabel = customData?.specialLabel || '';
+            variantsGrid.innerHTML = allVariants.map(v => {
+                const isCurrent = v.year === unit.year && v.trim === unit.trim;
+                return `<div class="art-variant-card${isCurrent ? ' art-variant-card--active' : ''}">
+                    <div class="art-variant-top">
+                        <span class="art-variant-year">${v.year}</span>
+                        ${v.energy ? `<span class="art-variant-energy">${v.energy}</span>` : ''}
+                    </div>
+                    <span class="art-variant-trim">${v.trim || ''}</span>
+                    <div class="art-variant-stats">
+                        ${v.power ? `<span class="art-variant-stat">${v.power}</span>` : ''}
+                        ${v.details?.engineFull ? `<span class="art-variant-stat">${v.details.engineFull}</span>` : ''}
+                    </div>
+                </div>`;
+            }).join('');
+            variantsSection.style.display = '';
+        }
+
+        if (!customData) return;
+
+        // ── Colour Palette ────────────────────────────────────────────────
+        const paints = customData.paints || {};
+        const allPaints = [...(paints.standard || []), ...(paints.special || [])];
+        const paintHexFn = typeof window._paintNameToHex === 'function'
+            ? window._paintNameToHex : () => null;
+        const validSwatches = allPaints
+            .map(name => ({ name, hex: paintHexFn(name) }))
+            .filter(p => p.hex);
+
+        const paletteSection = document.getElementById('art-palette');
+        const swatchesEl     = document.getElementById('art-palette-swatches');
+        const finishesEl     = document.getElementById('art-palette-finishes');
+        if (validSwatches.length > 0 && paletteSection && swatchesEl) {
+            swatchesEl.innerHTML = validSwatches.map(p => `
+                <div class="art-palette-swatch">
+                    <span class="art-palette-dot" style="background:${p.hex}"></span>
+                    <span class="art-palette-name">${p.name}</span>
+                </div>`).join('');
+            if (finishesEl && paints.finishes?.length) {
+                finishesEl.innerHTML = paints.finishes.map(f =>
+                    `<span class="art-palette-finish">${f}</span>`).join('');
+            }
+            paletteSection.style.display = '';
+        }
+
+        // ── Interior & Options ────────────────────────────────────────────
+        const optionsSection = document.getElementById('art-options');
+        const optionsBody    = document.getElementById('art-options-body');
+        let optHtml = '';
+
+        if (customData.interior?.packages?.length) {
+            optHtml += `<div class="art-options-block">
+                <span class="art-options-sublabel">Packages</span>
+                <div class="art-packages-grid">${
+                    customData.interior.packages.map(pkg => `
+                        <div class="art-pkg-card">
+                            <span class="art-pkg-name">${pkg.name}</span>
+                            ${pkg.desc ? `<p class="art-pkg-desc">${pkg.desc}</p>` : ''}
+                        </div>`).join('')
+                }</div>
+            </div>`;
+        }
+
+        const intColors = [
+            ...(customData.interior?.colors?.standard || []),
+            ...(customData.interior?.colors?.special  || []),
+        ];
+        if (intColors.length) {
+            optHtml += `<div class="art-options-block">
+                <span class="art-options-sublabel">Interior Colours</span>
+                <div class="art-int-colors">${
+                    intColors.map(c => `<span class="art-int-color">${c}</span>`).join('')
+                }</div>
+            </div>`;
+        }
+
+        if (customData.rims?.length) {
+            optHtml += `<div class="art-options-block">
+                <span class="art-options-sublabel">Wheel Options</span>
+                <div class="art-rims-list">${
+                    customData.rims.map(r => `<span class="art-rim-item">${r}</span>`).join('')
+                }</div>
+            </div>`;
+        }
+
+        if (customData.interior?.trim?.length) {
+            optHtml += `<div class="art-options-block">
+                <span class="art-options-sublabel">Trim Finishes</span>
+                <div class="art-rims-list">${
+                    customData.interior.trim.map(t => `<span class="art-rim-item">${t}</span>`).join('')
+                }</div>
+            </div>`;
+        }
+
+        if (optHtml && optionsSection && optionsBody) {
+            optionsBody.innerHTML = optHtml;
+            optionsSection.style.display = '';
         }
     },
 

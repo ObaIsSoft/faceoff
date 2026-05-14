@@ -1,4 +1,3 @@
-
 // ─── Paint Colour Preview — HSL utilities ─────────────────────────────────────
 function _rgbToHsl(r, g, b) {
     r /= 255; g /= 255; b /= 255;
@@ -40,6 +39,15 @@ function _hexToHsl(hex) {
 }
 
 const DEFAULT_PAINT_PROFILE = { bodyLightnessRange: [8, 90], usesAlphaMask: false, saturationBoost: 60 };
+
+// PAINT_HEX_MAP and _paintNameToHex are defined in js/paint-colors.js
+const PAINT_HEX_MAP = window.PAINT_HEX_MAP || {};
+
+// ─── Keep a local alias so the rest of this file can call it without `window.` ─
+// paint-colors.js sets window._paintNameToHex before this file runs.
+if (typeof _paintNameToHex === 'undefined') {
+    var _paintNameToHex = window._paintNameToHex || function() { return null; };
+}
 
 if (!window.ComparePage) {
 var ComparePage = {
@@ -478,13 +486,22 @@ class CarStack {
 
     _addSwatches(fgItem, fgCar) {
         fgItem.querySelector('.paint-swatches')?.remove();
-        
-        const spec = ComparePage.resolveSpec(fgCar.modelId);
-        let paintOptions = [];
-        
-        if (spec && spec.exterior && spec.exterior.paint && spec.exterior.paint.options) {
-            paintOptions = spec.exterior.paint.options;
-        }
+
+        const key = (fgCar.modelId || '') + ':' + (fgCar.year || '');
+        const customData = (window.CUSTOMIZATION || {})[key];
+        const paints = customData?.paints;
+
+        const rawNames = paints
+            ? [...(paints.standard || []), ...(paints.special || [])]
+            : [];
+
+        const paintOptions = rawNames
+            .map(name => {
+                const hex = _paintNameToHex(name);
+                if (!hex) return null;
+                return { id: name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, ''), label: name, hex };
+            })
+            .filter(Boolean);
 
         if (paintOptions.length === 0) return;
 
