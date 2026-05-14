@@ -359,16 +359,22 @@ window.ArticlePage = {
         // ② Kinetic
         document.querySelectorAll('.art-kinetic-item').forEach((el, i) => {
             ScrollTrigger.create({
-                trigger: el, start: 'top 82%',
-                onEnter: () => setTimeout(() => el.classList.add('is-fired'), i * 120),
+                trigger: el, start: 'top 82%', end: 'bottom top',
+                onEnter:     () => setTimeout(() => el.classList.add('is-fired'),    i * 120),
+                onLeave:     () => el.classList.remove('is-fired'),
+                onEnterBack: () => setTimeout(() => el.classList.add('is-fired'),    i * 120),
+                onLeaveBack: () => el.classList.remove('is-fired'),
             });
         });
 
         // ③ Spec rows
         document.querySelectorAll('.art-spec-row').forEach((el, i) => {
             ScrollTrigger.create({
-                trigger: el, start: 'top 88%',
-                onEnter: () => setTimeout(() => el.classList.add('is-revealed'), i * 80),
+                trigger: el, start: 'top 88%', end: 'bottom top',
+                onEnter:     () => setTimeout(() => el.classList.add('is-revealed'), i * 80),
+                onLeave:     () => el.classList.remove('is-revealed'),
+                onEnterBack: () => setTimeout(() => el.classList.add('is-revealed'), i * 80),
+                onLeaveBack: () => el.classList.remove('is-revealed'),
             });
         });
 
@@ -593,6 +599,10 @@ window.ArticlePage = {
     },
 
     destroy() {
+        // Restore cursor if it was hidden by the lens interaction
+        const wc = document.getElementById('wheel-cursor');
+        if (wc) wc.style.opacity = '1';
+
         if (this._entryTl) { this._entryTl.kill(); this._entryTl = null; }
         if (this._lenisRaf && typeof gsap !== 'undefined') {
             gsap.ticker.remove(this._lenisRaf);

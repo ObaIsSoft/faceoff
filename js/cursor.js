@@ -4,9 +4,9 @@ window.WheelCursor = (() => {
     if (!window.matchMedia('(hover: hover) and (pointer: fine)').matches) return {};
 
     const DPR  = Math.min(window.devicePixelRatio || 1, 2);
-    const SIZE = 44;
+    const SIZE = 28;
     const HALF = SIZE / 2;
-    const RIM  = 22;
+    const RIM  = SIZE / 2;
 
     // ── Wheel canvas ──────────────────────────────────────────────────────
     function makeWheelCanvas() {
@@ -21,7 +21,6 @@ window.WheelCursor = (() => {
         c.style.display       = 'block';
         c.style.pointerEvents = 'none';
         c.style.zIndex        = '99999';
-        c.style.mixBlendMode  = 'difference';
         c.style.willChange    = 'transform';
         c.style.opacity       = '1';
         c.style.transform     = `translate3d(${-SIZE * 3}px,${-SIZE * 3}px,0)`;
@@ -34,39 +33,47 @@ window.WheelCursor = (() => {
         ctx.clearRect(0, 0, c.width, c.height);
         ctx.save();
         ctx.scale(DPR, DPR);
-        ctx.strokeStyle = '#fff';
-        ctx.fillStyle   = '#fff';
-        ctx.lineCap     = 'round';
+        ctx.lineCap = 'round';
 
+        // White halo — makes cursor pop on dark backgrounds
+        ctx.shadowColor = 'rgba(255,255,255,0.9)';
+        ctx.shadowBlur  = 4;
+        ctx.strokeStyle = '#111';
+        ctx.fillStyle   = '#111';
+
+        // outer rim
         ctx.beginPath();
-        ctx.arc(HALF, HALF, 20, 0, Math.PI * 2);
-        ctx.lineWidth = 1.8;
+        ctx.arc(HALF, HALF, 12, 0, Math.PI * 2);
+        ctx.lineWidth = 1.4;
         ctx.stroke();
 
+        // inner dashed ring
         ctx.save();
-        ctx.globalAlpha = 0.55;
-        ctx.lineWidth   = 0.7;
-        ctx.setLineDash([3.5, 4.5]);
+        ctx.globalAlpha = 0.5;
+        ctx.lineWidth   = 0.6;
+        ctx.setLineDash([2.5, 3]);
         ctx.beginPath();
-        ctx.arc(HALF, HALF, 13, 0, Math.PI * 2);
+        ctx.arc(HALF, HALF, 8, 0, Math.PI * 2);
         ctx.stroke();
         ctx.restore();
 
+        // spokes
         ctx.save();
         ctx.translate(HALF, HALF);
         ctx.rotate(rot * Math.PI / 180);
-        ctx.lineWidth = 2.2;
+        ctx.lineWidth = 1.6;
         for (let i = 0; i < 5; i++) {
             ctx.save();
             ctx.rotate(i * 72 * Math.PI / 180);
             ctx.beginPath();
-            ctx.moveTo(0, -5);
-            ctx.lineTo(0, -19);
+            ctx.moveTo(0, -3);
+            ctx.lineTo(0, -11);
             ctx.stroke();
             ctx.restore();
         }
+        // hub
         ctx.beginPath();
-        ctx.arc(0, 0, 4.5, 0, Math.PI * 2);
+        ctx.arc(0, 0, 2.8, 0, Math.PI * 2);
         ctx.fill();
         ctx.restore();
         ctx.restore();
