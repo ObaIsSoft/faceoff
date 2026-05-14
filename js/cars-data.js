@@ -119,7 +119,7 @@ var MODELS = {
     "mercedes-c63": {
         name: "Mercedes-AMG C63", brand: "Mercedes-Benz",
         logo: "assets/brands/mercedes.svg", type: "SALOON", category: "SPORT",
-        heroImg: "assets/editorial/roman-uRbbJM3WL0g-unsplash.jpg", specProfile: "LUXURY"
+        heroImg: "assets/editorial/webp/roman-uRbbJM3WL0g-unsplash.webp", specProfile: "LUXURY"
     }
 };
 window.MODELS = MODELS;
@@ -1094,7 +1094,7 @@ var VARIANTS = {
         modelId: "mercedes-c63", year: "2011", trim: "C63 AMG",
         energy: "PETROL", facesRight: true,
         power: "451bhp", topSpeed: "155mph", torque: "442lb ft",
-        img: "assets/editorial/roman-uRbbJM3WL0g-unsplash.jpg",
+        img: "assets/editorial/webp/roman-uRbbJM3WL0g-unsplash.webp",
         details: {
             manufacturer: "Mercedes-AMG", production: "Affalterbach, Germany", limited: "W204",
             zeroToSixty: "4.4s", zeroToHundred: "4.4s", engineFull: "6.2L M156 V8",

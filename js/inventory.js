@@ -514,10 +514,10 @@ var INVENTORY = [
         mileage: 62400, price: "₦28,500,000",
         color: "Palladium Silver Metallic",
         imgs: [
-            "assets/editorial/roman-uRbbJM3WL0g-unsplash.jpg",
-            "assets/editorial/wolf-schram-19t6J2RVqQE-unsplash.jpg",
-            "assets/editorial/vitaly-mazur-pvDQwb8Mnm8-unsplash.jpg",
-            "assets/editorial/wes-hicks-mDASgFtuMRQ-unsplash.jpg"
+            "assets/editorial/webp/roman-uRbbJM3WL0g-unsplash.webp",
+            "assets/editorial/webp/wolf-schram-19t6J2RVqQE-unsplash.webp",
+            "assets/editorial/webp/vitaly-mazur-pvDQwb8Mnm8-unsplash.webp",
+            "assets/editorial/webp/wes-hicks-mDASgFtuMRQ-unsplash.webp"
         ],
         notes: "Two owners. Performance Pack Plus — 480bhp, floating discs, Quaife LSD retrofitted. Full AMG service history. Both keys.",
         certificate: {
