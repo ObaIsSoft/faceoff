@@ -131,7 +131,8 @@ function pickEditorial(unitId, count, offset) {
 window.ArticlePage = {
     lenis: null,
     _scrollVel: 0,
-    _cleanups: [], // all event-listener teardowns collected here
+    _motionInited: false,
+    _cleanups: [],
 
     init() {
         const titleEl = document.getElementById('article-title');
@@ -295,16 +296,23 @@ window.ArticlePage = {
         });
 
         this._initCustomizationSections(unit);
+        this._initLens();
+        this._initXray();
+
+        // If GSAP + Lenis already in scope (e.g. cached second visit), go immediately.
+        // Otherwise _initMotion() is called by the inline defer script after CDN libs land.
+        if (typeof gsap !== 'undefined' && typeof Lenis !== 'undefined') {
+            this._initMotion();
+        }
+    },
+
+    _initMotion() {
+        if (this._motionInited) return;
+        this._motionInited = true;
         this._initScroll();
         this._initProgress();
         this._initAnimations();
-        this._initLens();
-        this._initXray();
         this._initFluid();
-
-        // After one paint, recalculate all ScrollTrigger positions.
-        // Essential after SPA navigation: body goes from position:fixed → position:relative
-        // and the total scroll height isn't settled until after the first render cycle.
         requestAnimationFrame(() => {
             if (typeof ScrollTrigger !== 'undefined') ScrollTrigger.refresh();
         });
@@ -961,6 +969,7 @@ window.ArticlePage = {
         this._cleanups.forEach(fn => fn());
         this._cleanups = [];
         this._scrollVel = 0;
+        this._motionInited = false;
     },
 };
 
